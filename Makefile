@@ -1,3 +1,3 @@
 salsa:
-	go build -o bin/salsa cmd/salsa/*.go
+	go build -o bin/salsa cmd/main.go
 
