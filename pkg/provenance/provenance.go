@@ -72,19 +72,25 @@ func createRecipe() Recipe {
 	}
 }
 
-func createMaterial() {
-
+func createMaterials(deps map[string]string) []Material {
+	materials := make([]Material, 0)
+	for k, v := range deps {
+		m := Material{
+			URI:    k + ":" + v,
+			Digest: nil,
+		}
+		materials = append(materials, m)
+	}
+	return materials
 }
 
-func create() Provenance {
-	material := Material{
-		URI:    "",
-		Digest: nil,
-	}
+func Create(deps map[string]string) Provenance {
+	m := createMaterials(deps)
+
 	return Provenance{
 		Type:          "type",
 		Subject:       nil,
 		PredicateType: "pre",
-		Predicate:     createPredicate(),
+		Predicate:     createPredicate(m),
 	}
 }

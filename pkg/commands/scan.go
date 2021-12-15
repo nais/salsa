@@ -2,7 +2,9 @@ package commands
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"github.com/nais/salsa/pkg/provenance"
 	"github.com/nais/salsa/pkg/scan"
 	"log"
 	"os"
@@ -35,10 +37,14 @@ func GradleScan(workDir string) {
 	}
 
 	log.Print(gradleDeps)
-}
+	p := provenance.Create(gradleDeps)
 
-func Provenance() {
-
+	m, err := json.Marshal(p)
+	if err != nil {
+		fmt.Printf("failed: %v\n", err)
+		os.Exit(1)
+	}
+	log.Print(string(m))
 }
 
 type CommandOutput struct {
