@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/nais/salsa/pkg/provenance"
+	"github.com/nais/salsa/pkg/intoto"
 	"github.com/nais/salsa/pkg/scan"
 	"log"
 	"os"
@@ -37,7 +37,7 @@ func GradleScan(workDir string) {
 	}
 
 	log.Print(gradleDeps)
-	p := provenance.Create(gradleDeps)
+	p := intoto.GenerateProvenance(gradleDeps)
 
 	m, err := json.Marshal(p)
 	if err != nil {

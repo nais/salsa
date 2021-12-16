@@ -1,4 +1,4 @@
-package provenance
+package intoto
 
 type Predicate struct {
 	Builder   `json:"builder"`
@@ -84,7 +84,7 @@ func createMaterials(deps map[string]string) []Material {
 	return materials
 }
 
-func Create(deps map[string]string) Provenance {
+func GenerateProvenance(deps map[string]string) Provenance {
 	m := createMaterials(deps)
 
 	return Provenance{
