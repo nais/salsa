@@ -37,7 +37,8 @@ func GradleScan(workDir string) {
 	}
 
 	log.Print(gradleDeps)
-	p := intoto.GenerateProvenance(gradleDeps)
+	// Should send in Runner/Github info her
+	p := intoto.GenerateStatement(gradleDeps, "builderId")
 
 	m, err := json.Marshal(p)
 	if err != nil {

@@ -1,40 +1,13 @@
 package intoto
 
-type Predicate struct {
-	Builder   `json:"builder"`
-	Metadata  `json:"metadata"`
-	Recipe    `json:"recipe"`
-	Materials []Material `json:"materials"`
-}
-
-type Material struct {
-	URI    string    `json:"uri"`
-	Digest DigestSet `json:"digest"`
-}
-
-type Builder struct {
-	Id string `json:"id"`
-}
-type Metadata struct {
-	BuildInvocationId string `json:"buildInvocationId"`
-	Completeness      `json:"completeness"`
-	Reproducible      bool `json:"reproducible"`
-	// BuildStartedOn not defined as it's not available from a GitHub Action.
-	BuildFinishedOn string `json:"buildFinishedOn"`
-}
-
-type Completeness struct {
-	Arguments   bool `json:"arguments"`
-	Environment bool `json:"environment"`
-	Materials   bool `json:"materials"`
-}
+const (
+	// SlsaPredicateType the predicate type for SLSA intoto statements
+	SlsaPredicateType = "https://slsa.dev/provenance/v0.2"
+	// StatementType the type of the intoto statement
+	StatementType = "https://in-toto.io/Statement/v0.1"
+)
 
 type DigestSet map[string]string
-
-type Subject struct {
-	Name   string    `json:"name"`
-	Digest DigestSet `json:"digest"`
-}
 
 type Provenance struct {
 	Type          string    `json:"_type"`
@@ -43,54 +16,26 @@ type Provenance struct {
 	Predicate     Predicate `json:"predicate"`
 }
 
-type Arguments struct {
-	CFLAGS string `json:"CFLAGS"`
+type Subject struct {
+	Name   string    `json:"name"`
+	Digest DigestSet `json:"digest"`
 }
 
-type Recipe struct {
-	Type              string    `json:"type"`
-	DefinedInMaterial int       `json:"definedInMaterial"`
-	EntryPoint        string    `json:"entryPoint"`
-	Arguments         Arguments `json:"arguments"`
+func (p *Provenance) withPredicate(dependencies map[string]string, builderId string) *Provenance {
+	p.Predicate = Predicate{}.
+		withBuilder(builderId).
+		withBuildType("https://").
+		withMetadata("", "", false).
+		withRecipe("", "", "").
+		withMaterials(dependencies)
+	return p
 }
 
-func createPredicate(materials []Material) Predicate {
-	return Predicate{
-		Builder:   Builder{},
-		Metadata:  Metadata{},
-		Recipe:    createRecipe(),
-		Materials: materials,
-	}
-}
-
-func createRecipe() Recipe {
-	return Recipe{
-		Type:              "type",
-		DefinedInMaterial: 0,
-		EntryPoint:        "point",
-		Arguments:         Arguments{CFLAGS: "balls"},
-	}
-}
-
-func createMaterials(deps map[string]string) []Material {
-	materials := make([]Material, 0)
-	for k, v := range deps {
-		m := Material{
-			URI:    k + ":" + v,
-			Digest: nil,
-		}
-		materials = append(materials, m)
-	}
-	return materials
-}
-
-func GenerateProvenance(deps map[string]string) Provenance {
-	m := createMaterials(deps)
-
-	return Provenance{
-		Type:          "type",
+func GenerateStatement(dependencies map[string]string, builderId string) *Provenance {
+	statement := &Provenance{
+		PredicateType: SlsaPredicateType,
 		Subject:       nil,
-		PredicateType: "pre",
-		Predicate:     createPredicate(m),
+		Type:          StatementType,
 	}
+	return statement.withPredicate(dependencies, builderId)
 }
