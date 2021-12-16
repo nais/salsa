@@ -28,18 +28,6 @@ type Material struct {
 	Digest DigestSet `json:"digest"`
 }
 
-func (p Predicate) withBuildType(uri string) *Predicate {
-	p.BuildType = uri
-	return &p
-}
-
-func (p Predicate) withBuilder(uri string) *Predicate {
-	p.Builder = Builder{
-		Id: uri,
-	}
-	return &p
-}
-
 func (p Predicate) withMetadata(buildInvitationId, buildFinished string, rp bool) *Predicate {
 	p.Metadata = Metadata{
 		BuildInvocationId: buildInvitationId,
