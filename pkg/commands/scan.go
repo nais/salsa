@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/nais/salsa/pkg/intoto"
-	"github.com/nais/salsa/pkg/scan"
 	"log"
 	"os"
 	"os/exec"
+
+	"github.com/nais/salsa/pkg/intoto"
+	"github.com/nais/salsa/pkg/scan"
 )
 
 type CmdConfig struct {
@@ -37,15 +38,26 @@ func GradleScan(workDir string) {
 	}
 
 	log.Print(gradleDeps)
-	// Should send in Runner/Github info her
-	p := intoto.GenerateStatement(gradleDeps, "builderId")
 
-	m, err := json.Marshal(p)
+	// Should send in Runner/Github info
+	app := createApp("tokendings", gradleDeps)
+	s := intoto.GenerateStatement(app)
+
+	m, err := json.Marshal(s)
 	if err != nil {
 		fmt.Printf("failed: %v\n", err)
 		os.Exit(1)
 	}
 	log.Print(string(m))
+}
+
+func createApp(name string, deps map[string]string) intoto.App {
+	return intoto.App{
+		Name:         name,
+		BuilderId:    "todoId",
+		BuildType:    "todoType",
+		Dependencies: deps,
+	}
 }
 
 type CommandOutput struct {
