@@ -1,5 +1,9 @@
 package intoto
 
+// TODO: check if we can use something from here:
+// slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
+//	"github.com/in-toto/in-toto-golang/in_toto"
+
 const (
 	SlsaPredicateType = "https://slsa.dev/provenance/v0.2"
 	StatementType     = "https://in-toto.io/Statement/v0.1"
