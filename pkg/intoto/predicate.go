@@ -47,9 +47,10 @@ func (p Predicate) withRecipe(recipeType, entryPoint, cflags string) *Predicate 
 	return &p
 }
 
-func (p Predicate) withMaterials(deps map[string]string) Predicate {
+// TODO: use other type of materials aswell, e.g. github actions run in the build
+func (p Predicate) withMaterials(app App) Predicate {
 	materials := make([]Material, 0)
-	for k, v := range deps {
+	for k, v := range app.Dependencies {
 		m := Material{
 			URI:    k + ":" + v,
 			Digest: nil,

@@ -7,7 +7,7 @@ const (
 
 type DigestSet map[string]string
 
-type Provenance struct {
+type Statement struct {
 	Type          string    `json:"_type"`
 	Subject       []Subject `json:"subject"`
 	PredicateType string    `json:"predicateType"`
@@ -19,23 +19,23 @@ type Subject struct {
 	Digest DigestSet `json:"digest"`
 }
 
-func GenerateStatement(dependencies map[string]string, builderId string) *Provenance {
-	statement := &Provenance{
+func GenerateStatement(app App) *Statement {
+	statement := &Statement{
 		PredicateType: SlsaPredicateType,
 		Subject:       nil,
 		Type:          StatementType,
 	}
-	return statement.withPredicate(dependencies, builderId)
+	return statement.withPredicate(app)
 }
 
-func (p *Provenance) withPredicate(dependencies map[string]string, builderId string) *Provenance {
+func (p *Statement) withPredicate(app App) *Statement {
 	p.Predicate = Predicate{
 		Builder: Builder{
-			Id: builderId,
+			Id: app.BuilderId,
 		},
-		BuildType: "uri",
+		BuildType: app.BuildType,
 	}.withMetadata("", "", false).
 		withRecipe("", "", "").
-		withMaterials(dependencies)
+		withMaterials(app)
 	return p
 }
