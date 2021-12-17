@@ -4,15 +4,12 @@ import (
 	"bytes"
 	"context"
 	"crypto"
-	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/sigstore/cosign/pkg/oci"
-	"github.com/sigstore/cosign/pkg/oci/static"
-	"github.com/sigstore/cosign/pkg/types"
 	"github.com/sigstore/sigstore/pkg/signature"
 	"github.com/sigstore/sigstore/pkg/signature/dsse"
 	signatureoptions "github.com/sigstore/sigstore/pkg/signature/options"
@@ -20,7 +17,7 @@ import (
 
 type SignOptions struct {
 	CertPath string
-	PrivKey  *crypto.PrivateKey
+	PrivKey  crypto.PrivateKey
 	HashFunc crypto.Hash
 }
 
@@ -30,7 +27,7 @@ type StatementOptions struct {
 	Statement     *Statement
 }
 
-func sign(ctx context.Context, timeout time.Duration, so StatementOptions, opts SignOptions) (oci.Signature, error) {
+func sign(ctx context.Context, timeout time.Duration, so StatementOptions, opts SignOptions) ([]byte, error) {
 
 	if timeout != 0 {
 		var cancelFn context.CancelFunc
@@ -46,29 +43,14 @@ func sign(ctx context.Context, timeout time.Duration, so StatementOptions, opts 
 	wrapped := dsse.WrapSigner(sv, so.PredicateURI)
 
 	fmt.Fprintln(os.Stderr, "Using payload from:", so.StatementPath)
-	statement, err := os.Open(so.StatementPath)
+	statement, err := ioutil.ReadFile(so.StatementPath)
 	if err != nil {
 		return nil, err
 	}
-	defer statement.Close()
 
-	payload, err := json.Marshal(statement)
-	if err != nil {
-		return nil, err
-	}
-	signedPayload, err := wrapped.SignMessage(bytes.NewReader(payload), signatureoptions.WithContext(ctx))
+	signedPayload, err := wrapped.SignMessage(bytes.NewReader(statement), signatureoptions.WithContext(ctx))
 	if err != nil {
 		return nil, errors.Wrap(err, "signing")
 	}
-
-	opt := []static.Option{static.WithLayerMediaType(types.DssePayloadType)}
-	/*if sv.Cert != nil {
-	    opts = append(opt, static.WithCertChain(sv.Cert, sv.Chain))
-	}*/
-
-	sig, err := static.NewAttestation(signedPayload, opt...)
-	if err != nil {
-		return nil, err
-	}
-	return sig, nil
+	return signedPayload, nil
 }
