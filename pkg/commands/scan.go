@@ -43,12 +43,13 @@ func GradleScan(workDir string) {
 	app := createApp("tokendings", gradleDeps)
 	s := intoto.GenerateStatement(app)
 
-	m, err := json.Marshal(s)
+	statement, err := json.Marshal(s)
 	if err != nil {
 		fmt.Printf("failed: %v\n", err)
 		os.Exit(1)
 	}
-	log.Print(string(m))
+	log.Print(string(statement))
+	os.WriteFile("tokendings.provenance", statement, 0644)
 }
 
 func createApp(name string, deps map[string]string) intoto.App {
