@@ -4,6 +4,8 @@ go 1.17
 
 require (
 	github.com/go-git/go-git/v5 v5.4.2
+	github.com/in-toto/in-toto-golang v0.3.3
+	github.com/mitchellh/mapstructure v1.4.3
 	github.com/pkg/errors v0.9.1
 	github.com/sigstore/sigstore v1.0.2-0.20211203233310-c8e7f70eab4e
 	github.com/sirupsen/logrus v1.8.1
@@ -30,12 +32,12 @@ require (
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
-	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	github.com/secure-systems-lab/go-securesystemslib v0.2.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
+	github.com/shibumi/go-pathspec v1.2.0 // indirect
 	github.com/spf13/afero v1.6.0 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect

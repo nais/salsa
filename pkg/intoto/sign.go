@@ -24,7 +24,6 @@ type SignOptions struct {
 type StatementOptions struct {
 	StatementPath string
 	PredicateURI  string
-	Statement     *Statement
 }
 
 func sign(ctx context.Context, timeout time.Duration, so StatementOptions, opts SignOptions) ([]byte, error) {

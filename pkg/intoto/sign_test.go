@@ -27,7 +27,6 @@ func TestSign(t *testing.T) {
 	statementOpt := StatementOptions{
 		StatementPath: statementPath,
 		PredicateURI:  SlsaPredicateType,
-		Statement:     nil,
 	}
 
 	signedStatement, err := sign(ctx, timeout, statementOpt, signOptions)
