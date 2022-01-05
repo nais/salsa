@@ -45,4 +45,3 @@ Created simple CLI to test concepts:
 * https://github.com/secure-systems-lab/dsse
 * https://slsa.dev/provenance/v0.2
 * Mostly cosign, reko and fulcio: https://docs.sigstore.dev/
-

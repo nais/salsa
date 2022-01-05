@@ -1,12 +1,11 @@
 package commands
 
 import (
-	"bytes"
-	"fmt"
-	"os"
-	"os/exec"
+    "bytes"
+    "fmt"
+    "os/exec"
 
-	log "github.com/sirupsen/logrus"
+    log "github.com/sirupsen/logrus"
 )
 
 type CmdConfig struct {
@@ -22,17 +21,20 @@ type CommandOutput struct {
 func (c CmdConfig) ExecuteCommand() (CommandOutput, error) {
 	cmd := exec.Command(c.cmd, c.args...)
 
+    log.Printf("cmd: %s", cmd)
+
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 	cmd.Dir = c.workDir
 	err := cmd.Run()
 
+    outStr, errStr := string(stdout.Bytes()), string(stderr.Bytes())
 	if err != nil {
 		log.Printf("cmd.Run: %s failed: %v\n", cmd, err)
-		os.Exit(1)
+        log.Printf("stderr: %s", errStr)
+        return CommandOutput{}, err
 	}
-	outStr, errStr := string(stdout.Bytes()), string(stderr.Bytes())
 	if len(errStr) > 1 {
 		fmt.Printf("out:\n%s\nerr:\n%s\n", outStr, errStr)
 	}
