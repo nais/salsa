@@ -1,14 +1,14 @@
 package commands
 
 import (
-    "bytes"
-    "fmt"
-    "os/exec"
-
-    log "github.com/sirupsen/logrus"
+	"bytes"
+	"fmt"
+	"io"
+	"os"
+	"os/exec"
 )
 
-type CmdConfig struct {
+type CmdCfg struct {
 	workDir string
 	cmd     string
 	args    []string
@@ -16,28 +16,24 @@ type CmdConfig struct {
 
 type CommandOutput struct {
 	Output string
+	Error  string
 }
 
-func (c CmdConfig) ExecuteCommand() (CommandOutput, error) {
-	cmd := exec.Command(c.cmd, c.args...)
+func (cfg CmdCfg) Exec() (*CommandOutput, error) {
+	cmd := exec.Command(cfg.cmd, cfg.args...)
+	cmd.Dir = cfg.workDir
 
-    log.Printf("cmd: %s", cmd)
+	var stdoutBuf, stderrBuf bytes.Buffer
+	cmd.Stdout = io.MultiWriter(os.Stdout, &stdoutBuf)
+	cmd.Stderr = io.MultiWriter(os.Stderr, &stderrBuf)
 
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	cmd.Dir = c.workDir
 	err := cmd.Run()
-
-    outStr, errStr := string(stdout.Bytes()), string(stderr.Bytes())
 	if err != nil {
-		log.Printf("cmd.Run: %s failed: %v\n", cmd, err)
-        log.Printf("stderr: %s", errStr)
-        return CommandOutput{}, err
+		return nil, fmt.Errorf("%s failed:\n%w\n", cmd, err)
 	}
-	if len(errStr) > 1 {
-		fmt.Printf("out:\n%s\nerr:\n%s\n", outStr, errStr)
-	}
-	fmt.Printf(outStr)
-	return CommandOutput{Output: outStr}, nil
+	outStr, errStr := string(stdoutBuf.Bytes()), string(stderrBuf.Bytes())
+	return &CommandOutput{
+		Output: outStr,
+		Error:  errStr,
+	}, nil
 }

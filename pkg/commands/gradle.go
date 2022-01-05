@@ -11,12 +11,12 @@ import (
 )
 
 func GradleScan(workDir string) {
-	c := CmdConfig{
+	c := CmdCfg{
 		workDir: workDir,
 		cmd:     "./gradlew",
 		args:    []string{"-q", "dependencies", "--configuration", "runtimeClasspath"},
 	}
-	command, err := c.ExecuteCommand()
+	command, err := c.Exec()
 
 	if err != nil {
 		log.Printf("failed: %v\n", err)
