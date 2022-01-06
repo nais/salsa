@@ -1,25 +1,24 @@
 package scan
 
 import (
-    "reflect"
-    "testing"
+	"reflect"
+	"testing"
 )
 
-
 func TestGradleDeps(t *testing.T) {
-    got, _ := GradleDeps(gradleDependenciesOutput)
-    want := map[string] string {
-        "org.apache.logging.log4j:log4j-core": "2.14.1",
-        "org.apache.logging.log4j:log4j-api": "2.14.2",
-        "org.wso2.orbit.org.zapache.commons:commons-collections4": "4.4.wso2v1",
-        "com.nimbusds:oauth2-oidc-sdk": "9.17",
-        "com.github.stephenc.jcip:jcip-annotations": "1.0-1",
-        "junit:junit": "3.8.1",
-    }
+	got, _ := GradleDeps(gradleDependenciesOutput)
+	want := map[string]string{
+		"org.apache.logging.log4j:log4j-core":                     "2.14.1",
+		"org.apache.logging.log4j:log4j-api":                      "2.14.2",
+		"org.wso2.orbit.org.zapache.commons:commons-collections4": "4.4.wso2v1",
+		"com.nimbusds:oauth2-oidc-sdk":                            "9.17",
+		"com.github.stephenc.jcip:jcip-annotations":               "1.0-1",
+		"junit:junit": "3.8.1",
+	}
 
-    if !reflect.DeepEqual(got, want) {
-        t.Errorf("got %q, wanted %q", got, want)
-    }
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("got %q, wanted %q", got, want)
+	}
 }
 
 const gradleDependenciesOutput = `testCompileClasspath - Compile classpath for source set 'test'.

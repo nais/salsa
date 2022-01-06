@@ -1,9 +1,9 @@
 package vcs
 
 import (
-    "fmt"
+	"fmt"
 
-    "github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5"
 )
 
 func CloneRepo(repoUrl string, path string) error {
@@ -15,5 +15,5 @@ func CloneRepo(repoUrl string, path string) error {
 	if err != nil {
 		return fmt.Errorf("could not clone repo %s, got error %v", repoUrl, err)
 	}
-    return nil
+	return nil
 }
