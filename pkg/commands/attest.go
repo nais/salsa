@@ -6,6 +6,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+const predicateType = "slsaprovenance"
+
 var kmsUrl string
 var predicateFile string
 var logUrl string
@@ -28,6 +30,8 @@ var attestCmd = &cobra.Command{
 			cmd:     "cosign",
 			args: []string{
 				"attest",
+                "--type",
+                predicateType,
 				"--predicate",
 				predicateFile,
 				"--key",

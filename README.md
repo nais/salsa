@@ -2,7 +2,6 @@
 
 >in line with the best from abroad
 
-
 ## Status
 
 Proof of Concept for a SLSA github action / cli.

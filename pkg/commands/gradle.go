@@ -33,7 +33,7 @@ func GradleScan(workDir string) {
 
 	// Should send in Runner/Github info
 	app := createApp("tokendings", gradleDeps)
-	s := intoto.GenerateStatement(app)
+	s := intoto.GenerateSlsaPredicate(app)
 
 	statement, err := json.Marshal(s)
 	if err != nil {

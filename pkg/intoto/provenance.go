@@ -1,7 +1,8 @@
 package intoto
 
 import (
-	"github.com/in-toto/in-toto-golang/in_toto"
+    "github.com/in-toto/in-toto-golang/in_toto"
+    slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
 	"strings"
 	"time"
 )
@@ -22,19 +23,27 @@ func GenerateStatement(app App) in_toto.Statement {
 	}
 }
 
-func withPredicate(app App) in_toto.ProvenancePredicate {
-	return in_toto.ProvenancePredicate{
-		Builder: in_toto.ProvenanceBuilder{
-			ID: "",
-		},
-		Recipe:    withRecipe(),
-		Metadata:  withMetadata(false, time.Now(), time.Now()),
-		Materials: withMaterials(app),
-	}
+func GenerateSlsaPredicate(app App) slsa.ProvenancePredicate {
+    return withPredicate(app)
 }
 
-func FindMaterials(predicate in_toto.ProvenancePredicate, value string) []in_toto.ProvenanceMaterial {
-	var found []in_toto.ProvenanceMaterial
+func withPredicate(app App) slsa.ProvenancePredicate {
+	return slsa.ProvenancePredicate{
+        Builder:     slsa.ProvenanceBuilder{},
+        BuildType:   "yolo",
+        Invocation:  slsa.ProvenanceInvocation{
+            ConfigSource: slsa.ConfigSource{},
+            Parameters:   nil,
+            Environment:  nil,
+        },
+        BuildConfig: nil,
+        Metadata:    withMetadata(false, time.Now(), time.Now()),
+        Materials:   withMaterials(app),
+    }
+}
+
+func FindMaterials(predicate slsa.ProvenancePredicate, value string) []slsa.ProvenanceMaterial {
+	var found []slsa.ProvenanceMaterial
 	for _, m := range predicate.Materials {
 		if find(m, value) {
 			found = append(found, m)
@@ -43,12 +52,12 @@ func FindMaterials(predicate in_toto.ProvenancePredicate, value string) []in_tot
 	return found
 }
 
-func find(material in_toto.ProvenanceMaterial, value string) bool {
+func find(material slsa.ProvenanceMaterial, value string) bool {
 	return strings.Contains(material.URI, value)
 }
 
-func withMetadata(rp bool, buildStarted, buildFinished time.Time) *in_toto.ProvenanceMetadata {
-	return &in_toto.ProvenanceMetadata{
+func withMetadata(rp bool, buildStarted, buildFinished time.Time) *slsa.ProvenanceMetadata {
+	return &slsa.ProvenanceMetadata{
 		BuildStartedOn:  &buildStarted,
 		BuildFinishedOn: &buildFinished,
 		Completeness:    withCompleteness(false, false, false),
@@ -56,29 +65,18 @@ func withMetadata(rp bool, buildStarted, buildFinished time.Time) *in_toto.Prove
 	}
 }
 
-func withCompleteness(arguments, environment, materials bool) in_toto.ProvenanceComplete {
-	return in_toto.ProvenanceComplete{
-		Arguments:   arguments,
+func withCompleteness(arguments, environment, materials bool) slsa.ProvenanceComplete {
+	return slsa.ProvenanceComplete{
 		Environment: environment,
 		Materials:   materials,
 	}
 }
 
-func withRecipe() in_toto.ProvenanceRecipe {
-	return in_toto.ProvenanceRecipe{
-		Type:              "",
-		DefinedInMaterial: nil,
-		EntryPoint:        "",
-		Arguments:         nil,
-		Environment:       nil,
-	}
-}
-
 // TODO: use other type of materials aswell, e.g. github actions run in the build
-func withMaterials(app App) []in_toto.ProvenanceMaterial {
-	materials := make([]in_toto.ProvenanceMaterial, 0)
+func withMaterials(app App) []slsa.ProvenanceMaterial {
+	materials := make([]slsa.ProvenanceMaterial, 0)
 	for k, v := range app.Dependencies {
-		m := in_toto.ProvenanceMaterial{
+		m := slsa.ProvenanceMaterial{
 			URI:    k + ":" + v,
 			Digest: nil,
 		}
