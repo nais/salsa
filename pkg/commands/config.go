@@ -1,9 +1,9 @@
 package commands
 
 type Cfg struct {
-    AttestCfg `mapstructure:",squash"`
+	AttestCfg `mapstructure:",squash"`
 }
 
 type AttestCfg struct {
-    KmsUrl string `mapstructure:"kmsUrl"`
+	KmsUrl string `mapstructure:"kmsUrl"`
 }

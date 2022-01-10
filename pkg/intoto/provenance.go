@@ -1,50 +1,33 @@
 package intoto
 
 import (
-    "github.com/in-toto/in-toto-golang/in_toto"
-    slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
+	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
 	"strings"
 	"time"
 )
 
-const (
-	SlsaPredicateType = "https://slsa.dev/provenance/v0.2"
-	StatementType     = "https://in-toto.io/Statement/v0.1"
-)
-
-func GenerateStatement(app App) in_toto.Statement {
-	return in_toto.Statement{
-		StatementHeader: in_toto.StatementHeader{
-			Type:          StatementType,
-			PredicateType: SlsaPredicateType,
-			Subject:       nil,
-		},
-		Predicate: withPredicate(app),
-	}
-}
-
 func GenerateSlsaPredicate(app App) slsa.ProvenancePredicate {
-    return withPredicate(app)
+	return withPredicate(app)
 }
 
 func withPredicate(app App) slsa.ProvenancePredicate {
 	return slsa.ProvenancePredicate{
-        Builder:     slsa.ProvenanceBuilder{},
-        BuildType:   "yolo",
-        Invocation:  slsa.ProvenanceInvocation{
-            ConfigSource: slsa.ConfigSource{},
-            Parameters:   nil,
-            Environment:  nil,
-        },
-        BuildConfig: nil,
-        Metadata:    withMetadata(false, time.Now(), time.Now()),
-        Materials:   withMaterials(app),
-    }
+		Builder:   slsa.ProvenanceBuilder{},
+		BuildType: "yolo",
+		Invocation: slsa.ProvenanceInvocation{
+			ConfigSource: slsa.ConfigSource{},
+			Parameters:   nil,
+			Environment:  nil,
+		},
+		BuildConfig: nil,
+		Metadata:    withMetadata(false, time.Now(), time.Now()),
+		Materials:   withMaterials(app),
+	}
 }
 
-func FindMaterials(predicate slsa.ProvenancePredicate, value string) []slsa.ProvenanceMaterial {
+func FindMaterials(materials []slsa.ProvenanceMaterial, value string) []slsa.ProvenanceMaterial {
 	var found []slsa.ProvenanceMaterial
-	for _, m := range predicate.Materials {
+	for _, m := range materials {
 		if find(m, value) {
 			found = append(found, m)
 		}
