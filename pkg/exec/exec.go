@@ -1,4 +1,4 @@
-package commands
+package exec
 
 import (
 	"bytes"
@@ -9,9 +9,9 @@ import (
 )
 
 type CmdCfg struct {
-	workDir string
-	cmd     string
-	args    []string
+	WorkDir string
+	Cmd     string
+	Args    []string
 }
 
 type CommandOutput struct {
@@ -20,8 +20,8 @@ type CommandOutput struct {
 }
 
 func (cfg CmdCfg) Exec() (*CommandOutput, error) {
-	cmd := exec.Command(cfg.cmd, cfg.args...)
-	cmd.Dir = cfg.workDir
+	cmd := exec.Command(cfg.Cmd, cfg.Args...)
+	cmd.Dir = cfg.WorkDir
 
 	var stdoutBuf, stderrBuf bytes.Buffer
 	cmd.Stdout = io.MultiWriter(os.Stdout, &stdoutBuf)

@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"github.com/nais/salsa/pkg/exec"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -25,13 +26,13 @@ var attestCmd = &cobra.Command{
 			return err
 		}
 
-		c := CmdCfg{
-			workDir: repoPath,
-			cmd:     "cosign",
-			args: []string{
+		c := exec.CmdCfg{
+			WorkDir: repoPath,
+			Cmd:     "cosign",
+			Args: []string{
 				"attest",
-                "--type",
-                predicateType,
+				"--type",
+				predicateType,
 				"--predicate",
 				predicateFile,
 				"--key",

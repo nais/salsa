@@ -35,7 +35,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	scanCmd.PersistentFlags().StringVar(&repoPath, "repoPath", defaultPath, "project to scan")
+	scanCmd.PersistentFlags().StringVar(&repoPath, "repoPath", defaultPath, "a projects location to scan")
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/."+cmdName+".yaml)")
 }
 

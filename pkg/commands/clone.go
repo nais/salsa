@@ -5,6 +5,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"net/url"
 )
 
 var cloneCmd = &cobra.Command{
@@ -14,10 +15,14 @@ var cloneCmd = &cobra.Command{
 		cmd.SilenceErrors = true
 		cmd.SilenceUsage = true
 
-		url := viper.GetString("url")
+		repoUrl, err := url.Parse(viper.GetString("url"))
+		if err != nil {
+			return err
+		}
+
 		// TODO: check if path exists, if not create
-		log.Infof("prepare to checkout %s into path %s ...", url, repoPath)
-		err := vcs.CloneRepo(url, repoPath)
+		log.Infof("prepare to checkout %s into path %s ...", repoUrl.Path, repoPath)
+		err = vcs.CloneRepo(repoUrl.String(), repoPath)
 		if err != nil {
 			return err
 		}
