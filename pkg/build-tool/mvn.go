@@ -10,23 +10,23 @@ import (
 	"os"
 )
 
-const gradleBuildFileName = "build.gradle.kts"
+const mavenBuildFileName = "pom.xml"
 
-func NewGradle() BuildTool {
-	return &Gradle{
-		BuildFilePatterns: []string{gradleBuildFileName},
+func NewMaven() BuildTool {
+	return &Maven{
+		BuildFilePatterns: []string{mavenBuildFileName},
 	}
 }
 
-type Gradle struct {
+type Maven struct {
 	BuildFilePatterns []string
 }
 
-func (g Gradle) Build(workDir, project string) error {
+func (m Maven) Build(workDir, project string) error {
 	c := exec.CmdCfg{
 		WorkDir: workDir,
-		Cmd:     "./gradlew",
-		Args:    []string{"-q", "dependencies", "--configuration", "runtimeClasspath"},
+		Cmd:     "mvn",
+		Args:    []string{"dependency:list"},
 	}
 	command, err := c.Exec()
 
@@ -34,21 +34,21 @@ func (g Gradle) Build(workDir, project string) error {
 		return fmt.Errorf("exec: %v\n", err)
 	}
 
-	gradleDeps, err := jvm.GradleDeps(command.Output)
+	deps, err := jvm.MavenCompileAndRuntimeTimeDeps(command.Output)
 	if err != nil {
 		return fmt.Errorf("scan: %v\n", err)
 	}
 
-	log.Print(gradleDeps)
+	log.Println(deps)
 
-	app := createApp(project, gradleDeps)
+	app := createApp(project, deps)
 	s := intoto.GenerateSlsaPredicate(app)
 
 	statement, err := json.Marshal(s)
 	if err != nil {
 		return fmt.Errorf("marshal: %v\n", err)
 	}
-	log.Print(string(statement))
+	log.Println(string(statement))
 	provenanceName := fmt.Sprintf("%s.provenance", project)
 	err = os.WriteFile(provenanceName, statement, 0644)
 	if err != nil {
@@ -57,10 +57,10 @@ func (g Gradle) Build(workDir, project string) error {
 	return nil
 }
 
-func (g Gradle) BuildTool(pattern string) bool {
-	return Contains(g.BuildFilePatterns, pattern)
+func (m Maven) BuildTool(pattern string) bool {
+	return Contains(m.BuildFilePatterns, pattern)
 }
 
-func (g Gradle) BuildFiles() []string {
-	return g.BuildFilePatterns
+func (m Maven) BuildFiles() []string {
+	return m.BuildFilePatterns
 }

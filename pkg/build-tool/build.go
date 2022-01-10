@@ -4,39 +4,57 @@ import (
 	"fmt"
 	"github.com/nais/salsa/pkg/intoto"
 	log "github.com/sirupsen/logrus"
-	"io"
-	"io/fs"
-	"path/filepath"
-	"strings"
+	"io/ioutil"
 )
 
-var supportedBuildFiles = []string{
-	"build.gradle.kts",
-}
-
 type BuildTool interface {
-	Build(workingDir, project string) error
+	Build(workDir, project string) error
 	BuildTool(pattern string) bool
+	BuildFiles() []string
 }
 
 func Scan(workingDir, project string) error {
 	gradle := NewGradle()
+	mvn := NewMaven()
+	golang := NewGolang()
 
-	for _, pattern := range supportedBuildFiles {
+	supportedBuildFiles := sumSupported(
+		gradle.BuildFiles(),
+		mvn.BuildFiles(),
+		golang.BuildFiles(),
+	)
+
+	totalSupported := len(supportedBuildFiles)
+	for index, pattern := range supportedBuildFiles {
 		log.Printf("search for build type '%s'", pattern)
 		foundBuildType := findBuildType(workingDir, pattern)
 
-		if foundBuildType != "" {
-			log.Printf("found build type %s", foundBuildType)
-			switch true {
-			case gradle.BuildTool(foundBuildType):
-				err := gradle.Build(workingDir, project)
-				if err != nil {
-					return err
+		if index+1 <= totalSupported {
+			log.Printf("searching..")
+			if foundBuildType != "" {
+				log.Printf("found build type %s", foundBuildType)
+				switch true {
+				case gradle.BuildTool(foundBuildType):
+					err := gradle.Build(workingDir, project)
+					if err != nil {
+						return err
+					}
+				case mvn.BuildTool(foundBuildType):
+					err := mvn.Build(workingDir, project)
+					if err != nil {
+						return err
+					}
+				case golang.BuildTool(foundBuildType):
+					err := golang.Build(workingDir, project)
+					if err != nil {
+						return err
+					}
+
+					// add more cases
 				}
-				// add more cases
+				// found break out!
+				break
 			}
-			break
 
 		} else {
 			return fmt.Errorf("unknown build type")
@@ -46,31 +64,18 @@ func Scan(workingDir, project string) error {
 }
 
 func findBuildType(root, pattern string) (result string) {
-	err := filepath.WalkDir(root, func(s string, d fs.DirEntry, e error) error {
-		if e != nil {
-			return e
+	files, err := ioutil.ReadDir(root)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, file := range files {
+		if file.Name() == pattern {
+			result = file.Name()
+			break
 		}
-		// filepath.Ext(d.Name())
-		if d.Name() == pattern {
-			trimmed := strings.Trim(s, fmt.Sprintf("%s/", root))
-			result = trimmed
-			return io.EOF
-		}
-		return nil
-	})
-	if err == io.EOF {
-		err = nil
 	}
 	return result
-}
-
-func contains(s []string, e string) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
 }
 
 func createApp(name string, deps map[string]string) intoto.App {

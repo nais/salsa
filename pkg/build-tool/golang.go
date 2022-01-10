@@ -5,28 +5,28 @@ import (
 	"fmt"
 	"github.com/nais/salsa/pkg/exec"
 	"github.com/nais/salsa/pkg/intoto"
-	"github.com/nais/salsa/pkg/scan/jvm"
+	"github.com/nais/salsa/pkg/scan/golang"
 	log "github.com/sirupsen/logrus"
 	"os"
 )
 
-const gradleBuildFileName = "build.gradle.kts"
+const golangBuildFileName = "go.sum"
 
-func NewGradle() BuildTool {
-	return &Gradle{
-		BuildFilePatterns: []string{gradleBuildFileName},
+func NewGolang() BuildTool {
+	return &Golang{
+		BuildFilePatterns: []string{golangBuildFileName},
 	}
 }
 
-type Gradle struct {
+type Golang struct {
 	BuildFilePatterns []string
 }
 
-func (g Gradle) Build(workDir, project string) error {
+func (g Golang) Build(workDir, project string) error {
 	c := exec.CmdCfg{
 		WorkDir: workDir,
-		Cmd:     "./gradlew",
-		Args:    []string{"-q", "dependencies", "--configuration", "runtimeClasspath"},
+		Cmd:     "cat",
+		Args:    []string{"go.sum"},
 	}
 	command, err := c.Exec()
 
@@ -34,21 +34,17 @@ func (g Gradle) Build(workDir, project string) error {
 		return fmt.Errorf("exec: %v\n", err)
 	}
 
-	gradleDeps, err := jvm.GradleDeps(command.Output)
-	if err != nil {
-		return fmt.Errorf("scan: %v\n", err)
-	}
+	deps := golang.GoDeps(command.Output)
+	log.Println(deps)
 
-	log.Print(gradleDeps)
-
-	app := createApp(project, gradleDeps)
+	app := createApp(project, deps)
 	s := intoto.GenerateSlsaPredicate(app)
 
 	statement, err := json.Marshal(s)
 	if err != nil {
 		return fmt.Errorf("marshal: %v\n", err)
 	}
-	log.Print(string(statement))
+	log.Println(string(statement))
 	provenanceName := fmt.Sprintf("%s.provenance", project)
 	err = os.WriteFile(provenanceName, statement, 0644)
 	if err != nil {
@@ -57,10 +53,10 @@ func (g Gradle) Build(workDir, project string) error {
 	return nil
 }
 
-func (g Gradle) BuildTool(pattern string) bool {
+func (g Golang) BuildTool(pattern string) bool {
 	return Contains(g.BuildFilePatterns, pattern)
 }
 
-func (g Gradle) BuildFiles() []string {
+func (g Golang) BuildFiles() []string {
 	return g.BuildFilePatterns
 }
