@@ -78,7 +78,7 @@ func findBuildType(root, pattern string) (result string) {
 	return result
 }
 
-func createApp(name string, deps map[string]string) intoto.App {
+func CreateApp(name string, deps map[string]string) intoto.App {
 	return intoto.App{
 		Name:         name,
 		BuilderId:    "todoId",

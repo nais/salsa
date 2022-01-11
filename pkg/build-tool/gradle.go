@@ -41,7 +41,7 @@ func (g Gradle) Build(workDir, project string) error {
 
 	log.Print(gradleDeps)
 
-	app := createApp(project, gradleDeps)
+	app := CreateApp(project, gradleDeps)
 	s := intoto.GenerateSlsaPredicate(app)
 
 	statement, err := json.Marshal(s)

@@ -37,7 +37,7 @@ func (g Golang) Build(workDir, project string) error {
 	deps := golang.GoDeps(command.Output)
 	log.Println(deps)
 
-	app := createApp(project, deps)
+	app := CreateApp(project, deps)
 	s := intoto.GenerateSlsaPredicate(app)
 
 	statement, err := json.Marshal(s)

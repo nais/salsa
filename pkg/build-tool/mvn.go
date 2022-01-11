@@ -41,7 +41,7 @@ func (m Maven) Build(workDir, project string) error {
 
 	log.Println(deps)
 
-	app := createApp(project, deps)
+	app := CreateApp(project, deps)
 	s := intoto.GenerateSlsaPredicate(app)
 
 	statement, err := json.Marshal(s)
