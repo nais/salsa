@@ -26,12 +26,11 @@ func Scan(workingDir, project string) error {
 		golang.BuildFiles(),
 	)
 
-	totalSupported := len(supportedBuildFiles)
 	for index, pattern := range supportedBuildFiles {
 		log.Printf("search for build type '%s'", pattern)
 		foundBuildType := findBuildType(workingDir, pattern)
 
-		if index < totalSupported {
+		if index < len(supportedBuildFiles) {
 			log.Printf("searching..")
 			if foundBuildType != "" {
 				log.Printf("found build type %s", foundBuildType)

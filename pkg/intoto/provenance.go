@@ -44,12 +44,12 @@ func withMetadata(rp bool, buildStarted, buildFinished time.Time) *slsa.Provenan
 	return &slsa.ProvenanceMetadata{
 		BuildStartedOn:  &buildStarted,
 		BuildFinishedOn: &buildFinished,
-		Completeness:    withCompleteness(false, false, false),
+		Completeness:    withCompleteness(false, false),
 		Reproducible:    rp,
 	}
 }
 
-func withCompleteness(arguments, environment, materials bool) slsa.ProvenanceComplete {
+func withCompleteness(environment, materials bool) slsa.ProvenanceComplete {
 	return slsa.ProvenanceComplete{
 		Environment: environment,
 		Materials:   materials,
