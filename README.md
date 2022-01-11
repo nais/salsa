@@ -26,17 +26,17 @@ Created simple CLI to test concepts:
 * list all dependencies in a gradle project
 * create attestation with materials based on dependencies
 * sign attestation with DSSE
-
+* sign docker image and put into attestation, using cosign
+* digest over dependencies etc in attestation
 
 ### Stuff we should explore
 
-* digest over dependencies etc in attestation
 * include build steps from workflow
-* sign docker image and put into attestation (maybe using cosign)
 * create a pipeline where a "provenance" action can be used
 * upload attestation somewhere
 * explore tools like cosign, Fulcio and Reko from sigstore to see where they can fit in
 * how to make attestations searchable
+* Handle the ability to resolve packages that's private
 
 ## Relevant links
 * https://github.com/in-toto/attestation/blob/main/spec/README.md

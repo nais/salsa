@@ -2,6 +2,7 @@ package intoto
 
 import (
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
+	"github.com/nais/salsa/pkg/digest"
 	"strings"
 	"time"
 )
@@ -59,9 +60,11 @@ func withCompleteness(arguments, environment, materials bool) slsa.ProvenanceCom
 func withMaterials(app App) []slsa.ProvenanceMaterial {
 	materials := make([]slsa.ProvenanceMaterial, 0)
 	for k, v := range app.Dependencies {
+		var uri = k + ":" + v
+		var hashedDigest = digest.Hash(uri)
 		m := slsa.ProvenanceMaterial{
-			URI:    k + ":" + v,
-			Digest: nil,
+			URI:    uri,
+			Digest: slsa.DigestSet{hashedDigest.Algorithm().String(): hashedDigest.Encoded()},
 		}
 		materials = append(materials, m)
 	}
