@@ -28,24 +28,25 @@ func Scan(workingDir, project string) error {
 
 	for index, pattern := range supportedBuildFiles {
 		log.Printf("search for build type '%s'", pattern)
-		foundBuildType := findBuildType(workingDir, pattern)
+		buildFile := findBuildFile(workingDir, pattern)
 
 		if index < len(supportedBuildFiles) {
 			log.Printf("searching..")
-			if foundBuildType != "" {
-				log.Printf("found build type %s", foundBuildType)
+			if buildFile != "" {
+				log.Printf("found build type %s", buildFile)
+
 				switch true {
-				case gradle.BuildTool(foundBuildType):
+				case gradle.BuildTool(buildFile):
 					err := gradle.Build(project)
 					if err != nil {
 						return err
 					}
-				case mvn.BuildTool(foundBuildType):
+				case mvn.BuildTool(buildFile):
 					err := mvn.Build(project)
 					if err != nil {
 						return err
 					}
-				case golang.BuildTool(foundBuildType):
+				case golang.BuildTool(buildFile):
 					err := golang.Build(project)
 					if err != nil {
 						return err
@@ -64,7 +65,7 @@ func Scan(workingDir, project string) error {
 	return nil
 }
 
-func findBuildType(root, pattern string) (result string) {
+func findBuildFile(root, pattern string) (result string) {
 	files, err := ioutil.ReadDir(root)
 	if err != nil {
 		log.Fatal(err)
