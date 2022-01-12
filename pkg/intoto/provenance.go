@@ -27,13 +27,13 @@ func withPredicate(app App) slsa.ProvenancePredicate {
 }
 
 func FindMaterials(materials []slsa.ProvenanceMaterial, value string) []slsa.ProvenanceMaterial {
-	var found []slsa.ProvenanceMaterial
+	f := make([]slsa.ProvenanceMaterial, 0)
 	for _, m := range materials {
 		if find(m, value) {
-			found = append(found, m)
+			f = append(f, m)
 		}
 	}
-	return found
+	return f
 }
 
 func find(material slsa.ProvenanceMaterial, value string) bool {

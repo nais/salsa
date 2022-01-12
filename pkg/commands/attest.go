@@ -5,6 +5,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"os"
 )
 
 const predicateType = "slsaprovenance"
@@ -39,6 +40,7 @@ var attestCmd = &cobra.Command{
 				kmsUrl,
 				"--rekor-url",
 				logUrl,
+				"--no-upload=true",
 				image,
 			},
 		}
@@ -46,6 +48,8 @@ var attestCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		os.Mkdir("attestations", os.FileMode(0755))
+		os.WriteFile("./attestations/"+predicateFile+".json", []byte(command.Output), os.FileMode(0755))
 		log.Infof("finished signing and uploading attestation. %s", command.Output)
 		return nil
 	},

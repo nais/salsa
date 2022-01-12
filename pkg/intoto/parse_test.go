@@ -1,6 +1,7 @@
 package intoto
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -15,6 +16,7 @@ func TestFindsAllMaterials(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.NotEmpty(t, statement.Predicate.Materials)
+	fmt.Println(statement.Predicate.Materials)
 }
 
 func TestFindMaterial(t *testing.T) {
@@ -31,4 +33,7 @@ func TestFindMaterial(t *testing.T) {
 
 	foundMaterial := FindMaterials(statement.Predicate.Materials, valueToFind)
 	assert.NotEmpty(t, foundMaterial)
+	assert.Contains(t, foundMaterial[0].URI, valueToFind)
+	fmt.Println(len(foundMaterial))
+	assert.Equal(t, 1, len(foundMaterial))
 }
