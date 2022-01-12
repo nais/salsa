@@ -2,8 +2,10 @@ package build_tool
 
 import (
 	"fmt"
-	"github.com/nais/salsa/pkg/exec"
+	"os/exec"
+
 	"github.com/nais/salsa/pkg/scan/golang"
+	"github.com/nais/salsa/pkg/utils"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -11,31 +13,31 @@ const golangBuildFileName = "go.sum"
 
 type Golang struct {
 	BuildFilePatterns []string
-	Cmd               exec.CmdCfg
 }
 
-func NewGolang(workDir string) BuildTool {
+func NewGolang() BuildTool {
 	return &Golang{
 		BuildFilePatterns: []string{golangBuildFileName},
-		Cmd: exec.CmdCfg{
-			WorkDir: workDir,
-			Cmd:     "cat",
-			Args:    []string{"go.sum"},
-		},
 	}
 }
 
-func (g Golang) Build(project string) error {
-	command, err := g.Cmd.Exec()
+func (g Golang) Build(workDir, project string) error {
+	cmd := exec.Command(
+		"cat",
+		"go.sum",
+	)
+	cmd.Dir = workDir
+
+	output, err := utils.Exec(cmd)
 
 	if err != nil {
 		return fmt.Errorf("exec: %v\n", err)
 	}
 
-	deps := golang.GoDeps(command.Output)
+	deps := golang.GoDeps(output)
 	log.Println(deps)
 
-	err = GenerateProvenance(project, deps)
+	err = GenerateProvenance(workDir, project, deps)
 	if err != nil {
 		return fmt.Errorf("generating provencance %v", err)
 	}

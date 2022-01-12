@@ -3,22 +3,23 @@ package build_tool
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/nais/salsa/pkg/intoto"
-	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
+
+	"github.com/nais/salsa/pkg/intoto"
+	log "github.com/sirupsen/logrus"
 )
 
 type BuildTool interface {
-	Build(project string) error
+	Build(workDir, project string) error
 	BuildTool(pattern string) bool
 	BuildFiles() []string
 }
 
 func Scan(workingDir, project string) error {
-	gradle := NewGradle(workingDir)
-	mvn := NewMaven(workingDir)
-	golang := NewGolang(workingDir)
+	gradle := NewGradle()
+	mvn := NewMaven()
+	golang := NewGolang()
 
 	supportedBuildFiles := sumSupported(
 		gradle.BuildFiles(),
@@ -37,17 +38,17 @@ func Scan(workingDir, project string) error {
 
 				switch true {
 				case gradle.BuildTool(buildFile):
-					err := gradle.Build(project)
+					err := gradle.Build(workingDir, project)
 					if err != nil {
 						return err
 					}
 				case mvn.BuildTool(buildFile):
-					err := mvn.Build(project)
+					err := mvn.Build(workingDir, project)
 					if err != nil {
 						return err
 					}
 				case golang.BuildTool(buildFile):
-					err := golang.Build(project)
+					err := golang.Build(workingDir, project)
 					if err != nil {
 						return err
 					}
@@ -80,7 +81,7 @@ func findBuildFile(root, pattern string) (result string) {
 	return result
 }
 
-func GenerateProvenance(project string, deps map[string]string) error {
+func GenerateProvenance(workDir, project string, deps map[string]string) error {
 	app := createApp(project, deps)
 	s := intoto.GenerateSlsaPredicate(app)
 
@@ -92,7 +93,7 @@ func GenerateProvenance(project string, deps map[string]string) error {
 	log.Println(string(statement))
 	provenanceName := fmt.Sprintf("%s.provenance", project)
 
-	err = os.WriteFile(provenanceName, statement, 0644)
+	err = os.WriteFile(fmt.Sprintf("%s/%s", workDir, provenanceName), statement, 0644)
 	if err != nil {
 		return fmt.Errorf("write to file: %v\n", err)
 	}

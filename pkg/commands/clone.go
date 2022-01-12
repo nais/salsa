@@ -1,11 +1,12 @@
 package commands
 
 import (
+	"net/url"
+
 	"github.com/nais/salsa/pkg/vcs"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"net/url"
 )
 
 var cloneCmd = &cobra.Command{
@@ -21,8 +22,8 @@ var cloneCmd = &cobra.Command{
 		}
 
 		// TODO: check if path exists, if not create
-		log.Infof("prepare to checkout %s into path %s ...", repoUrl.Path, repoPath)
-		err = vcs.CloneRepo(repoUrl.String(), repoPath)
+		log.Infof("prepare to checkout %s into path %s ...", repoUrl.Path, RepoPath)
+		err = vcs.CloneRepo(repoUrl.String(), RepoPath)
 		if err != nil {
 			return err
 		}

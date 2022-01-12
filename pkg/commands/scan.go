@@ -16,10 +16,10 @@ var scanCmd = &cobra.Command{
 		cmd.SilenceErrors = true
 		cmd.SilenceUsage = true
 
-		log.Infof("prepare to scan path %s for project %s...", repoPath, project)
+		log.Infof("prepare to scan path %s for project %s...", RepoPath, project)
 		// TODO: generalize into other build tools
 		// Check repo for build file
-		err := build_tool.Scan(repoPath, project)
+		err := build_tool.Scan(RepoPath, project)
 		if err != nil {
 			return err
 		}

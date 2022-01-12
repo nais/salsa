@@ -2,8 +2,10 @@ package build_tool
 
 import (
 	"fmt"
-	"github.com/nais/salsa/pkg/exec"
+	"os/exec"
+
 	"github.com/nais/salsa/pkg/scan/jvm"
+	"github.com/nais/salsa/pkg/utils"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -11,34 +13,34 @@ const gradleBuildFileName = "build.gradle.kts"
 
 type Gradle struct {
 	BuildFilePatterns []string
-	Cmd               exec.CmdCfg
 }
 
-func NewGradle(workDir string) BuildTool {
+func NewGradle() BuildTool {
 	return &Gradle{
 		BuildFilePatterns: []string{gradleBuildFileName},
-		Cmd: exec.CmdCfg{
-			WorkDir: workDir,
-			Cmd:     "./gradlew",
-			Args:    []string{"-q", "dependencies", "--configuration", "runtimeClasspath"},
-		},
 	}
 }
 
-func (g Gradle) Build(project string) error {
-	command, err := g.Cmd.Exec()
+func (g Gradle) Build(workDir string, project string) error {
+	cmd := exec.Command(
+		"./gradlew",
+		"-q", "dependencies", "--configuration", "runtimeClasspath",
+	)
+	cmd.Dir = workDir
+
+	output, err := utils.Exec(cmd)
 	if err != nil {
 		return fmt.Errorf("exec: %v\n", err)
 	}
 
-	deps, err := jvm.GradleDeps(command.Output)
+	deps, err := jvm.GradleDeps(output)
 	if err != nil {
 		return fmt.Errorf("scan: %v\n", err)
 	}
 
 	log.Print(deps)
 
-	err = GenerateProvenance(project, deps)
+	err = GenerateProvenance(workDir, project, deps)
 	if err != nil {
 		return fmt.Errorf("generating provencance %v", err)
 	}
