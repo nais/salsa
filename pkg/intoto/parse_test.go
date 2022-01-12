@@ -2,8 +2,6 @@ package intoto
 
 import (
 	"fmt"
-	"github.com/in-toto/in-toto-golang/in_toto"
-	"github.com/mitchellh/mapstructure"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -12,18 +10,13 @@ import (
 func TestFindsAllMaterials(t *testing.T) {
 	attPath := "testdata/cosign-dsse-attestation.json"
 	fileContents, err := os.ReadFile(attPath)
-	assert.NoError(t, err)
 
+	assert.NoError(t, err)
 	statement, err := ParseEnvelope(fileContents)
 
-	fmt.Printf("yo %v", statement.Predicate)
-
 	assert.NoError(t, err)
-
-	p := &in_toto.ProvenancePredicate{}
-	err = mapstructure.Decode(statement.Predicate, p)
-
-	assert.NotEmpty(t, p.Materials)
+	assert.NotEmpty(t, statement.Predicate.Materials)
+	fmt.Println(statement.Predicate.Materials)
 }
 
 func TestFindMaterial(t *testing.T) {
@@ -32,12 +25,15 @@ func TestFindMaterial(t *testing.T) {
 	fileContents, err := os.ReadFile(attPath)
 	assert.NoError(t, err)
 
-	statement, err := ParseEnvelope(fileContents)
 	assert.NoError(t, err)
+	statement, err := ParseEnvelope(fileContents)
 
-	p := &in_toto.ProvenancePredicate{}
-	err = mapstructure.Decode(statement.Predicate, p)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, statement.Predicate.Materials)
 
-	foundMaterial := FindMaterials(*p, valueToFind)
+	foundMaterial := FindMaterials(statement.Predicate.Materials, valueToFind)
 	assert.NotEmpty(t, foundMaterial)
+	assert.Contains(t, foundMaterial[0].URI, valueToFind)
+	fmt.Println(len(foundMaterial))
+	assert.Equal(t, 1, len(foundMaterial))
 }

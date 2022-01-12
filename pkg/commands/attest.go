@@ -1,8 +1,10 @@
 package commands
 
 import (
+	"os"
 	"os/exec"
 
+	"github.com/nais/salsa/pkg/utils"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -31,12 +33,14 @@ var attestCmd = &cobra.Command{
 			return err
 		}
 		log.Infof("finished attestation %s\n", out)
+		os.Mkdir("attestations", os.FileMode(0755))
+		os.WriteFile("./attestations/"+attest.PredicateFile+".json", []byte(out), os.FileMode(0755))
 		return nil
 	},
 }
 
 func (o AttestOptions) Exec(a []string) (string, error) {
-	err := RequireCommand("cosign")
+	err := utils.RequireCommand("cosign")
 	if err != nil {
 		return "", err
 	}
@@ -58,7 +62,7 @@ func (o AttestOptions) Exec(a []string) (string, error) {
 	)
 
 	cmd.Dir = o.WorkDir
-	return Exec(cmd)
+	return utils.Exec(cmd)
 }
 
 func init() {

@@ -6,7 +6,7 @@ import (
 	"github.com/in-toto/in-toto-golang/in_toto"
 )
 
-func ParseEnvelope(dsseEnvelope []byte) (*in_toto.Statement, error) {
+func ParseEnvelope(dsseEnvelope []byte) (*in_toto.ProvenanceStatement, error) {
 	var env = Envelope{}
 	err := json.Unmarshal(dsseEnvelope, &env)
 	if err != nil {
@@ -16,12 +16,17 @@ func ParseEnvelope(dsseEnvelope []byte) (*in_toto.Statement, error) {
 	if err != nil {
 		return nil, err
 	}
-	var att = Attestation{}
-	err = json.Unmarshal(decodedPayload, &att)
+	var stat = &in_toto.ProvenanceStatement{}
+
+	err = json.Unmarshal(decodedPayload, &stat)
 	if err != nil {
 		return nil, err
 	}
-	var stmt in_toto.Statement
-	err = json.Unmarshal([]byte(att.Predicate.Data), &stmt)
-	return &stmt, nil
+
+	//var att = Attestation{}
+	//err = json.Unmarshal(decodedPayload, &att)
+	//if err != nil {
+	//	return nil, err
+	//}
+	return stat, nil
 }

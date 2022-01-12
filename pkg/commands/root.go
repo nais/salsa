@@ -19,7 +19,7 @@ const (
 )
 
 var (
-	repoPath string
+	RepoPath string
 	cfgFile  string
 )
 
@@ -40,7 +40,7 @@ func Execute() {
 }
 
 func init() {
-	scanCmd.PersistentFlags().StringVar(&repoPath, "repoPath", defaultPath, "project to scan")
+	rootCmd.PersistentFlags().StringVar(&RepoPath, "repoPath", defaultPath, "project to scan")
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/."+cmdName+".yaml)")
 }
 

@@ -1,6 +1,6 @@
 # salsa
 
->in line with the best from abroad
+> in line with the best from abroad
 
 ## Status
 
@@ -17,7 +17,6 @@ Proof of Concept for a SLSA github action / cli.
 * explore tools like cosign, Fulcio and Reko from sigstore to see where they can fit in
 * how to make attestations searchable
 
-
 ### Concepts tested so far
 
 Created simple CLI to test concepts:
@@ -26,19 +25,23 @@ Created simple CLI to test concepts:
 * list all dependencies in a gradle project
 * create attestation with materials based on dependencies
 * sign attestation with DSSE
-
+* sign docker image and put into attestation, using cosign
+* digest over dependencies etc in attestation
 
 ### Stuff we should explore
 
-* digest over dependencies etc in attestation
 * include build steps from workflow
-* sign docker image and put into attestation (maybe using cosign)
 * create a pipeline where a "provenance" action can be used
 * upload attestation somewhere
 * explore tools like cosign, Fulcio and Reko from sigstore to see where they can fit in
+    * https://github.com/sigstore/fulcio:
+        * Fulcio is a work in progress. There's working code and a running instance and a plan, but you should not
+          attempt to try to actually use it for anything
 * how to make attestations searchable
+* Handle the ability to resolve packages that's private
 
 ## Relevant links
+
 * https://github.com/in-toto/attestation/blob/main/spec/README.md
 * https://github.com/slsa-framework/slsa/blob/main/controls/attestations.md
 * https://github.com/secure-systems-lab/dsse

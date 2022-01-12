@@ -1,0 +1,24 @@
+name: Salsa CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name: Extract version of Go to use
+        run: echo "GOVERSION=$(cat go.mod | grep -w "go" | awk ' { print $2 } ' | grep -w "^[^v]")" >> $GITHUB_ENV
+      - uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GOVERSION }}
+
+      - name: Test
+        run: make test
+      - name: Ensure no files were modified as a result of the build
+        run: git update-index --refresh && git diff-index --quiet HEAD -- || git diff --exit-code

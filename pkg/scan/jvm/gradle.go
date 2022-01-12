@@ -1,4 +1,4 @@
-package scan
+package jvm
 
 import (
 	"errors"
@@ -16,8 +16,9 @@ func GradleDeps(gradleOutput string) (map[string]string, error) {
 	dependencies := make(map[string]string)
 	for _, match := range matches {
 		elements := strings.Split(strings.Replace(match, "--- ", "", -1), ":")
+		e := strings.Split(elements[2], " ")
 		name := elements[0] + ":" + elements[1]
-		dependencies[name] = elements[2]
+		dependencies[name] = e[0]
 	}
 
 	return dependencies, nil
