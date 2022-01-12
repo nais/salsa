@@ -2,28 +2,26 @@ package commands
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
+	"os/exec"
 
 	"github.com/nais/salsa/pkg/intoto"
 	"github.com/nais/salsa/pkg/scan"
 	log "github.com/sirupsen/logrus"
 )
 
-func GradleScan(workDir string) {
-	c := CmdCfg{
-		workDir: workDir,
-		cmd:     "./gradlew",
-		args:    []string{"-q", "dependencies", "--configuration", "runtimeClasspath"},
-	}
-	command, err := c.Exec()
-
+func GradleScan(workDir string) error {
+	c := exec.Command(
+		"./gradlew",
+		"-q", "dependencies", "--configuration", "runtimeClasspath",
+	)
+	c.Dir = workDir
+	result, err := Exec(c)
 	if err != nil {
-		log.Printf("failed: %v\n", err)
-		os.Exit(1)
+		return err
 	}
 
-	gradleDeps, err := scan.GradleDeps(command.Output)
+	gradleDeps, err := scan.GradleDeps(result)
 	if err != nil {
 		log.Printf("failed: %v\n", err)
 		os.Exit(1)
@@ -37,11 +35,11 @@ func GradleScan(workDir string) {
 
 	statement, err := json.Marshal(s)
 	if err != nil {
-		fmt.Printf("failed: %v\n", err)
-		os.Exit(1)
+		return err
 	}
 	log.Print(string(statement))
 	os.WriteFile("tokendings.provenance", statement, 0644)
+	return nil
 }
 
 func createApp(name string, deps map[string]string) intoto.App {
