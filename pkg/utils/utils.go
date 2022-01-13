@@ -3,9 +3,11 @@ package utils
 import (
 	"bytes"
 	"fmt"
+	"github.com/briandowns/spinner"
 	"io"
 	"os"
 	"os/exec"
+	"time"
 )
 
 func RequireCommand(cmd string) error {
@@ -26,4 +28,11 @@ func Exec(cmd *exec.Cmd) (string, error) {
 	}
 	outStr, _ := string(stdoutBuf.Bytes()), string(stderrBuf.Bytes())
 	return outStr, nil
+}
+
+func StartSpinner(message string) *spinner.Spinner {
+	s := spinner.New(spinner.CharSets[11], 150*time.Millisecond)
+	s.FinalMSG = message
+	s.Start()
+	return s
 }

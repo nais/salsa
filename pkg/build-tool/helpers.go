@@ -1,11 +1,5 @@
 package build_tool
 
-import (
-	"fmt"
-	"github.com/briandowns/spinner"
-	"time"
-)
-
 func Contains(s []string, e string) bool {
 	for _, a := range s {
 		if a == e {
@@ -22,12 +16,4 @@ func sumSupported(buildFiles ...[]string) (supported []string) {
 		}
 	}
 	return supported
-}
-
-func StartSpinner(project string) *spinner.Spinner {
-	s := spinner.New(spinner.CharSets[11], 150*time.Millisecond)
-	s.Suffix = "\n"
-	s.FinalMSG = fmt.Sprintf("provenace for %s finished", project)
-	s.Start()
-	return s
 }

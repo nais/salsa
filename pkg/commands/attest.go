@@ -34,11 +34,13 @@ var attestCmd = &cobra.Command{
 			return errors.New("repo name must be specified")
 		}
 
+		s := utils.StartSpinner(fmt.Sprintf("attestation for %s finished", PathFlags.Repo))
 		out, err := attest.Exec(args)
 		if err != nil {
 			return err
 		}
 		log.Infof("finished attestation %s\n", out)
+		s.Stop()
 		path := PathFlags.RepoDir
 
 		file := path + "/" + attest.PredicateFile + ".att"
