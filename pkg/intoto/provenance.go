@@ -1,6 +1,7 @@
 package intoto
 
 import (
+	"fmt"
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
 	"github.com/nais/salsa/pkg/digest"
 	"strings"
@@ -21,31 +22,32 @@ func withPredicate(app App) slsa.ProvenancePredicate {
 			Environment:  nil,
 		},
 		BuildConfig: nil,
-		Metadata:    withMetadata(false, time.Now(), time.Now()),
+		Metadata:    withMetadata(app, false, time.Now().UTC()),
 		Materials:   withMaterials(app),
 	}
 }
 
 func FindMaterials(materials []slsa.ProvenanceMaterial, value string) []slsa.ProvenanceMaterial {
-	f := make([]slsa.ProvenanceMaterial, 0)
+	found := make([]slsa.ProvenanceMaterial, 0)
 	for _, m := range materials {
 		if find(m, value) {
-			f = append(f, m)
+			found = append(found, m)
 		}
 	}
-	return f
+	return found
 }
 
 func find(material slsa.ProvenanceMaterial, value string) bool {
 	return strings.Contains(material.URI, value)
 }
 
-func withMetadata(rp bool, buildStarted, buildFinished time.Time) *slsa.ProvenanceMetadata {
+func withMetadata(app App, rp bool, buildFinished time.Time) *slsa.ProvenanceMetadata {
 	return &slsa.ProvenanceMetadata{
-		BuildStartedOn:  &buildStarted,
-		BuildFinishedOn: &buildFinished,
-		Completeness:    withCompleteness(false, false),
-		Reproducible:    rp,
+		BuildInvocationID: app.BuildInvocationId,
+		BuildStartedOn:    &app.BuildStartedOn,
+		BuildFinishedOn:   &buildFinished,
+		Completeness:      withCompleteness(false, false),
+		Reproducible:      rp,
 	}
 }
 
@@ -60,11 +62,10 @@ func withCompleteness(environment, materials bool) slsa.ProvenanceComplete {
 func withMaterials(app App) []slsa.ProvenanceMaterial {
 	materials := make([]slsa.ProvenanceMaterial, 0)
 	for k, v := range app.Dependencies {
-		var uri = k + ":" + v
-		var hashedDigest = digest.Hash(uri)
+		var uri = fmt.Sprintf("pkg:%s:%s", k, v)
 		m := slsa.ProvenanceMaterial{
 			URI:    uri,
-			Digest: slsa.DigestSet{hashedDigest.Algorithm().String(): hashedDigest.Encoded()},
+			Digest: slsa.DigestSet{digest.SHA256: app.Checksums[k]},
 		}
 		materials = append(materials, m)
 	}

@@ -16,8 +16,8 @@ func TestGradleDeps(t *testing.T) {
 		"junit:junit": "3.8.1",
 	}
 
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("got %q, wanted %q", got, want)
+	if !reflect.DeepEqual(got.Deps, want) {
+		t.Errorf("got %q, wanted %q", got.Deps, want)
 	}
 }
 

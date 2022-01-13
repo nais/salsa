@@ -22,11 +22,5 @@ func ParseEnvelope(dsseEnvelope []byte) (*in_toto.ProvenanceStatement, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	//var att = Attestation{}
-	//err = json.Unmarshal(decodedPayload, &att)
-	//if err != nil {
-	//	return nil, err
-	//}
 	return stat, nil
 }

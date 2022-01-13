@@ -12,8 +12,8 @@ func TestMavenDeps(t *testing.T) {
 		"org.apache.logging.log4j:log4j-api":  "2.14.2",
 	}
 
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("got %q, wanted %q", got, want)
+	if !reflect.DeepEqual(got.Deps, want) {
+		t.Errorf("got %q, wanted %q", got.Deps, want)
 	}
 
 }

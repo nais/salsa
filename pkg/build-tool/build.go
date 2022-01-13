@@ -3,20 +3,26 @@ package build_tool
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/nais/salsa/pkg/intoto"
+	"github.com/nais/salsa/pkg/scan"
+	"github.com/nais/salsa/pkg/vcs"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
-
-	"github.com/nais/salsa/pkg/intoto"
-	log "github.com/sirupsen/logrus"
 )
 
 type BuildTool interface {
-	Build(workDir, project string) error
+	Build(workDir, project string, context *vcs.AnyContext) error
 	BuildTool(pattern string) bool
 	BuildFiles() []string
 }
 
-func Scan(workingDir, project string) error {
+func Scan(workingDir, project string, inputContext *string) error {
+	context, err := vcs.CreateCIContext(inputContext)
+	if err != nil {
+		return err
+	}
+
 	gradle := NewGradle()
 	mvn := NewMaven()
 	golang := NewGolang()
@@ -38,17 +44,17 @@ func Scan(workingDir, project string) error {
 
 				switch true {
 				case gradle.BuildTool(buildFile):
-					err := gradle.Build(workingDir, project)
+					err := gradle.Build(workingDir, project, context)
 					if err != nil {
 						return err
 					}
 				case mvn.BuildTool(buildFile):
-					err := mvn.Build(workingDir, project)
+					err := mvn.Build(workingDir, project, context)
 					if err != nil {
 						return err
 					}
 				case golang.BuildTool(buildFile):
-					err := golang.Build(workingDir, project)
+					err := golang.Build(workingDir, project, context)
 					if err != nil {
 						return err
 					}
@@ -81,30 +87,20 @@ func findBuildFile(root, pattern string) (result string) {
 	return result
 }
 
-func GenerateProvenance(workDir, project string, deps map[string]string) error {
-	app := createApp(project, deps)
-	s := intoto.GenerateSlsaPredicate(app)
-
-	statement, err := json.Marshal(s)
+func GenerateProvenance(workDir, project string, buildToolMetadata *scan.BuildToolMetadata, context *vcs.AnyContext) error {
+	app := intoto.CreateApp(project, buildToolMetadata).With(context)
+	predicate := intoto.GenerateSlsaPredicate(app)
+	statement, err := json.Marshal(predicate)
 	if err != nil {
 		return fmt.Errorf("marshal: %v\n", err)
 	}
 
 	log.Println(string(statement))
-	provenanceName := fmt.Sprintf("%s.provenance", project)
 
-	err = os.WriteFile(fmt.Sprintf("%s/%s", workDir, provenanceName), statement, 0644)
+	provenanceFileName := fmt.Sprintf("%s.provenance", project)
+	err = os.WriteFile(fmt.Sprintf("%s/%s", workDir, provenanceFileName), statement, 0644)
 	if err != nil {
 		return fmt.Errorf("write to file: %v\n", err)
 	}
 	return nil
-}
-
-func createApp(name string, deps map[string]string) intoto.App {
-	return intoto.App{
-		Name:         name,
-		BuilderId:    "todoId",
-		BuildType:    "todoType",
-		Dependencies: deps,
-	}
 }

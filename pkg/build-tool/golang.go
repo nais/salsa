@@ -2,6 +2,7 @@ package build_tool
 
 import (
 	"fmt"
+	"github.com/nais/salsa/pkg/vcs"
 	"os/exec"
 
 	"github.com/nais/salsa/pkg/scan/golang"
@@ -21,7 +22,7 @@ func NewGolang() BuildTool {
 	}
 }
 
-func (g Golang) Build(workDir, project string) error {
+func (g Golang) Build(workDir, project string, context *vcs.AnyContext) error {
 	cmd := exec.Command(
 		"cat",
 		"go.sum",
@@ -34,10 +35,10 @@ func (g Golang) Build(workDir, project string) error {
 		return fmt.Errorf("exec: %v\n", err)
 	}
 
-	deps := golang.GoDeps(output)
-	log.Println(deps)
+	goMetadata := golang.GoDeps(output)
+	log.Println(goMetadata.Deps)
 
-	err = GenerateProvenance(workDir, project, deps)
+	err = GenerateProvenance(workDir, project, goMetadata, context)
 	if err != nil {
 		return fmt.Errorf("generating provencance %v", err)
 	}

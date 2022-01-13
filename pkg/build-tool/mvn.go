@@ -2,6 +2,7 @@ package build_tool
 
 import (
 	"fmt"
+	"github.com/nais/salsa/pkg/vcs"
 	"os/exec"
 
 	"github.com/nais/salsa/pkg/scan/jvm"
@@ -21,7 +22,7 @@ func NewMaven() BuildTool {
 	}
 }
 
-func (m Maven) Build(workDir, project string) error {
+func (m Maven) Build(workDir, project string, context *vcs.AnyContext) error {
 
 	cmd := exec.Command(
 		"mvn",
@@ -41,7 +42,7 @@ func (m Maven) Build(workDir, project string) error {
 
 	log.Println(deps)
 
-	err = GenerateProvenance(workDir, project, deps)
+	err = GenerateProvenance(workDir, project, deps, context)
 	if err != nil {
 		return fmt.Errorf("generating provencance %v", err)
 	}

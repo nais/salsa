@@ -1,0 +1,106 @@
+{
+  "token": "***",
+  "job": "build",
+  "ref": "refs/heads/main",
+  "sha": "ebe231e64736728ac2d6f3ae779fd29ad52d178f",
+  "repository": "nais/salsa",
+  "repository_owner": "nais",
+  "repositoryUrl": "git://github.com/nais/salsa.git",
+  "run_id": "1691669140",
+  "run_number": "11",
+  "retention_days": "90",
+  "run_attempt": "1",
+  "actor": "ybelMekk",
+  "workflow": "Salsa CI",
+  "event_name": "push",
+  "event": {
+    "after": "ebe231e64736728ac2d6f3ae779fd29ad52d178f",
+    "base_ref": null,
+    "before": "0d031e298b5279609d9817e601111d1ba79c3e0a",
+    "commits": [
+      {
+        "author": {
+          "email": "youssef.bel.mekki@nav.no",
+          "name": "ybelMekk",
+          "username": "ybelMekk"
+        },
+        "committer": {
+          "email": "youssef.bel.mekki@nav.no",
+          "name": "ybelMekk",
+          "username": "ybelMekk"
+        },
+        "distinct": true,
+        "id": "ebe231e64736728ac2d6f3ae779fd29ad52d178f",
+        "message": "test: print github context data",
+        "timestamp": "2022-01-13T09:10:36+01:00",
+        "tree_id": "7784ed2560921f7c00e26b10b3736ed732db73ea",
+        "url": "https://github.com/nais/salsa/commit/ebe231e64736728ac2d6f3ae779fd29ad52d17"
+      }
+    ],
+    "compare": "https://github.com/nais/salsa/compare/0d031e298b52...ebe231e64736",
+    "created": false,
+    "deleted": false,
+    "enterprise": {
+      "avatar_url": "https://avatars.githubusercontent.com/b/371?v=4",
+      "created_at": "2019-06-26T11:17:54Z",
+      "description": "",
+      "html_url": "https://github.com/enterprises/nav",
+      "id": 371,
+      "name": "NAV",
+      "node_id": "MDEwOkVudGVycHJpc2UzNzE=",
+      "slug": "nav",
+      "updated_at": "2021-11-10T10:20:48Z",
+      "website_url": "https://nav.no"
+    },
+    "forced": false,
+    "head_commit": {
+      "author": {
+        "email": "youssef.bel.mekki@nav.no",
+        "name": "ybelMekk",
+        "username": "ybelMekk"
+      },
+      "committer": {
+        "email": "youssef.bel.mekki@nav.no",
+        "name": "ybelMekk",
+        "username": "ybelMekk"
+      },
+      "distinct": true,
+      "id": "ebe231e64736728ac2d6f3ae779fd29ad52d178f",
+      "message": "test: print github context data",
+      "timestamp": "2022-01-13T09:10:36+01:00",
+      "tree_id": "7784ed2560921f7c00e26b10b3736ed732db73",
+      "url": "https://github.com/nais/salsa/commit/ebe231e64736728ac2d6f3ae779fd29ad52d17"
+    },
+    "organization": {
+      "avatar_url": "https://avatars.githubusercontent.com/u/29488289?v=4",
+      "description": "NAV Application Infrastructure Service",
+      "events_url": "https://api.github.com/orgs/nais/events",
+      "hooks_url": "https://api.github.com/orgs/nais/hooks",
+      "id": 29488289,
+      "issues_url": "https://api.github.com/orgs/nais/issues",
+      "login": "nais",
+      "members_url": "https://api.github.com/orgs/nais/members{/member}",
+      "node_id": "MDEyOk9yZ2FuaXphdGlvbjI5NDg4Mjg5",
+      "public_members_url": "https://api.github.com/orgs/nais/public_members{/member}",
+      "repos_url": "https://api.github.com/orgs/nais/repos",
+      "url": "https://api.github.com/orgs/nais"
+    },
+    "pusher": {
+      "email": "38552193+ybelMekk@users.noreply.github.com",
+      "name": "ybelMekk"
+    },
+    "ref": "refs/heads/main"
+  },
+  "server_url": "https://github.com",
+  "api_url": "https://api.github.com",
+  "graphql_url": "https://api.github.com/graphql",
+  "ref_name": "main",
+  "ref_protected": true,
+  "ref_type": "branch",
+  "secret_source": "Actions",
+  "workspace": "/home/runner/work/salsa/salsa",
+  "action": "__run_4",
+  "event_path": "/home/runner/work/_temp/_github_workflow/event.json",
+  "path": "/home/runner/work/_temp/_runner_file_commands/add_path_4f69c67b-19ca-4184-821a-aca2084d4502",
+  "env": "/home/runner/work/_temp/_runner_file_commands/set_env_4f69c67b-19ca-4184-821a-aca2084d4502"
+}

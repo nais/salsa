@@ -1,0 +1,21 @@
+name: NAIS SALSA
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  generate-provenance:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Generate provenance
+        uses: nais/salsa@v0.1
+
+      - name: Upload provenance
+        uses: actions/upload-artifact@v2
+        with:
+          path: tmp/${{ github.event.repository.name }}.provenance
