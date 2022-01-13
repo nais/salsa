@@ -1,6 +1,8 @@
 package commands
 
 import (
+    "errors"
+    "fmt"
 	"os"
 	"os/exec"
 
@@ -16,7 +18,6 @@ type AttestOptions struct {
 	RekorURL      string `mapstructure:"rekor-url"`
 	PredicateFile string `mapstructure:"predicate"`
 	PredicateType string `mapstructure:"type"`
-	WorkDir       string `mapstructure:"workDir"`
 }
 
 var attestCmd = &cobra.Command{
@@ -28,13 +29,23 @@ var attestCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+
+        if PathFlags.Repo == "" {
+            return errors.New("repo name must be specified")
+        }
+
 		out, err := attest.Exec(args)
 		if err != nil {
 			return err
 		}
 		log.Infof("finished attestation %s\n", out)
-		os.Mkdir("attestations", os.FileMode(0755))
-		os.WriteFile("./attestations/"+attest.PredicateFile+".json", []byte(out), os.FileMode(0755))
+		path := PathFlags.RepoDir
+
+		file := path + "/" + attest.PredicateFile + ".att"
+		err = os.WriteFile(file, []byte(out), os.FileMode(0755))
+		if err != nil {
+			return fmt.Errorf("could not write file %s %w", file, err)
+		}
 		return nil
 	},
 }
@@ -61,7 +72,7 @@ func (o AttestOptions) Exec(a []string) (string, error) {
 		args...,
 	)
 
-	cmd.Dir = o.WorkDir
+	cmd.Dir = PathFlags.WorkDir()
 	return utils.Exec(cmd)
 }
 
