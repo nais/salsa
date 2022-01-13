@@ -45,9 +45,17 @@ var findCmd = &cobra.Command{
 				return fmt.Errorf("could not read file %s, %w", attFilePath, err)
 			}
 			result := intoto.FindMaterials(provenance.Predicate.Materials, artifact)
-			if len(result) > 0 {
-				app := strings.Split(file.Name(), ".")[0]
-				log.Infof("found dependency %s in app %s", result, app)
+			app := strings.Split(file.Name(), ".")[0]
+			if len(result) == 0 {
+				log.Infof("no dependcies where found in app %s", app)
+			} else {
+				log.Infof("found dependency(ies) in app %s:", app)
+				for _, f := range result {
+					log.Infof("-uri: %s", f.URI)
+					for k, d := range f.Digest {
+						log.Infof("--digest: %s:%s", k, d)
+					}
+				}
 			}
 		}
 		return nil
