@@ -16,7 +16,8 @@ func GradleDeps(gradleOutput string) (*scan.BuildToolMetadata, error) {
 	}
 
 	for _, match := range matches {
-		elements := strings.Split(strings.Replace(match, "--- ", "", -1), ":")
+		replacedDownGrades := strings.Replace(match, " -> ", ":", -1)
+		elements := strings.Split(strings.Replace(replacedDownGrades, "--- ", "", -1), ":")
 		e := strings.Split(elements[2], " ")
 		name := elements[0] + ":" + elements[1]
 		gradleMetatdata.Deps[name] = e[0]

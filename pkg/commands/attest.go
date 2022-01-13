@@ -1,8 +1,8 @@
 package commands
 
 import (
-    "errors"
-    "fmt"
+	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 
@@ -30,9 +30,9 @@ var attestCmd = &cobra.Command{
 			return err
 		}
 
-        if PathFlags.Repo == "" {
-            return errors.New("repo name must be specified")
-        }
+		if PathFlags.Repo == "" {
+			return errors.New("repo name must be specified")
+		}
 
 		out, err := attest.Exec(args)
 		if err != nil {

@@ -1,12 +1,12 @@
 package commands
 
 import (
-    "errors"
+	"errors"
 
-    "github.com/nais/salsa/pkg/vcs"
-    log "github.com/sirupsen/logrus"
-    "github.com/spf13/cobra"
-    "github.com/spf13/viper"
+	"github.com/nais/salsa/pkg/vcs"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var url string
@@ -20,9 +20,8 @@ var cloneCmd = &cobra.Command{
 			return errors.New("repo and url must be specified")
 		}
 
-
-        path := PathFlags.WorkDir()
-        log.Infof("prepare to checkout %s into path %s ...", url, path)
+		path := PathFlags.WorkDir()
+		log.Infof("prepare to checkout %s into path %s ...", url, path)
 		err := vcs.CloneRepo(url, path)
 		if err != nil {
 			return err

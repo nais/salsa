@@ -8,6 +8,7 @@ import (
 func TestGradleDeps(t *testing.T) {
 	got, _ := GradleDeps(gradleDependenciesOutput)
 	want := map[string]string{
+		"ch.qos.logback:logback-classic":                          "1.2.9",
 		"org.apache.logging.log4j:log4j-core":                     "2.14.1",
 		"org.apache.logging.log4j:log4j-api":                      "2.14.2",
 		"org.wso2.orbit.org.zapache.commons:commons-collections4": "4.4.wso2v1",
@@ -22,6 +23,7 @@ func TestGradleDeps(t *testing.T) {
 }
 
 const gradleDependenciesOutput = `testCompileClasspath - Compile classpath for source set 'test'.
++--- ch.qos.logback:logback-classic -> 1.2.9
 +--- org.apache.logging.log4j:log4j-core:2.14.1
 |    \--- org.apache.logging.log4j:log4j-api:2.14.2
 +--- org.wso2.orbit.org.zapache.commons:commons-collections4:4.4.wso2v1

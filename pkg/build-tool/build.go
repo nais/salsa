@@ -34,14 +34,12 @@ func Scan(workingDir, project string, inputContext *string) error {
 	)
 
 	for index, pattern := range supportedBuildFiles {
-		log.Printf("search for build type '%s'", pattern)
+		log.Printf("search for build type '%s'\n", pattern)
 		buildFile := findBuildFile(workingDir, pattern)
-
 		if index < len(supportedBuildFiles) {
-			log.Printf("searching..")
 			if buildFile != "" {
 				log.Printf("found build type %s", buildFile)
-
+				s := StartSpinner(project)
 				switch true {
 				case gradle.BuildTool(buildFile):
 					err := gradle.Build(workingDir, project, context)
@@ -62,6 +60,7 @@ func Scan(workingDir, project string, inputContext *string) error {
 					// add more cases
 				}
 				// found break out!
+				s.Stop()
 				break
 			}
 

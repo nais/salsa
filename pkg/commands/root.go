@@ -1,31 +1,31 @@
 package commands
 
 import (
-    "fmt"
-    "os"
-    "strings"
+	"fmt"
+	"os"
+	"strings"
 
-    log "github.com/sirupsen/logrus"
-    "github.com/spf13/cobra"
-    "github.com/spf13/pflag"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 
-    "github.com/spf13/viper"
+	"github.com/spf13/viper"
 )
 
 const (
-	envVarPrefix = "SALSA"
-	cmdName      = "salsa"
-	defaultRepoDir  = "tmp"
+	envVarPrefix   = "SALSA"
+	cmdName        = "salsa"
+	defaultRepoDir = "tmp"
 )
 
 type RootFlags struct {
-    Repo    string
-    RepoDir string
+	Repo    string
+	RepoDir string
 }
 
 var (
-	cfgFile  string
-    PathFlags *RootFlags
+	cfgFile   string
+	PathFlags *RootFlags
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -38,8 +38,8 @@ var rootCmd = &cobra.Command{
 	},
 }
 
-func (r RootFlags) WorkDir() string  {
-    return r.RepoDir + "/" + r.Repo
+func (r RootFlags) WorkDir() string {
+	return r.RepoDir + "/" + r.Repo
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -49,10 +49,10 @@ func Execute() {
 }
 
 func init() {
-    PathFlags = &RootFlags{}
-    rootCmd.PersistentFlags().StringVar(&PathFlags.Repo, "repo", "", "name of git repo")
-    rootCmd.PersistentFlags().StringVar(&PathFlags.RepoDir, "repoDir", defaultRepoDir, "path to folder for cloned projects")
-    rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/."+cmdName+".yaml)")
+	PathFlags = &RootFlags{}
+	rootCmd.PersistentFlags().StringVar(&PathFlags.Repo, "repo", "", "name of git repo")
+	rootCmd.PersistentFlags().StringVar(&PathFlags.RepoDir, "repoDir", defaultRepoDir, "path to folder for cloned projects")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/."+cmdName+".yaml)")
 }
 
 // initConfig reads in config file and ENV variables if set.

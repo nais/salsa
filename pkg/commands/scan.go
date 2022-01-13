@@ -1,11 +1,11 @@
 package commands
 
 import (
-    "errors"
+	"errors"
 
-    "github.com/nais/salsa/pkg/build-tool"
-    log "github.com/sirupsen/logrus"
-    "github.com/spf13/cobra"
+	"github.com/nais/salsa/pkg/build-tool"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 )
 
 var project string
@@ -22,9 +22,9 @@ var scanCmd = &cobra.Command{
 			artifact = args[0]
 		}
 
-        if PathFlags.Repo == "" {
-            return errors.New("repo name must be specified")
-        }
+		if PathFlags.Repo == "" {
+			return errors.New("repo name must be specified")
+		}
 
 		log.Infof("prepare to scan path %s for project %s...", PathFlags.WorkDir(), project)
 		// TODO: generalize into other build tools

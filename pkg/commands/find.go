@@ -2,11 +2,11 @@ package commands
 
 import (
 	"errors"
-    "fmt"
-    "io/ioutil"
+	"fmt"
+	"io/ioutil"
 	"os"
-    "path/filepath"
-    "strings"
+	"path/filepath"
+	"strings"
 
 	"github.com/nais/salsa/pkg/intoto"
 	log "github.com/sirupsen/logrus"
@@ -26,7 +26,7 @@ var findCmd = &cobra.Command{
 		if artifact == "" {
 			return errors.New("missing artifact")
 		}
-        path := PathFlags.RepoDir
+		path := PathFlags.RepoDir
 		files, err := ioutil.ReadDir(path)
 		if err != nil {
 			return fmt.Errorf("could not read dir %w", err)
@@ -35,14 +35,14 @@ var findCmd = &cobra.Command{
 		for _, file := range files {
 			var attFilePath = "./" + path + "/" + file.Name()
 
-            if ext := filepath.Ext(file.Name()); ext != ".att" {
-                continue
-            }
+			if ext := filepath.Ext(file.Name()); ext != ".att" {
+				continue
+			}
 
 			fileContents, _ := os.ReadFile(attFilePath)
 			provenance, err := intoto.ParseEnvelope(fileContents)
 			if err != nil {
-                return fmt.Errorf("could not read file %s, %w", attFilePath,  err)
+				return fmt.Errorf("could not read file %s, %w", attFilePath, err)
 			}
 			result := intoto.FindMaterials(provenance.Predicate.Materials, artifact)
 			if len(result) > 0 {
