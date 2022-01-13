@@ -7,7 +7,6 @@ import (
 	"os/exec"
 
 	"github.com/nais/salsa/pkg/utils"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -34,12 +33,11 @@ var attestCmd = &cobra.Command{
 			return errors.New("repo name must be specified")
 		}
 
-		s := utils.StartSpinner(fmt.Sprintf("attestation for %s finished", PathFlags.Repo))
+		s := utils.StartSpinner(fmt.Sprintf("attestation generated for %s in %s", PathFlags.Repo, PathFlags.RepoDir))
 		out, err := attest.Exec(args)
 		if err != nil {
 			return err
 		}
-		log.Infof("finished attestation %s\n", out)
 		s.Stop()
 		path := PathFlags.RepoDir
 

@@ -40,7 +40,7 @@ func Scan(workingDir, project string, inputContext *string) error {
 		if index < len(supportedBuildFiles) {
 			if buildFile != "" {
 				log.Printf("found build type %s", buildFile)
-				s := utils.StartSpinner(fmt.Sprintf("provenace for %s finished", project))
+				s := utils.StartSpinner(fmt.Sprintf("provenace generated for %s in %s", project, workingDir))
 				switch true {
 				case gradle.BuildTool(buildFile):
 					err := gradle.Build(workingDir, project, context)
