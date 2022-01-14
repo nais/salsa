@@ -27,11 +27,13 @@ func Scan(workingDir, project string, inputContext *string) error {
 	gradle := NewGradle()
 	mvn := NewMaven()
 	golang := NewGolang()
+	npm := NewNpm()
 
 	supportedBuildFiles := sumSupported(
 		gradle.BuildFiles(),
 		mvn.BuildFiles(),
 		golang.BuildFiles(),
+		npm.BuildFiles(),
 	)
 
 	for index, pattern := range supportedBuildFiles {
@@ -54,6 +56,11 @@ func Scan(workingDir, project string, inputContext *string) error {
 					}
 				case golang.BuildTool(buildFile):
 					err := golang.Build(workingDir, project, context)
+					if err != nil {
+						return err
+					}
+				case npm.BuildTool(buildFile):
+					err := npm.Build(workingDir, project, context)
 					if err != nil {
 						return err
 					}
