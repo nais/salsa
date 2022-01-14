@@ -2,6 +2,62 @@
 
 > in line with the best from abroad
 
+## Usage
+
+`Prerequisites to run locally`
+* Google Setup
+  * KMS is enabled in project
+    * create keyring
+      * create keys: `Elliptic Curve P-256 key SHA256 Digest`
+  * Serviceuser in project has roles:
+    * Cloud KMS CryptoKey signer/verifier
+    * Cloud KMS viewer
+* Logged in to Google
+* Set: `GOOGLE_APPLICATION_CREDENTIALS` with path to .json file containing serviceuser credentials.
+
+* Install
+  * Cosign: https://github.com/sigstore/cosign
+  
+## Local install
+
+```
+make
+```
+
+### Commands
+
+clone: `clones the given project into user defined path`
+```
+bin/salsa clone --repo salsa --url https://github.com/nais/salsa
+```
+
+scan: `Scan files and dependencies for a given project`
+```
+bin/salsa scan --repo salsa
+```
+
+attest: `sign and upload in-toto attestation`
+```
+bin/salsa attest --repo salsa --predicate salsa.provenance --no-upload --key gcpkms://projects/$PROJECT/locations/$LOCATION/keyRings/$KEYRING/cryptoKeys/$KEY/versions/$KEY_VERSION  ttl.sh/salsax:1h
+```
+
+Info:
+Image can to be pushed to ttl.sh, who offers free, short-lived (ie: hours), anonymous container image hosting if you just want to try these commands out.
+**Quick Start** [Cosign](https://github.com/sigstore/cosign#quick-start)  
+**ttl.sh** [tt.sh info](https://ttl.sh/)
+
+find: `find artifact from attestations`
+```
+bin/salsa find go-crypto
+```
+
+Instead of setting a bunch of flags, in home directory create a config file with name ".salsa" (without extension).
+```yml
+attest:
+  key: gcpkms://projects/$PROJECT/locations/$LOCATION/keyRings/$KEYRING/cryptoKeys/$KEY/versions/$KEY_VERSION
+...
+```
+
 ## Status
 
 Proof of Concept for a SLSA github action / cli.
