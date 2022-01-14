@@ -26,7 +26,7 @@ func (m Maven) Build(workDir, project string, context *vcs.AnyContext) error {
 
 	cmd := exec.Command(
 		"mvn",
-		"dependencies:list",
+		"dependency:list",
 	)
 	cmd.Dir = workDir
 

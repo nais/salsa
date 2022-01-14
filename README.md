@@ -94,6 +94,8 @@ Created simple CLI to test concepts:
         * Fulcio is a work in progress. There's working code and a running instance and a plan, but you should not
           attempt to try to actually use it for anything
 * how to make attestations searchable
+* how to get/add the digest for dependency artifacts for all build tools
+  * currently, implemented only in golang
 * Handle the ability to resolve packages that's private
 
 ## Relevant links
