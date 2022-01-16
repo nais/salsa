@@ -3,7 +3,6 @@ package intoto
 import (
 	"fmt"
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
-	"github.com/nais/salsa/pkg/digest"
 	"strings"
 	"time"
 )
@@ -65,7 +64,7 @@ func withMaterials(app App) []slsa.ProvenanceMaterial {
 		var uri = fmt.Sprintf("pkg:%s:%s", k, v)
 		m := slsa.ProvenanceMaterial{
 			URI:    uri,
-			Digest: slsa.DigestSet{digest.SHA256: app.Checksums[k]},
+			Digest: slsa.DigestSet{app.Checksums[k].Algorithm: app.Checksums[k].Digest},
 		}
 		materials = append(materials, m)
 	}

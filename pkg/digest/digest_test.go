@@ -14,8 +14,4 @@ func TestDigest(t *testing.T) {
 	result, err = Hash("yello")
 	assert.NoError(t, err)
 	assert.True(t, result.Verify(hello), "Should return true for verifying NOT OK")
-
-	checksum, err := Digest("aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=").DecodeToString()
-	assert.NoError(t, err)
-	assert.Equal(t, "690518917cd5b2e7ccf83c05d5a13ed317dc53ee7a27009a2e2724d02966313c", checksum)
 }

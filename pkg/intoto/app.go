@@ -13,7 +13,7 @@ type App struct {
 	BuilderId         string
 	BuildType         string
 	Dependencies      map[string]string
-	Checksums         map[string]string
+	Checksums         map[string]scan.CheckSum
 	BuildStartedOn    time.Time
 	BuildInvocationId string
 	BuilderRepoDigest v02.ProvenanceMaterial

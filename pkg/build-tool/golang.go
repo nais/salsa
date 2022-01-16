@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/nais/salsa/pkg/scan/golang"
 	"github.com/nais/salsa/pkg/vcs"
-	log "github.com/sirupsen/logrus"
 	"os"
 )
 
@@ -23,8 +22,6 @@ func NewGolang() BuildTool {
 func (g Golang) Build(workDir, project string, context *vcs.AnyContext) error {
 	fileContent, err := os.ReadFile(fmt.Sprintf("%s/%s", workDir, golangBuildFileName))
 	goMetadata := golang.GoDeps(string(fileContent))
-	log.Println(goMetadata.Deps)
-
 	err = GenerateProvenance(workDir, project, goMetadata, context)
 	if err != nil {
 		return fmt.Errorf("generating provencance %v", err)

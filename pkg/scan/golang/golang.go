@@ -16,8 +16,8 @@ func GoDeps(goSumContents string) *scan.BuildToolMetadata {
 		parts := strings.Split(line, " ")
 		goMetatdata.Deps[parts[0]] = parts[1][1:]
 		strings.Split(parts[2], ":")
-		stringDecodedDigest, _ := digest.Digest(strings.Split(parts[2], ":")[1]).DecodeToString()
-		goMetatdata.Checksums[parts[0]] = stringDecodedDigest
+		stringDecodedDigest := digest.Digest(strings.Split(parts[2], ":")[1])
+		goMetatdata.Checksums[parts[0]] = scan.CheckSum{Algorithm: digest.SHA256, Digest: string(stringDecodedDigest)}
 
 	}
 	return goMetatdata
