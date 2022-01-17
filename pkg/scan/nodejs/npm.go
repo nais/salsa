@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/nais/salsa/pkg/scan"
+	"strings"
 )
 
 func NpmDeps(packageLockJsonContents string) (*scan.BuildToolMetadata, error) {
@@ -22,6 +23,12 @@ func transform(input map[string]interface{}) *scan.BuildToolMetadata {
 	for key, value := range input {
 		dependency := value.(map[string]interface{})
 		npmMetadata.Deps[key] = fmt.Sprintf("%s", dependency["version"])
+		integrity := fmt.Sprintf("%s", dependency["integrity"])
+		shaDig := strings.Split(integrity, "-")
+		npmMetadata.Checksums[key] = scan.CheckSum{
+			Algorithm: fmt.Sprintf("%s", shaDig[0]),
+			Digest:    fmt.Sprintf("%s", shaDig[1]),
+		}
 	}
 	return npmMetadata
 }
