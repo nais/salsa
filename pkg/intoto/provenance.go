@@ -61,6 +61,7 @@ func withCompleteness(environment, materials bool) slsa.ProvenanceComplete {
 func withMaterials(app App) []slsa.ProvenanceMaterial {
 	materials := make([]slsa.ProvenanceMaterial, 0)
 	for k, v := range app.Dependencies {
+		// TODO should move pkg or other, to resolve the actual artifact where it get generated
 		var uri = fmt.Sprintf("pkg:%s:%s", k, v)
 		m := slsa.ProvenanceMaterial{
 			URI:    uri,
