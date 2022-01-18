@@ -27,7 +27,6 @@ var scanCmd = &cobra.Command{
 		}
 
 		log.Infof("prepare to scan path %s for project %s...", PathFlags.WorkDir(), project)
-		// TODO: generalize into other build tools
 		err := build_tool.Scan(PathFlags.WorkDir(), PathFlags.Repo, &inputContext)
 		if err != nil {
 			return err

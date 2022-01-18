@@ -3,11 +3,12 @@ package utils
 import (
 	"bytes"
 	"fmt"
-	"github.com/briandowns/spinner"
 	"io"
 	"os"
 	"os/exec"
 	"time"
+
+	"github.com/briandowns/spinner"
 )
 
 func RequireCommand(cmd string) error {
@@ -28,6 +29,10 @@ func Exec(cmd *exec.Cmd) (string, error) {
 	}
 	outStr, _ := string(stdoutBuf.Bytes()), string(stderrBuf.Bytes())
 	return outStr, nil
+}
+
+func ProvenanceFile(repoName string) string {
+	return fmt.Sprintf("%s.provenance", repoName)
 }
 
 func StartSpinner(message string) *spinner.Spinner {

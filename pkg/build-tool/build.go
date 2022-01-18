@@ -3,13 +3,14 @@ package build_tool
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"os"
+
 	"github.com/nais/salsa/pkg/intoto"
 	"github.com/nais/salsa/pkg/scan"
 	"github.com/nais/salsa/pkg/utils"
 	"github.com/nais/salsa/pkg/vcs"
 	log "github.com/sirupsen/logrus"
-	"io/ioutil"
-	"os"
 )
 
 type BuildTool interface {
@@ -111,8 +112,8 @@ func GenerateProvenance(workDir, project string, buildToolMetadata *scan.BuildTo
 
 	log.Println(string(statement))
 
-	provenanceFileName := fmt.Sprintf("%s.provenance", project)
-	err = os.WriteFile(fmt.Sprintf("%s/%s", workDir, provenanceFileName), statement, 0644)
+	provenanceFileName := utils.ProvenanceFile(project)
+	err = os.WriteFile(workDir+"/"+provenanceFileName, statement, 0644)
 	if err != nil {
 		return fmt.Errorf("write to file: %v\n", err)
 	}
