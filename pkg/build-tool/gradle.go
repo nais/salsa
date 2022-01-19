@@ -2,13 +2,12 @@ package build_tool
 
 import (
 	"fmt"
-	"github.com/nais/salsa/pkg/scan"
+	"os/exec"
+
 	"github.com/nais/salsa/pkg/scan/jvm"
 	"github.com/nais/salsa/pkg/utils"
 	"github.com/nais/salsa/pkg/vcs"
 	log "github.com/sirupsen/logrus"
-	"os"
-	"os/exec"
 )
 
 const gradleBuildFileName = "build.gradle.kts"
@@ -24,43 +23,22 @@ func NewGradle() BuildTool {
 }
 
 func (g Gradle) Build(workDir string, project string, context *vcs.AnyContext) error {
-	//cmd := exec.Command(
-	//	"./gradlew",
-	//	"-q", "dependencies", "--configuration", "runtimeClasspath",
-	//)
-	//cmd.Dir = workDir
-	//
-	//depsOutput, err := utils.Exec(cmd)
-	//if err != nil {
-	//	return fmt.Errorf("exec: %v\n", err)
-	//}
-
 	cmd := exec.Command(
 		"./gradlew",
-		"-M", "sha256",
+		"-q", "dependencies", "--configuration", "runtimeClasspath",
 	)
 	cmd.Dir = workDir
-	sumsOutput, err := utils.Exec(cmd)
+
+	depsOutput, err := utils.Exec(cmd)
 	if err != nil {
 		return fmt.Errorf("exec: %v\n", err)
 	}
-	log.Info(sumsOutput)
+	log.Info(depsOutput)
 
-	// deps, err := jvm.GradleDeps(depsOutput)
-	depsSums := scan.CreateMetadata()
+	deps, err := jvm.GradleDeps(depsOutput)
 	log.Info(workDir)
 
-	depsSumsFile, err := os.ReadFile(fmt.Sprintf("%s/gradle/verification-metadata.xml", workDir))
-	if err != nil {
-		return fmt.Errorf("exec: %v\n", err)
-	}
-
-	err = jvm.GradleDepsAndSums(depsSums, depsSumsFile)
-	if err != nil {
-		return fmt.Errorf("scan: %v\n", err)
-	}
-
-	err = GenerateProvenance(workDir, project, depsSums, context)
+	err = GenerateProvenance(workDir, project, deps, context)
 	if err != nil {
 		return fmt.Errorf("generating provencance %v", err)
 	}
