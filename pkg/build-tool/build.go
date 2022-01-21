@@ -30,6 +30,7 @@ func Scan(workingDir, project string, inputContext *string) error {
 	golang := NewGolang()
 	npm := NewNpm()
 	yarn := NewYarn()
+	composer := NewComposer()
 
 	supportedBuildFiles := sumSupported(
 		gradle.BuildFiles(),
@@ -37,6 +38,7 @@ func Scan(workingDir, project string, inputContext *string) error {
 		golang.BuildFiles(),
 		npm.BuildFiles(),
 		yarn.BuildFiles(),
+		composer.BuildFiles(),
 	)
 
 	for index, pattern := range supportedBuildFiles {
@@ -69,6 +71,11 @@ func Scan(workingDir, project string, inputContext *string) error {
 					}
 				case yarn.BuildTool(buildFile):
 					err := yarn.Build(workingDir, project, context)
+					if err != nil {
+						return err
+					}
+				case composer.BuildTool(buildFile):
+					err := composer.Build(workingDir, project, context)
 					if err != nil {
 						return err
 					}
