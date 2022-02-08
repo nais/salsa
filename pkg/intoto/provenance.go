@@ -1,20 +1,42 @@
 package intoto
 
 import (
-	"fmt"
-	"strings"
+	"github.com/nais/salsa/pkg/vcs"
+	"os"
 	"time"
 
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
+	"github.com/nais/salsa/pkg/scan"
 )
 
-func GenerateSlsaPredicate(app App) slsa.ProvenancePredicate {
-	return withPredicate(app)
+type ProvenanceArtifact struct {
+	Name              string
+	BuilderId         string
+	BuildType         string
+	Dependencies      *scan.ArtifactDependencies
+	BuildStartedOn    time.Time
+	BuildInvocationId string
+	BuilderRepoDigest *slsa.ProvenanceMaterial
 }
 
-func withPredicate(app App) slsa.ProvenancePredicate {
+func CreateProvenanceArtifact(name string, deps *scan.ArtifactDependencies) *ProvenanceArtifact {
+	return &ProvenanceArtifact{
+		Name:           name,
+		BuildType:      "todoType",
+		Dependencies:   deps,
+		BuildStartedOn: time.Now().UTC(),
+	}
+}
+
+func (in *ProvenanceArtifact) GenerateSlsaPredicate() slsa.ProvenancePredicate {
+	return in.withPredicate()
+}
+
+func (in *ProvenanceArtifact) withPredicate() slsa.ProvenancePredicate {
 	return slsa.ProvenancePredicate{
-		Builder:   slsa.ProvenanceBuilder{},
+		Builder: slsa.ProvenanceBuilder{
+			ID: in.BuilderId,
+		},
 		BuildType: "yolo",
 		Invocation: slsa.ProvenanceInvocation{
 			ConfigSource: slsa.ConfigSource{},
@@ -22,29 +44,39 @@ func withPredicate(app App) slsa.ProvenancePredicate {
 			Environment:  nil,
 		},
 		BuildConfig: nil,
-		Metadata:    withMetadata(app, false, time.Now().UTC()),
-		Materials:   withMaterials(app),
+		Metadata:    in.withMetadata(false, time.Now().UTC()),
+		Materials:   in.withMaterials(),
 	}
 }
 
-func FindMaterials(materials []slsa.ProvenanceMaterial, value string) []slsa.ProvenanceMaterial {
-	found := make([]slsa.ProvenanceMaterial, 0)
-	for _, m := range materials {
-		if find(m, value) {
-			found = append(found, m)
+// TODO: use other type of materials aswell, e.g. github actions run in the build
+func (in *ProvenanceArtifact) withMaterials() []slsa.ProvenanceMaterial {
+	materials := make([]slsa.ProvenanceMaterial, 0)
+	in.AppendRuntimeDependencies(&materials)
+	in.AppendBuildContext(&materials)
+	return materials
+}
+
+func (in *ProvenanceArtifact) AppendRuntimeDependencies(materials *[]slsa.ProvenanceMaterial) {
+	for _, dep := range in.Dependencies.RuntimeDeps {
+		m := slsa.ProvenanceMaterial{
+			URI:    dep.ToUri(),
+			Digest: dep.ToDigestSet(),
 		}
+		*materials = append(*materials, m)
 	}
-	return found
 }
 
-func find(material slsa.ProvenanceMaterial, value string) bool {
-	return strings.Contains(material.URI, value)
+func (in *ProvenanceArtifact) AppendBuildContext(materials *[]slsa.ProvenanceMaterial) {
+	if in.BuilderRepoDigest != nil {
+		*materials = append(*materials, *in.BuilderRepoDigest)
+	}
 }
 
-func withMetadata(app App, rp bool, buildFinished time.Time) *slsa.ProvenanceMetadata {
+func (in *ProvenanceArtifact) withMetadata(rp bool, buildFinished time.Time) *slsa.ProvenanceMetadata {
 	return &slsa.ProvenanceMetadata{
-		BuildInvocationID: app.BuildInvocationId,
-		BuildStartedOn:    &app.BuildStartedOn,
+		BuildInvocationID: in.BuildInvocationId,
+		BuildStartedOn:    &in.BuildStartedOn,
 		BuildFinishedOn:   &buildFinished,
 		Completeness:      withCompleteness(false, false),
 		Reproducible:      rp,
@@ -58,17 +90,38 @@ func withCompleteness(environment, materials bool) slsa.ProvenanceComplete {
 	}
 }
 
-// TODO: use other type of materials aswell, e.g. github actions run in the build
-func withMaterials(app App) []slsa.ProvenanceMaterial {
-	materials := make([]slsa.ProvenanceMaterial, 0)
-	for _, dep := range app.Dependencies.RuntimeDeps {
-		// TODO should move pkg or other, to resolve the actual artifact where it get generated
-		var uri = fmt.Sprintf("pkg:%s:%s", dep.Coordinates, dep.Version)
-		m := slsa.ProvenanceMaterial{
-			URI:    uri,
-			Digest: slsa.DigestSet{dep.CheckSum.Algorithm: dep.CheckSum.Digest},
-		}
-		materials = append(materials, m)
+func (in *ProvenanceArtifact) WithRunnerContext(context *vcs.AnyContext) *ProvenanceArtifact {
+	if context == nil {
+		// Required
+		in.BuilderId = "default"
+		return in
 	}
-	return materials
+
+	repoURI := "https://github.com/" + context.GitHubContext.Repository
+	in.WithBuildInvocationId(repoURI, context).
+		WithBuilderRepoDigest(repoURI, context).
+		WithBuilderId(repoURI)
+	return in
+}
+
+func (in *ProvenanceArtifact) WithBuildInvocationId(repoURI string, context *vcs.AnyContext) *ProvenanceArtifact {
+	in.BuildInvocationId = repoURI + "/actions/runs/" + context.GitHubContext.RunId
+	return in
+}
+
+func (in *ProvenanceArtifact) WithBuilderRepoDigest(repoURI string, context *vcs.AnyContext) *ProvenanceArtifact {
+	in.BuilderRepoDigest = &slsa.ProvenanceMaterial{
+		URI:    "git+" + repoURI,
+		Digest: slsa.DigestSet{"sha1": context.GitHubContext.SHA},
+	}
+	return in
+}
+
+func (in *ProvenanceArtifact) WithBuilderId(repoURI string) *ProvenanceArtifact {
+	if os.Getenv("GITHUB_ACTIONS") == "true" {
+		in.BuilderId = repoURI + vcs.GitHubHostedIdSuffix
+	} else {
+		in.BuilderId = repoURI + vcs.GitHubHostedIdSuffix
+	}
+	return in
 }

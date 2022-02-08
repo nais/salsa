@@ -10,7 +10,7 @@
   "run_number": "11",
   "retention_days": "90",
   "run_attempt": "1",
-  "actor": "ybelMekk",
+  "actor": "jdoe",
   "workflow": "Salsa CI",
   "event_name": "push",
   "event": {
@@ -20,14 +20,14 @@
     "commits": [
       {
         "author": {
-          "email": "youssef.bel.mekki@nav.no",
-          "name": "ybelMekk",
-          "username": "ybelMekk"
+          "email": "jon.doe@nav.no",
+          "name": "jdoe",
+          "username": "jdoe"
         },
         "committer": {
-          "email": "youssef.bel.mekki@nav.no",
-          "name": "ybelMekk",
-          "username": "ybelMekk"
+          "email": "jon.doe@nav.no",
+          "name": "jdoe",
+          "username": "jdoe"
         },
         "distinct": true,
         "id": "ebe231e64736728ac2d6f3ae779fd29ad52d178f",
@@ -55,14 +55,14 @@
     "forced": false,
     "head_commit": {
       "author": {
-        "email": "youssef.bel.mekki@nav.no",
-        "name": "ybelMekk",
-        "username": "ybelMekk"
+        "email": "jon.doe@nav.no",
+        "name": "jdoe",
+        "username": "jdoe"
       },
       "committer": {
-        "email": "youssef.bel.mekki@nav.no",
-        "name": "ybelMekk",
-        "username": "ybelMekk"
+        "email": "jon.doe@nav.no",
+        "name": "jdoe",
+        "username": "jdoe"
       },
       "distinct": true,
       "id": "ebe231e64736728ac2d6f3ae779fd29ad52d178f",
@@ -86,8 +86,8 @@
       "url": "https://api.github.com/orgs/nais"
     },
     "pusher": {
-      "email": "38552193+ybelMekk@users.noreply.github.com",
-      "name": "ybelMekk"
+      "email": "38552193+jdoe@users.noreply.github.com",
+      "name": "jdoe"
     },
     "ref": "refs/heads/main"
   },
