@@ -2,10 +2,10 @@ package build_tool
 
 import (
 	"fmt"
-	"github.com/nais/salsa/pkg/scan/nodejs"
-	"github.com/nais/salsa/pkg/vcs"
-	log "github.com/sirupsen/logrus"
 	"os"
+
+	"github.com/nais/salsa/pkg/scan"
+	"github.com/nais/salsa/pkg/scan/nodejs"
 )
 
 const npmBuildFileName = "package-lock.json"
@@ -14,35 +14,31 @@ type Npm struct {
 	BuildFilePatterns []string
 }
 
+func (n Npm) ResolveDeps(workDir string) (*scan.ArtifactDependencies, error) {
+	fileContent, err := os.ReadFile(fmt.Sprintf("%s/%s", workDir, npmBuildFileName))
+	if err != nil {
+		return nil, fmt.Errorf("read file: %w\n", err)
+	}
+	deps, err := nodejs.NpmDeps(string(fileContent))
+	if err != nil {
+		return nil, fmt.Errorf("error parsing deps: %v\n", err)
+	}
+	return &scan.ArtifactDependencies{
+		Cmd:         npmBuildFileName,
+		RuntimeDeps: deps,
+	}, nil
+}
+
 func NewNpm() BuildTool {
 	return &Npm{
 		BuildFilePatterns: []string{npmBuildFileName},
 	}
 }
 
-func (m Npm) Build(workDir, project string, context *vcs.AnyContext) error {
-	fileContent, err := os.ReadFile(fmt.Sprintf("%s/%s", workDir, npmBuildFileName))
-	if err != nil {
-		return fmt.Errorf("read file: %w\n", err)
-	}
-	deps, err := nodejs.NpmDeps(string(fileContent))
-	if err != nil {
-		return fmt.Errorf("scan: %v\n", err)
-	}
-
-	log.Println(deps)
-
-	err = GenerateProvenance(workDir, project, deps, context)
-	if err != nil {
-		return fmt.Errorf("generating provencance %v", err)
-	}
-	return nil
+func (n Npm) Supported(pattern string) bool {
+	return Contains(n.BuildFilePatterns, pattern)
 }
 
-func (m Npm) BuildTool(pattern string) bool {
-	return Contains(m.BuildFilePatterns, pattern)
-}
-
-func (m Npm) BuildFiles() []string {
-	return m.BuildFilePatterns
+func (n Npm) BuildFiles() []string {
+	return n.BuildFilePatterns
 }

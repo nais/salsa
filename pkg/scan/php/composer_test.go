@@ -3,29 +3,42 @@ package php
 import (
 	"reflect"
 	"testing"
+
+	"github.com/nais/salsa/pkg/scan"
 )
 
 func TestComposerLockJsonParsing(t *testing.T) {
 	got, _ := ComposerDeps(composerLockContents)
-	want := map[string]string{
-		"guzzlehttp/guzzle":             "7.4.1",
-		"guzzlehttp/promises":           "1.5.1",
-		"guzzlehttp/psr7":               "2.1.0",
-		"nikic/fast-route":              "v1.3.0",
-		"psr/container":                 "2.0.2",
-		"psr/http-client":               "1.0.1",
-		"psr/http-factory":              "1.0.1",
-		"psr/http-message":              "1.0.1",
-		"psr/http-server-handler":       "1.0.1",
-		"psr/http-server-middleware":    "1.0.1",
-		"psr/log":                       "1.1.4",
-		"ralouphie/getallheaders":       "3.0.3",
-		"slim/slim":                     "4.9.0",
-		"symfony/deprecation-contracts": "v2.5.0",
+	want := []scan.Dependency{
+		dependency("guzzlehttp/guzzle", "7.4.1"),
+		dependency("guzzlehttp/promises", "1.5.1"),
+		dependency("guzzlehttp/psr7", "2.1.0"),
+		dependency("nikic/fast-route", "v1.3.0"),
+		dependency("psr/container", "2.0.2"),
+		dependency("psr/http-client", "1.0.1"),
+		dependency("psr/http-factory", "1.0.1"),
+		dependency("psr/http-message", "1.0.1"),
+		dependency("psr/http-server-handler", "1.0.1"),
+		dependency("psr/http-server-middleware", "1.0.1"),
+		dependency("psr/log", "1.1.4"),
+		dependency("ralouphie/getallheaders", "3.0.3"),
+		dependency("slim/slim", "4.9.0"),
+		dependency("symfony/deprecation-contracts", "v2.5.0"),
 	}
 
-	if !reflect.DeepEqual(got.Deps, want) {
-		t.Errorf("got %q, wanted %q", got.Deps, want)
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("got %q, wanted %q", got, want)
+	}
+}
+
+func dependency(coordinates, version string) scan.Dependency {
+	return scan.Dependency{
+		Coordinates: coordinates,
+		Version:     version,
+		CheckSum: scan.CheckSum{
+			Algorithm: "sha1",
+			Digest:    "",
+		},
 	}
 }
 

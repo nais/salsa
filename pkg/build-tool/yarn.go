@@ -2,9 +2,10 @@ package build_tool
 
 import (
 	"fmt"
-	"github.com/nais/salsa/pkg/scan/nodejs"
-	"github.com/nais/salsa/pkg/vcs"
 	"os"
+
+	"github.com/nais/salsa/pkg/scan"
+	"github.com/nais/salsa/pkg/scan/nodejs"
 )
 
 const yarnBuildFileName = "yarn.lock"
@@ -19,23 +20,23 @@ func NewYarn() BuildTool {
 	}
 }
 
-func (m Yarn) Build(workDir, project string, context *vcs.AnyContext) error {
+func (y Yarn) ResolveDeps(workDir string) (*scan.ArtifactDependencies, error) {
 	fileContent, err := os.ReadFile(fmt.Sprintf("%s/%s", workDir, yarnBuildFileName))
 	if err != nil {
-		return fmt.Errorf("read file: %w\n", err)
+		return nil, fmt.Errorf("read file: %w\n", err)
 	}
 	deps := nodejs.YarnDeps(string(fileContent))
-	err = GenerateProvenance(workDir, project, deps, context)
-	if err != nil {
-		return fmt.Errorf("generating provencance %v", err)
-	}
-	return nil
+
+	return &scan.ArtifactDependencies{
+		Cmd:         yarnBuildFileName,
+		RuntimeDeps: deps,
+	}, nil
 }
 
-func (m Yarn) BuildTool(pattern string) bool {
-	return Contains(m.BuildFilePatterns, pattern)
+func (y Yarn) Supported(pattern string) bool {
+	return Contains(y.BuildFilePatterns, pattern)
 }
 
-func (m Yarn) BuildFiles() []string {
-	return m.BuildFilePatterns
+func (y Yarn) BuildFiles() []string {
+	return y.BuildFilePatterns
 }

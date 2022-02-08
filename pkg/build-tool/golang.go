@@ -2,9 +2,10 @@ package build_tool
 
 import (
 	"fmt"
-	"github.com/nais/salsa/pkg/scan/golang"
-	"github.com/nais/salsa/pkg/vcs"
 	"os"
+
+	"github.com/nais/salsa/pkg/scan"
+	"github.com/nais/salsa/pkg/scan/golang"
 )
 
 const golangBuildFileName = "go.sum"
@@ -13,23 +14,25 @@ type Golang struct {
 	BuildFilePatterns []string
 }
 
+func (g Golang) ResolveDeps(workDir string) (*scan.ArtifactDependencies, error) {
+	fileContent, err := os.ReadFile(fmt.Sprintf("%s/%s", workDir, golangBuildFileName))
+	deps := golang.GoDeps(string(fileContent))
+	if err != nil {
+		return nil, fmt.Errorf("error parsing %s, %v", golangBuildFileName, err)
+	}
+	return &scan.ArtifactDependencies{
+		Cmd:         golangBuildFileName,
+		RuntimeDeps: deps,
+	}, nil
+}
+
 func NewGolang() BuildTool {
 	return &Golang{
 		BuildFilePatterns: []string{golangBuildFileName},
 	}
 }
 
-func (g Golang) Build(workDir, project string, context *vcs.AnyContext) error {
-	fileContent, err := os.ReadFile(fmt.Sprintf("%s/%s", workDir, golangBuildFileName))
-	goMetadata := golang.GoDeps(string(fileContent))
-	err = GenerateProvenance(workDir, project, goMetadata, context)
-	if err != nil {
-		return fmt.Errorf("generating provencance %v", err)
-	}
-	return nil
-}
-
-func (g Golang) BuildTool(pattern string) bool {
+func (g Golang) Supported(pattern string) bool {
 	return Contains(g.BuildFilePatterns, pattern)
 }
 

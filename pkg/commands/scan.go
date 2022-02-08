@@ -1,9 +1,16 @@
 package commands
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
+	"os"
 
 	"github.com/nais/salsa/pkg/build-tool"
+	"github.com/nais/salsa/pkg/intoto"
+	"github.com/nais/salsa/pkg/scan"
+	"github.com/nais/salsa/pkg/utils"
+	"github.com/nais/salsa/pkg/vcs"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -27,12 +34,36 @@ var scanCmd = &cobra.Command{
 		}
 
 		log.Infof("prepare to scan path %s for project %s...", PathFlags.WorkDir(), project)
-		err := build_tool.Scan(PathFlags.WorkDir(), PathFlags.Repo, &inputContext)
+		workDir := PathFlags.WorkDir()
+		deps, err := build_tool.Dependencies(workDir)
+		err = GenerateProvenance(workDir, PathFlags.Repo, deps, &inputContext)
 		if err != nil {
 			return err
 		}
 		return nil
 	},
+}
+
+func GenerateProvenance(workDir, project string, dependencies *scan.ArtifactDependencies, inputContext *string) error {
+	context, err := vcs.CreateCIContext(inputContext)
+	if err != nil {
+		return err
+	}
+	app := intoto.CreateApp(project, dependencies).With(context)
+	predicate := intoto.GenerateSlsaPredicate(app)
+	statement, err := json.Marshal(predicate)
+	if err != nil {
+		return fmt.Errorf("marshal: %v\n", err)
+	}
+
+	log.Println(string(statement))
+
+	provenanceFileName := utils.ProvenanceFile(project)
+	err = os.WriteFile(workDir+"/"+provenanceFileName, statement, 0644)
+	if err != nil {
+		return fmt.Errorf("write to file: %v\n", err)
+	}
+	return nil
 }
 
 func init() {

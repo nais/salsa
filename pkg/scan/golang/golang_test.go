@@ -1,30 +1,32 @@
 package golang
 
 import (
-	"github.com/nais/salsa/pkg/digest"
-	"github.com/nais/salsa/pkg/scan"
 	"reflect"
 	"testing"
+
+	"github.com/nais/salsa/pkg/scan"
 )
 
 func TestGoDeps(t *testing.T) {
 	got := GoDeps(goSumContents)
-	wantDeps := map[string]string{
-		"github.com/google/uuid":  "1.0.0",
-		"github.com/pborman/uuid": "1.2.1",
+	wantDeps := []scan.Dependency{
+		dep("github.com/google/uuid", "1.0.0", "b4Gk+7WdP/d3HZH8EJsZpvV7EtDOgaZLtnaNGIu1adA="),
+		dep("github.com/pborman/uuid", "1.2.1", "+ZZIw58t/ozdjRaXh/3awHfmWRbzYxJoAdNJxe/3pvw="),
 	}
 
-	wantChecksum := map[string]scan.CheckSum{
-		"github.com/google/uuid":  {Algorithm: digest.SHA256, Digest: "b4Gk+7WdP/d3HZH8EJsZpvV7EtDOgaZLtnaNGIu1adA="},
-		"github.com/pborman/uuid": {Algorithm: digest.SHA256, Digest: "+ZZIw58t/ozdjRaXh/3awHfmWRbzYxJoAdNJxe/3pvw="},
+	if !reflect.DeepEqual(got, wantDeps) {
+		t.Errorf("got %q, wanted %q", got, wantDeps)
 	}
+}
 
-	if !reflect.DeepEqual(got.Deps, wantDeps) {
-		t.Errorf("got %q, wanted %q", got.Deps, wantDeps)
-	}
-
-	if !reflect.DeepEqual(got.Checksums, wantChecksum) {
-		t.Errorf("got %v, wanted %v", got.Checksums, wantChecksum)
+func dep(coordinates, version, digest string) scan.Dependency {
+	return scan.Dependency{
+		Coordinates: coordinates,
+		Version:     version,
+		CheckSum: scan.CheckSum{
+			Algorithm: "sha256",
+			Digest:    digest,
+		},
 	}
 }
 

@@ -2,9 +2,10 @@ package intoto
 
 import (
 	"fmt"
-	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
 	"strings"
 	"time"
+
+	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
 )
 
 func GenerateSlsaPredicate(app App) slsa.ProvenancePredicate {
@@ -60,12 +61,12 @@ func withCompleteness(environment, materials bool) slsa.ProvenanceComplete {
 // TODO: use other type of materials aswell, e.g. github actions run in the build
 func withMaterials(app App) []slsa.ProvenanceMaterial {
 	materials := make([]slsa.ProvenanceMaterial, 0)
-	for k, v := range app.Dependencies {
+	for _, dep := range app.Dependencies.RuntimeDeps {
 		// TODO should move pkg or other, to resolve the actual artifact where it get generated
-		var uri = fmt.Sprintf("pkg:%s:%s", k, v)
+		var uri = fmt.Sprintf("pkg:%s:%s", dep.Coordinates, dep.Version)
 		m := slsa.ProvenanceMaterial{
 			URI:    uri,
-			Digest: slsa.DigestSet{app.Checksums[k].Algorithm: app.Checksums[k].Digest},
+			Digest: slsa.DigestSet{dep.CheckSum.Algorithm: dep.CheckSum.Digest},
 		}
 		materials = append(materials, m)
 	}

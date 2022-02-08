@@ -5,32 +5,44 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/nais/salsa/pkg/digest"
-	"github.com/nais/salsa/pkg/scan"
 	"regexp"
 	"strings"
+
+	"github.com/nais/salsa/pkg/digest"
+	"github.com/nais/salsa/pkg/scan"
 )
 
-func GradleDeps(depsOutput string) (*scan.BuildToolMetadata, error) {
-	gradleMetatdata := scan.CreateMetadata()
+// TODO: get gradle checksums
+func GradleDeps(depsOutput string) ([]scan.Dependency, error) {
 	pattern := regexp.MustCompile(`(?m)---\s[a-zA-Z0-9.]+:.*$`)
 	matches := pattern.FindAllString(depsOutput, -1)
 	if matches == nil {
 		return nil, errors.New("unable to find any dependencies")
 	}
 
+	deps := make([]scan.Dependency, 0)
+
 	for _, match := range matches {
 		replacedDownGrades := strings.Replace(match, " -> ", ":", -1)
 		elements := strings.Split(strings.Replace(replacedDownGrades, "--- ", "", -1), ":")
-		e := strings.Split(elements[2], " ")
-		name := elements[0] + ":" + elements[1]
-		gradleMetatdata.Deps[name] = e[0]
+		groupId := elements[0]
+		artifactId := elements[1]
+		version := strings.Split(elements[2], " ")[0]
+		deps = append(deps, scan.Dependency{
+			Coordinates: fmt.Sprintf("%s:%s", groupId, artifactId),
+			Version:     version,
+			CheckSum: scan.CheckSum{
+				Algorithm: "todo",
+				Digest:    "todo",
+			},
+		})
 	}
 
-	return gradleMetatdata, nil
+	return deps, nil
 }
 
-func GradleDepsAndSums(metadata *scan.BuildToolMetadata, outputSums []byte) error {
+// TODO: use some of this for checksums above
+func GradleDepsAndSums(metadata *scan.BuildArtifactMetadata, outputSums []byte) error {
 	sum := GradleChecksum{}
 	err := xml.Unmarshal(outputSums, &sum)
 	if err != nil {

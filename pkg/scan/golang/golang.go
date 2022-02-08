@@ -1,26 +1,29 @@
 package golang
 
 import (
+	"strings"
+
 	"github.com/nais/salsa/pkg/digest"
 	"github.com/nais/salsa/pkg/scan"
-	"strings"
 )
 
-func GoDeps(goSumContents string) *scan.BuildToolMetadata {
-	goMetatdata := scan.CreateMetadata()
+func GoDeps(goSumContents string) []scan.Dependency {
+	deps := make([]scan.Dependency, 0)
 	lines := strings.Split(goSumContents, "\n")
 	for _, line := range lines {
 		if isNotInteresting(line) {
 			continue
 		}
 		parts := strings.Split(line, " ")
-		goMetatdata.Deps[parts[0]] = parts[1][1:]
-		strings.Split(parts[2], ":")
+		version := parts[1][1:]
 		stringDecodedDigest := digest.Digest(strings.Split(parts[2], ":")[1])
-		goMetatdata.Checksums[parts[0]] = scan.CheckSum{Algorithm: digest.SHA256, Digest: string(stringDecodedDigest)}
-
+		deps = append(deps, scan.Dependency{
+			Coordinates: parts[0],
+			Version:     version,
+			CheckSum:    scan.CheckSum{Algorithm: digest.SHA256, Digest: string(stringDecodedDigest)},
+		})
 	}
-	return goMetatdata
+	return deps
 }
 
 func isNotInteresting(line string) bool {

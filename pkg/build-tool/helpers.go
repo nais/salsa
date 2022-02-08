@@ -9,11 +9,11 @@ func Contains(s []string, e string) bool {
 	return false
 }
 
-func sumSupported(buildFiles ...[]string) (supported []string) {
-	for _, supportedBuildFiles := range buildFiles {
-		for _, s := range supportedBuildFiles {
-			supported = append(supported, s)
+func concat(slices ...[]string) (result []string) {
+	for _, slice := range slices {
+		for _, s := range slice {
+			result = append(result, s)
 		}
 	}
-	return supported
+	return result
 }

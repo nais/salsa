@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os/exec"
 
+	"github.com/nais/salsa/pkg/scan"
 	"github.com/nais/salsa/pkg/scan/jvm"
 	"github.com/nais/salsa/pkg/utils"
-	"github.com/nais/salsa/pkg/vcs"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -16,13 +16,7 @@ type Gradle struct {
 	BuildFilePatterns []string
 }
 
-func NewGradle() BuildTool {
-	return &Gradle{
-		BuildFilePatterns: []string{gradleBuildFileName},
-	}
-}
-
-func (g Gradle) Build(workDir string, project string, context *vcs.AnyContext) error {
+func (g Gradle) ResolveDeps(workDir string) (*scan.ArtifactDependencies, error) {
 	cmd := exec.Command(
 		"./gradlew",
 		"-q", "dependencies", "--configuration", "runtimeClasspath",
@@ -31,21 +25,29 @@ func (g Gradle) Build(workDir string, project string, context *vcs.AnyContext) e
 
 	depsOutput, err := utils.Exec(cmd)
 	if err != nil {
-		return fmt.Errorf("exec: %v\n", err)
+		return nil, fmt.Errorf("exec: %v\n", err)
 	}
 	log.Info(depsOutput)
 
 	deps, err := jvm.GradleDeps(depsOutput)
+	if err != nil {
+		return nil, fmt.Errorf("could not get gradle deps: %w", err)
+	}
 	log.Info(workDir)
 
-	err = GenerateProvenance(workDir, project, deps, context)
-	if err != nil {
-		return fmt.Errorf("generating provencance %v", err)
-	}
-	return nil
+	return &scan.ArtifactDependencies{
+		Cmd:         fmt.Sprintf("%s %v", cmd.Path, cmd.Args),
+		RuntimeDeps: deps,
+	}, nil
 }
 
-func (g Gradle) BuildTool(pattern string) bool {
+func NewGradle() BuildTool {
+	return &Gradle{
+		BuildFilePatterns: []string{gradleBuildFileName},
+	}
+}
+
+func (g Gradle) Supported(pattern string) bool {
 	return Contains(g.BuildFilePatterns, pattern)
 }
 

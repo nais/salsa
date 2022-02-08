@@ -2,12 +2,11 @@ package build_tool
 
 import (
 	"fmt"
-	"github.com/nais/salsa/pkg/vcs"
 	"os/exec"
 
+	"github.com/nais/salsa/pkg/scan"
 	"github.com/nais/salsa/pkg/scan/jvm"
 	"github.com/nais/salsa/pkg/utils"
-	log "github.com/sirupsen/logrus"
 )
 
 const mavenBuildFileName = "pom.xml"
@@ -16,14 +15,7 @@ type Maven struct {
 	BuildFilePatterns []string
 }
 
-func NewMaven() BuildTool {
-	return &Maven{
-		BuildFilePatterns: []string{mavenBuildFileName},
-	}
-}
-
-func (m Maven) Build(workDir, project string, context *vcs.AnyContext) error {
-
+func (m Maven) ResolveDeps(workDir string) (*scan.ArtifactDependencies, error) {
 	cmd := exec.Command(
 		"mvn",
 		"dependency:list",
@@ -32,24 +24,26 @@ func (m Maven) Build(workDir, project string, context *vcs.AnyContext) error {
 
 	output, err := utils.Exec(cmd)
 	if err != nil {
-		return fmt.Errorf("exec: %v\n", err)
+		return nil, fmt.Errorf("exec: %v\n", err)
 	}
 
 	deps, err := jvm.MavenCompileAndRuntimeTimeDeps(output)
 	if err != nil {
-		return fmt.Errorf("scan: %v\n", err)
+		return nil, fmt.Errorf("scan: %v\n", err)
 	}
-
-	log.Println(deps)
-
-	err = GenerateProvenance(workDir, project, deps, context)
-	if err != nil {
-		return fmt.Errorf("generating provencance %v", err)
-	}
-	return nil
+	return &scan.ArtifactDependencies{
+		Cmd:         fmt.Sprintf("%s %v", cmd.Path, cmd.Args),
+		RuntimeDeps: deps,
+	}, nil
 }
 
-func (m Maven) BuildTool(pattern string) bool {
+func NewMaven() BuildTool {
+	return &Maven{
+		BuildFilePatterns: []string{mavenBuildFileName},
+	}
+}
+
+func (m Maven) Supported(pattern string) bool {
 	return Contains(m.BuildFilePatterns, pattern)
 }
 

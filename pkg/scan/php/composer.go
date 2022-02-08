@@ -3,25 +3,26 @@ package php
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/nais/salsa/pkg/scan"
 )
 
-type Dist struct {
+type dist struct {
 	Shasum string `json:"shasum"`
 }
 
-type Dependency struct {
+type dep struct {
 	Name    string `json:"name"`
 	Version string `json:"version"`
-	Dist    Dist   `json:"dist"`
+	Dist    dist   `json:"dist"`
 }
 
-type ComposerLock struct {
-	Dependencies []Dependency `json:"packages"`
+type composerLock struct {
+	Dependencies []dep `json:"packages"`
 }
 
-func ComposerDeps(composerLockJsonContents string) (*scan.BuildToolMetadata, error) {
-	var lock ComposerLock
+func ComposerDeps(composerLockJsonContents string) ([]scan.Dependency, error) {
+	var lock composerLock
 	err := json.Unmarshal([]byte(composerLockJsonContents), &lock)
 	if err != nil {
 		return nil, fmt.Errorf("unable to parse composer.lock: %v", err)
@@ -30,15 +31,17 @@ func ComposerDeps(composerLockJsonContents string) (*scan.BuildToolMetadata, err
 	return transform(lock.Dependencies), nil
 }
 
-func transform(dependencies []Dependency) *scan.BuildToolMetadata {
-	metadata := scan.CreateMetadata()
-
-	for _, dep := range dependencies {
-		metadata.Deps[dep.Name] = dep.Version
-		metadata.Checksums[dep.Name] = scan.CheckSum{
-			Algorithm: "sha1",
-			Digest:    dep.Dist.Shasum,
-		}
+func transform(dependencies []dep) []scan.Dependency {
+	deps := make([]scan.Dependency, 0)
+	for _, d := range dependencies {
+		deps = append(deps, scan.Dependency{
+			Coordinates: d.Name,
+			Version:     d.Version,
+			CheckSum: scan.CheckSum{
+				Algorithm: "sha1",
+				Digest:    d.Dist.Shasum,
+			},
+		})
 	}
-	return metadata
+	return deps
 }

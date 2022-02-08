@@ -3,19 +3,32 @@ package jvm
 import (
 	"reflect"
 	"testing"
+
+	"github.com/nais/salsa/pkg/scan"
 )
 
 func TestMavenDeps(t *testing.T) {
 	got, _ := MavenCompileAndRuntimeTimeDeps(mvnDependencyListOutput)
-	want := map[string]string{
-		"org.apache.logging.log4j:log4j-core": "2.14.1",
-		"org.apache.logging.log4j:log4j-api":  "2.14.2",
+	want := []scan.Dependency{
+		mvnDep("org.apache.logging.log4j:log4j-core", "2.14.1"),
+		mvnDep("org.apache.logging.log4j:log4j-api", "2.14.2"),
 	}
 
-	if !reflect.DeepEqual(got.Deps, want) {
-		t.Errorf("got %q, wanted %q", got.Deps, want)
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("got %q, wanted %q", got, want)
 	}
 
+}
+
+func mvnDep(coordinates, version string) scan.Dependency {
+	return scan.Dependency{
+		Coordinates: coordinates,
+		Version:     version,
+		CheckSum: scan.CheckSum{
+			Algorithm: "todo",
+			Digest:    "todo",
+		},
+	}
 }
 
 const mvnDependencyListOutput = `[INFO] Scanning for projects...
