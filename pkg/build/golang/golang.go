@@ -5,8 +5,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/digest"
-	"github.com/nais/salsa/pkg/scan/common"
 )
 
 const golangBuildFileName = "go.sum"
@@ -15,19 +15,19 @@ type Golang struct {
 	BuildFilePatterns []string
 }
 
-func (g Golang) ResolveDeps(workDir string) (*common.ArtifactDependencies, error) {
+func (g Golang) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
 	fileContent, err := os.ReadFile(fmt.Sprintf("%s/%s", workDir, golangBuildFileName))
 	deps := GoDeps(string(fileContent))
 	if err != nil {
 		return nil, fmt.Errorf("error parsing %s, %v", golangBuildFileName, err)
 	}
-	return &common.ArtifactDependencies{
+	return &build.ArtifactDependencies{
 		Cmd:         golangBuildFileName,
 		RuntimeDeps: deps,
 	}, nil
 }
 
-func NewGolang() common.BuildTool {
+func NewGolang() build.BuildTool {
 	return &Golang{
 		BuildFilePatterns: []string{golangBuildFileName},
 	}
@@ -37,8 +37,8 @@ func (g Golang) BuildFiles() []string {
 	return g.BuildFilePatterns
 }
 
-func GoDeps(goSumContents string) []common.Dependency {
-	deps := make([]common.Dependency, 0)
+func GoDeps(goSumContents string) []build.Dependency {
+	deps := make([]build.Dependency, 0)
 	lines := strings.Split(goSumContents, "\n")
 	for _, line := range lines {
 		if isNotInteresting(line) {
@@ -47,10 +47,10 @@ func GoDeps(goSumContents string) []common.Dependency {
 		parts := strings.Split(line, " ")
 		version := parts[1][1:]
 		stringDecodedDigest := digest.Digest(strings.Split(parts[2], ":")[1])
-		deps = append(deps, common.Dependency{
+		deps = append(deps, build.Dependency{
 			Coordinates: parts[0],
 			Version:     version,
-			CheckSum:    common.CheckSum{Algorithm: digest.SHA256, Digest: string(stringDecodedDigest)},
+			CheckSum:    build.CheckSum{Algorithm: digest.SHA256, Digest: string(stringDecodedDigest)},
 		})
 	}
 	return deps

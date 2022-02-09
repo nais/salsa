@@ -9,7 +9,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/nais/salsa/pkg/scan/common"
+	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/utils"
 )
 
@@ -19,7 +19,7 @@ type Gradle struct {
 	BuildFilePatterns []string
 }
 
-func (g Gradle) ResolveDeps(workDir string) (*common.ArtifactDependencies, error) {
+func (g Gradle) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
 	cmd := exec.Command(
 		"gradle",
 		"-q", "dependencies", "--configuration", "runtimeClasspath", "-M", "sha256",
@@ -46,13 +46,13 @@ func (g Gradle) ResolveDeps(workDir string) (*common.ArtifactDependencies, error
 		return nil, fmt.Errorf("could not get gradle deps: %w", err)
 	}
 
-	return &common.ArtifactDependencies{
+	return &build.ArtifactDependencies{
 		Cmd:         fmt.Sprintf("%s %v", cmd.Path, cmd.Args),
 		RuntimeDeps: deps,
 	}, nil
 }
 
-func NewGradle() common.BuildTool {
+func NewGradle() build.BuildTool {
 	return &Gradle{
 		BuildFilePatterns: []string{gradleBuildFileName},
 	}
@@ -62,14 +62,14 @@ func (g Gradle) BuildFiles() []string {
 	return g.BuildFilePatterns
 }
 
-func GradleDeps(depsOutput string, checksumXml []byte) ([]common.Dependency, error) {
+func GradleDeps(depsOutput string, checksumXml []byte) ([]build.Dependency, error) {
 	pattern := regexp.MustCompile(`(?m)---\s[a-zA-Z0-9.]+:.*$`)
 	matches := pattern.FindAllString(depsOutput, -1)
 	if matches == nil {
 		return nil, errors.New("unable to find any dependencies")
 	}
 
-	deps := make([]common.Dependency, 0)
+	deps := make([]build.Dependency, 0)
 
 	sum := GradleChecksum{}
 	err := xml.Unmarshal(checksumXml, &sum)
@@ -83,10 +83,10 @@ func GradleDeps(depsOutput string, checksumXml []byte) ([]common.Dependency, err
 		groupId := elements[0]
 		artifactId := elements[1]
 		version := strings.Split(elements[2], " ")[0]
-		deps = append(deps, common.Dependency{
+		deps = append(deps, build.Dependency{
 			Coordinates: fmt.Sprintf("%s:%s", groupId, artifactId),
 			Version:     version,
-			CheckSum: common.CheckSum{
+			CheckSum: build.CheckSum{
 				Algorithm: "sha256",
 				Digest:    sum.checksum(groupId, artifactId, version),
 			},

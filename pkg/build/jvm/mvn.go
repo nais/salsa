@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/nais/salsa/pkg/scan/common"
+	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/utils"
 )
 
@@ -17,7 +17,7 @@ type Maven struct {
 	BuildFilePatterns []string
 }
 
-func (m Maven) ResolveDeps(workDir string) (*common.ArtifactDependencies, error) {
+func (m Maven) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
 	cmd := exec.Command(
 		"mvn",
 		"dependency:list",
@@ -33,13 +33,13 @@ func (m Maven) ResolveDeps(workDir string) (*common.ArtifactDependencies, error)
 	if err != nil {
 		return nil, fmt.Errorf("scan: %v\n", err)
 	}
-	return &common.ArtifactDependencies{
+	return &build.ArtifactDependencies{
 		Cmd:         fmt.Sprintf("%s %v", cmd.Path, cmd.Args),
 		RuntimeDeps: deps,
 	}, nil
 }
 
-func NewMaven() common.BuildTool {
+func NewMaven() build.BuildTool {
 	return &Maven{
 		BuildFilePatterns: []string{mavenBuildFileName},
 	}
@@ -49,8 +49,8 @@ func (m Maven) BuildFiles() []string {
 	return m.BuildFilePatterns
 }
 
-func MavenCompileAndRuntimeTimeDeps(mvnOutput string) ([]common.Dependency, error) {
-	deps := make([]common.Dependency, 0)
+func MavenCompileAndRuntimeTimeDeps(mvnOutput string) ([]build.Dependency, error) {
+	deps := make([]build.Dependency, 0)
 	pattern := regexp.MustCompile(`(?m)\s{4}[a-zA-Z0-9.]+:.*`)
 	matches := pattern.FindAllString(mvnOutput, -1)
 	if matches == nil {
@@ -61,10 +61,10 @@ func MavenCompileAndRuntimeTimeDeps(mvnOutput string) ([]common.Dependency, erro
 		if elements[4] == "test" {
 			continue
 		}
-		deps = append(deps, common.Dependency{
+		deps = append(deps, build.Dependency{
 			Coordinates: fmt.Sprintf("%s:%s", elements[0], elements[1]),
 			Version:     elements[3],
-			CheckSum: common.CheckSum{
+			CheckSum: build.CheckSum{
 				Algorithm: "todo",
 				Digest:    "todo",
 			},

@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/nais/salsa/pkg/scan/common"
+	"github.com/nais/salsa/pkg/build"
 )
 
 const yarnBuildFileName = "yarn.lock"
@@ -15,20 +15,20 @@ type Yarn struct {
 	BuildFilePatterns []string
 }
 
-func NewYarn() common.BuildTool {
+func NewYarn() build.BuildTool {
 	return &Yarn{
 		BuildFilePatterns: []string{yarnBuildFileName},
 	}
 }
 
-func (y Yarn) ResolveDeps(workDir string) (*common.ArtifactDependencies, error) {
+func (y Yarn) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
 	fileContent, err := os.ReadFile(fmt.Sprintf("%s/%s", workDir, yarnBuildFileName))
 	if err != nil {
 		return nil, fmt.Errorf("read file: %w\n", err)
 	}
 	deps := YarnDeps(string(fileContent))
 
-	return &common.ArtifactDependencies{
+	return &build.ArtifactDependencies{
 		Cmd:         yarnBuildFileName,
 		RuntimeDeps: deps,
 	}, nil
@@ -38,8 +38,8 @@ func (y Yarn) BuildFiles() []string {
 	return y.BuildFilePatterns
 }
 
-func YarnDeps(yarnLockContents string) []common.Dependency {
-	deps := make([]common.Dependency, 0)
+func YarnDeps(yarnLockContents string) []build.Dependency {
+	deps := make([]build.Dependency, 0)
 	lines := strings.Split(yarnLockContents, "\n")
 	blockLines := blockLineNumbers(lines)
 	for _, startLine := range blockLines {
@@ -47,7 +47,7 @@ func YarnDeps(yarnLockContents string) []common.Dependency {
 		depVersion := parseVersion(lines[startLine+1])
 		integrityLine := lines[startLine+3]
 
-		deps = append(deps, common.Dependency{
+		deps = append(deps, build.Dependency{
 			Coordinates: depName,
 			Version:     depVersion,
 			CheckSum:    yarnShaDigest(integrityLine),
@@ -89,13 +89,13 @@ func parseVersion(line string) string {
 	return matches[pkgversionIndex]
 }
 
-func yarnShaDigest(line string) common.CheckSum {
+func yarnShaDigest(line string) build.CheckSum {
 	trimPrefixIntegrity := strings.TrimPrefix(line, "  integrity ")
 	fields := strings.Split(trimPrefixIntegrity, "-")
 	// Better to keep the digest base64 encoded when signing envelope
 	// decodedDigest, _ := base64.StdEncoding.DecodeString(algoDigest[1])
 	// s.Digest = fmt.Sprintf("%x", decodedDigest)
-	return common.CheckSum{
+	return build.CheckSum{
 		Algorithm: fields[0],
 		Digest:    fields[1],
 	}

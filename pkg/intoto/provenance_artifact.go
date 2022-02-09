@@ -5,7 +5,7 @@ import (
 	"time"
 
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
-	"github.com/nais/salsa/pkg/scan/common"
+	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/vcs"
 )
 
@@ -13,14 +13,14 @@ type ProvenanceArtifact struct {
 	Name              string
 	BuilderId         string
 	BuildType         string
-	Dependencies      *common.ArtifactDependencies
+	Dependencies      *build.ArtifactDependencies
 	BuildStartedOn    time.Time
 	BuildInvocationId string
 	BuilderRepoDigest *slsa.ProvenanceMaterial
 	Invocation        slsa.ProvenanceInvocation
 }
 
-func CreateProvenanceArtifact(name string, deps *common.ArtifactDependencies) *ProvenanceArtifact {
+func CreateProvenanceArtifact(name string, deps *build.ArtifactDependencies) *ProvenanceArtifact {
 	return &ProvenanceArtifact{
 		Name:           name,
 		BuildType:      "todoType",

@@ -6,9 +6,12 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/nais/salsa/pkg/build"
+	"github.com/nais/salsa/pkg/build/golang"
+	"github.com/nais/salsa/pkg/build/jvm"
+	"github.com/nais/salsa/pkg/build/nodejs"
+	"github.com/nais/salsa/pkg/build/php"
 	"github.com/nais/salsa/pkg/intoto"
-	"github.com/nais/salsa/pkg/scan/common"
-	"github.com/nais/salsa/pkg/scan/deps"
 	"github.com/nais/salsa/pkg/utils"
 	"github.com/nais/salsa/pkg/vcs"
 	log "github.com/sirupsen/logrus"
@@ -35,7 +38,19 @@ var scanCmd = &cobra.Command{
 
 		log.Infof("prepare to scan path %s for project %s...", PathFlags.WorkDir(), project)
 		workDir := PathFlags.WorkDir()
-		deps, err := deps.Dependencies(workDir)
+
+		tools := build.SupportedBuildTools{
+			Tools: []build.BuildTool{
+				jvm.NewGradle(),
+				jvm.NewMaven(),
+				golang.NewGolang(),
+				nodejs.NewNpm(),
+				nodejs.NewYarn(),
+				php.NewComposer(),
+			},
+		}
+
+		deps, err := tools.DetectDeps(workDir)
 		err = GenerateProvenance(workDir, PathFlags.Repo, deps, &inputContext)
 		if err != nil {
 			return err
@@ -44,7 +59,7 @@ var scanCmd = &cobra.Command{
 	},
 }
 
-func GenerateProvenance(workDir, project string, dependencies *common.ArtifactDependencies, inputContext *string) error {
+func GenerateProvenance(workDir, project string, dependencies *build.ArtifactDependencies, inputContext *string) error {
 	context, err := vcs.CreateCIContext(inputContext)
 	if err != nil {
 		return err

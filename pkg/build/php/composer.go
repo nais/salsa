@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/nais/salsa/pkg/scan/common"
+	"github.com/nais/salsa/pkg/build"
 )
 
 const composerLockFileName = "composer.lock"
@@ -14,7 +14,7 @@ type Composer struct {
 	BuildFilePatterns []string
 }
 
-func (c Composer) ResolveDeps(workDir string) (*common.ArtifactDependencies, error) {
+func (c Composer) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
 	fileContent, err := os.ReadFile(fmt.Sprintf("%s/%s", workDir, composerLockFileName))
 	if err != nil {
 		return nil, fmt.Errorf("read file: %w\n", err)
@@ -23,13 +23,13 @@ func (c Composer) ResolveDeps(workDir string) (*common.ArtifactDependencies, err
 	if err != nil {
 		return nil, fmt.Errorf("scan: %v\n", err)
 	}
-	return &common.ArtifactDependencies{
+	return &build.ArtifactDependencies{
 		Cmd:         composerLockFileName,
 		RuntimeDeps: deps,
 	}, nil
 }
 
-func NewComposer() common.BuildTool {
+func NewComposer() build.BuildTool {
 	return &Composer{
 		BuildFilePatterns: []string{composerLockFileName},
 	}
@@ -53,7 +53,7 @@ type composerLock struct {
 	Dependencies []dep `json:"packages"`
 }
 
-func ComposerDeps(composerLockJsonContents string) ([]common.Dependency, error) {
+func ComposerDeps(composerLockJsonContents string) ([]build.Dependency, error) {
 	var lock composerLock
 	err := json.Unmarshal([]byte(composerLockJsonContents), &lock)
 	if err != nil {
@@ -63,13 +63,13 @@ func ComposerDeps(composerLockJsonContents string) ([]common.Dependency, error) 
 	return transform(lock.Dependencies), nil
 }
 
-func transform(dependencies []dep) []common.Dependency {
-	deps := make([]common.Dependency, 0)
+func transform(dependencies []dep) []build.Dependency {
+	deps := make([]build.Dependency, 0)
 	for _, d := range dependencies {
-		deps = append(deps, common.Dependency{
+		deps = append(deps, build.Dependency{
 			Coordinates: d.Name,
 			Version:     d.Version,
-			CheckSum: common.CheckSum{
+			CheckSum: build.CheckSum{
 				Algorithm: "sha1",
 				Digest:    d.Dist.Shasum,
 			},

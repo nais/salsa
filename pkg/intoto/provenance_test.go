@@ -8,7 +8,7 @@ import (
 	"time"
 
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
-	"github.com/nais/salsa/pkg/scan/common"
+	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/vcs"
 	"github.com/stretchr/testify/assert"
 )
@@ -93,12 +93,12 @@ func TestProvenanceArtifact_GenerateSlsaPredicate(t *testing.T) {
 	assert.Equal(t, expectedMaterials, slsaPredicate.Materials)
 }
 
-func toDeps() []common.Dependency {
-	return []common.Dependency{
+func toDeps() []build.Dependency {
+	return []build.Dependency{
 		{
 			Coordinates: fmt.Sprintf("%s:%s", "groupId", "artifactId"),
 			Version:     "v01",
-			CheckSum: common.CheckSum{
+			CheckSum: build.CheckSum{
 				Algorithm: "todo",
 				Digest:    "todo",
 			},
@@ -106,8 +106,8 @@ func toDeps() []common.Dependency {
 	}
 }
 
-func toArtDeps(deps []common.Dependency) *common.ArtifactDependencies {
-	return &common.ArtifactDependencies{
+func toArtDeps(deps []build.Dependency) *build.ArtifactDependencies {
+	return &build.ArtifactDependencies{
 		Cmd:         "lang list:deps",
 		RuntimeDeps: deps,
 	}
