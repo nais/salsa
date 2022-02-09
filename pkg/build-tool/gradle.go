@@ -2,12 +2,12 @@ package build_tool
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os/exec"
 
 	"github.com/nais/salsa/pkg/scan"
 	"github.com/nais/salsa/pkg/scan/jvm"
 	"github.com/nais/salsa/pkg/utils"
-	log "github.com/sirupsen/logrus"
 )
 
 const gradleBuildFileName = "build.gradle.kts"
@@ -18,22 +18,30 @@ type Gradle struct {
 
 func (g Gradle) ResolveDeps(workDir string) (*scan.ArtifactDependencies, error) {
 	cmd := exec.Command(
-		"./gradlew",
-		"-q", "dependencies", "--configuration", "runtimeClasspath",
+		"gradle",
+		"-q", "dependencies", "--configuration", "runtimeClasspath", "-M", "sha256",
 	)
 	cmd.Dir = workDir
+
+	err := utils.RequireCommand("gradle")
+	if err != nil {
+		return nil, fmt.Errorf("exec: %v\n", err)
+	}
 
 	depsOutput, err := utils.Exec(cmd)
 	if err != nil {
 		return nil, fmt.Errorf("exec: %v\n", err)
 	}
-	log.Info(depsOutput)
 
-	deps, err := jvm.GradleDeps(depsOutput)
+	xml, err := ioutil.ReadFile(workDir + "/gradle/verification-metadata.xml")
+	if err != nil {
+		return nil, fmt.Errorf("readfile: %v\n", err)
+	}
+
+	deps, err := jvm.GradleDeps(depsOutput, xml)
 	if err != nil {
 		return nil, fmt.Errorf("could not get gradle deps: %w", err)
 	}
-	log.Info(workDir)
 
 	return &scan.ArtifactDependencies{
 		Cmd:         fmt.Sprintf("%s %v", cmd.Path, cmd.Args),

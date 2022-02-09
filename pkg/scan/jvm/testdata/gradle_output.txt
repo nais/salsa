@@ -1,0 +1,265 @@
+------------------------------------------------------------
+Root project 'tokendings'
+------------------------------------------------------------
+
+runtimeClasspath - Runtime classpath of compilation 'main' (target  (jvm)).
++--- org.jetbrains.kotlin:kotlin-stdlib:1.6.10
+|    +--- org.jetbrains:annotations:13.0
+|    \--- org.jetbrains.kotlin:kotlin-stdlib-common:1.6.10
++--- org.jetbrains.kotlin:kotlin-reflect:1.6.10
+|    \--- org.jetbrains.kotlin:kotlin-stdlib:1.6.10 (*)
++--- org.jetbrains.kotlin:kotlin-script-runtime:1.6.10
++--- io.ktor:ktor-server-netty:1.6.7
+|    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0
+|    |    +--- org.jetbrains.kotlin:kotlin-stdlib:1.6.0 -> 1.6.10 (*)
+|    |    \--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.0
+|    |         \--- org.jetbrains.kotlin:kotlin-stdlib:1.6.0 -> 1.6.10 (*)
+|    +--- org.jetbrains.kotlin:kotlin-stdlib:1.6.0 -> 1.6.10 (*)
+|    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.0 (*)
+|    +--- org.slf4j:slf4j-api:1.7.32
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.5.2-native-mt
+|    |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt
+|    |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.2-native-mt
+|    |              +--- org.jetbrains.kotlin:kotlin-stdlib-common:1.5.30 -> 1.6.10
+|    |              \--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.30 -> 1.6.0 (*)
+|    +--- io.ktor:ktor-server-host-common-kotlinMultiplatform:1.6.7
+|    |    \--- io.ktor:ktor-server-host-common:1.6.7
+|    |         +--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0 (*)
+|    |         +--- org.jetbrains.kotlin:kotlin-stdlib:1.6.0 -> 1.6.10 (*)
+|    |         +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.0 (*)
+|    |         +--- org.slf4j:slf4j-api:1.7.32
+|    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.5.2-native-mt (*)
+|    |         +--- io.ktor:ktor-server-core-kotlinMultiplatform:1.6.7
+|    |         |    \--- io.ktor:ktor-server-core:1.6.7
+|    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:1.6.0 -> 1.6.10 (*)
+|    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.0 (*)
+|    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0 (*)
+|    |         |         +--- org.slf4j:slf4j-api:1.7.32
+|    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.5.2-native-mt (*)
+|    |         |         +--- io.ktor:ktor-utils:1.6.7
+|    |         |         |    \--- io.ktor:ktor-utils-jvm:1.6.7
+|    |         |         |         +--- org.jetbrains.kotlin:kotlin-stdlib-common:1.6.0 -> 1.6.10
+|    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt (*)
+|    |         |         |         +--- io.ktor:ktor-io:1.6.7
+|    |         |         |         |    \--- io.ktor:ktor-io-jvm:1.6.7
+|    |         |         |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:1.6.0 -> 1.6.10 (*)
+|    |         |         |         |         +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.0 (*)
+|    |         |         |         |         +--- org.slf4j:slf4j-api:1.7.32
+|    |         |         |         |         +--- org.jetbrains.kotlin:kotlin-stdlib-common:1.6.0 -> 1.6.10
+|    |         |         |         |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt (*)
+|    |         |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:1.6.0 -> 1.6.10 (*)
+|    |         |         |         +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.0 (*)
+|    |         |         |         \--- org.slf4j:slf4j-api:1.7.32
+|    |         |         +--- io.ktor:ktor-http:1.6.7
+|    |         |         |    \--- io.ktor:ktor-http-jvm:1.6.7
+|    |         |         |         +--- org.jetbrains.kotlin:kotlin-stdlib-common:1.6.0 -> 1.6.10
+|    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt (*)
+|    |         |         |         +--- io.ktor:ktor-utils:1.6.7 (*)
+|    |         |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:1.6.0 -> 1.6.10 (*)
+|    |         |         |         +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.0 (*)
+|    |         |         |         \--- org.slf4j:slf4j-api:1.7.32
+|    |         |         +--- com.typesafe:config:1.4.1
+|    |         |         +--- org.jetbrains.kotlin:kotlin-reflect:1.6.0 -> 1.6.10 (*)
+|    |         |         \--- org.fusesource.jansi:jansi:2.4.0
+|    |         \--- io.ktor:ktor-http-cio:1.6.7
+|    |              \--- io.ktor:ktor-http-cio-jvm:1.6.7
+|    |                   +--- org.jetbrains.kotlin:kotlin-stdlib:1.6.0 -> 1.6.10 (*)
+|    |                   +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.0 (*)
+|    |                   +--- org.slf4j:slf4j-api:1.7.32
+|    |                   +--- io.ktor:ktor-network:1.6.7
+|    |                   |    \--- io.ktor:ktor-network-jvm:1.6.7
+|    |                   |         +--- org.jetbrains.kotlin:kotlin-stdlib:1.6.0 -> 1.6.10 (*)
+|    |                   |         +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.0 (*)
+|    |                   |         +--- org.slf4j:slf4j-api:1.7.32
+|    |                   |         +--- org.jetbrains.kotlin:kotlin-stdlib-common:1.6.0 -> 1.6.10
+|    |                   |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt (*)
+|    |                   |         \--- io.ktor:ktor-utils:1.6.7 (*)
+|    |                   +--- org.jetbrains.kotlin:kotlin-stdlib-common:1.6.0 -> 1.6.10
+|    |                   +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt (*)
+|    |                   \--- io.ktor:ktor-http:1.6.7 (*)
+|    +--- io.netty:netty-codec-http2:4.1.69.Final
+|    |    +--- io.netty:netty-common:4.1.69.Final
+|    |    +--- io.netty:netty-buffer:4.1.69.Final
+|    |    |    \--- io.netty:netty-common:4.1.69.Final
+|    |    +--- io.netty:netty-transport:4.1.69.Final
+|    |    |    +--- io.netty:netty-common:4.1.69.Final
+|    |    |    +--- io.netty:netty-buffer:4.1.69.Final (*)
+|    |    |    \--- io.netty:netty-resolver:4.1.69.Final
+|    |    |         \--- io.netty:netty-common:4.1.69.Final
+|    |    +--- io.netty:netty-codec:4.1.69.Final
+|    |    |    +--- io.netty:netty-common:4.1.69.Final
+|    |    |    +--- io.netty:netty-buffer:4.1.69.Final (*)
+|    |    |    \--- io.netty:netty-transport:4.1.69.Final (*)
+|    |    +--- io.netty:netty-handler:4.1.69.Final
+|    |    |    +--- io.netty:netty-common:4.1.69.Final
+|    |    |    +--- io.netty:netty-resolver:4.1.69.Final (*)
+|    |    |    +--- io.netty:netty-buffer:4.1.69.Final (*)
+|    |    |    +--- io.netty:netty-transport:4.1.69.Final (*)
+|    |    |    \--- io.netty:netty-codec:4.1.69.Final (*)
+|    |    \--- io.netty:netty-codec-http:4.1.69.Final
+|    |         +--- io.netty:netty-common:4.1.69.Final
+|    |         +--- io.netty:netty-buffer:4.1.69.Final (*)
+|    |         +--- io.netty:netty-transport:4.1.69.Final (*)
+|    |         +--- io.netty:netty-codec:4.1.69.Final (*)
+|    |         \--- io.netty:netty-handler:4.1.69.Final (*)
+|    +--- org.eclipse.jetty.alpn:alpn-api:1.1.3.v20160715
+|    +--- io.netty:netty-transport-native-kqueue:4.1.69.Final
+|    |    +--- io.netty:netty-common:4.1.69.Final
+|    |    +--- io.netty:netty-buffer:4.1.69.Final (*)
+|    |    +--- io.netty:netty-transport:4.1.69.Final (*)
+|    |    \--- io.netty:netty-transport-native-unix-common:4.1.69.Final
+|    |         +--- io.netty:netty-common:4.1.69.Final
+|    |         +--- io.netty:netty-buffer:4.1.69.Final (*)
+|    |         \--- io.netty:netty-transport:4.1.69.Final (*)
+|    \--- io.netty:netty-transport-native-epoll:4.1.69.Final
+|         +--- io.netty:netty-common:4.1.69.Final
+|         +--- io.netty:netty-buffer:4.1.69.Final (*)
+|         +--- io.netty:netty-transport:4.1.69.Final (*)
+|         \--- io.netty:netty-transport-native-unix-common:4.1.69.Final (*)
++--- io.ktor:ktor-auth:1.6.7
+|    +--- io.ktor:ktor-server-core-kotlinMultiplatform:1.6.7 (*)
+|    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0 (*)
+|    +--- org.jetbrains.kotlin:kotlin-stdlib:1.6.0 -> 1.6.10 (*)
+|    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.0 (*)
+|    +--- org.slf4j:slf4j-api:1.7.32
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.5.2-native-mt (*)
+|    +--- io.ktor:ktor-client-core:1.6.7
+|    |    \--- io.ktor:ktor-client-core-jvm:1.6.7
+|    |         +--- org.jetbrains.kotlin:kotlin-stdlib:1.6.0 -> 1.6.10 (*)
+|    |         +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.0 (*)
+|    |         +--- org.slf4j:slf4j-api:1.7.32
+|    |         +--- org.jetbrains.kotlin:kotlin-stdlib-common:1.6.0 -> 1.6.10
+|    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt (*)
+|    |         +--- io.ktor:ktor-http:1.6.7 (*)
+|    |         \--- io.ktor:ktor-http-cio:1.6.7 (*)
+|    \--- com.googlecode.json-simple:json-simple:1.1.1
+|         \--- junit:junit:4.10
+|              \--- org.hamcrest:hamcrest-core:1.1
++--- io.ktor:ktor-auth-jwt:1.6.7
+|    +--- io.ktor:ktor-server-core-kotlinMultiplatform:1.6.7 (*)
+|    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0 (*)
+|    +--- org.jetbrains.kotlin:kotlin-stdlib:1.6.0 -> 1.6.10 (*)
+|    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.0 (*)
+|    +--- org.slf4j:slf4j-api:1.7.32
+|    +--- org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.5.2-native-mt (*)
+|    +--- io.ktor:ktor-auth-kotlinMultiplatform:1.6.7
+|    |    \--- io.ktor:ktor-auth:1.6.7 (*)
+|    +--- com.googlecode.json-simple:json-simple:1.1.1 (*)
+|    +--- com.auth0:java-jwt:3.13.0
+|    |    +--- com.fasterxml.jackson.core:jackson-databind:2.11.0 -> 2.13.0
+|    |    |    +--- com.fasterxml.jackson.core:jackson-annotations:2.13.0
+|    |    |    |    \--- com.fasterxml.jackson:jackson-bom:2.13.0
+|    |    |    |         +--- com.fasterxml.jackson.core:jackson-annotations:2.13.0 (c)
+|    |    |    |         +--- com.fasterxml.jackson.core:jackson-core:2.13.0 (c)
+|    |    |    |         +--- com.fasterxml.jackson.core:jackson-databind:2.13.0 (c)
+|    |    |    |         \--- com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0 (c)
+|    |    |    +--- com.fasterxml.jackson.core:jackson-core:2.13.0
+|    |    |    |    \--- com.fasterxml.jackson:jackson-bom:2.13.0 (*)
+|    |    |    \--- com.fasterxml.jackson:jackson-bom:2.13.0 (*)
+|    |    \--- commons-codec:commons-codec:1.14 -> 1.15
+|    \--- com.auth0:jwks-rsa:0.17.0
+|         +--- commons-codec:commons-codec:1.15
+|         +--- com.fasterxml.jackson.core:jackson-databind:2.11.3 -> 2.13.0 (*)
+|         \--- com.google.guava:guava:30.0-jre
+|              +--- com.google.guava:failureaccess:1.0.1
+|              +--- com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava
+|              +--- com.google.code.findbugs:jsr305:3.0.2
+|              +--- org.checkerframework:checker-qual:3.5.0
+|              +--- com.google.errorprone:error_prone_annotations:2.3.4
+|              \--- com.google.j2objc:j2objc-annotations:1.3
++--- io.ktor:ktor-client-core:1.6.7 (*)
++--- io.ktor:ktor-client-cio:1.6.7
+|    \--- io.ktor:ktor-client-cio-jvm:1.6.7
+|         +--- org.jetbrains.kotlin:kotlin-stdlib-common:1.6.0 -> 1.6.10
+|         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt (*)
+|         +--- io.ktor:ktor-client-core:1.6.7 (*)
+|         +--- io.ktor:ktor-http-cio:1.6.7 (*)
+|         +--- io.ktor:ktor-network-tls:1.6.7
+|         |    \--- io.ktor:ktor-network-tls-jvm:1.6.7
+|         |         +--- org.jetbrains.kotlin:kotlin-stdlib-common:1.6.0 -> 1.6.10
+|         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt (*)
+|         |         +--- io.ktor:ktor-network:1.6.7 (*)
+|         |         +--- io.ktor:ktor-utils:1.6.7 (*)
+|         |         +--- org.jetbrains.kotlin:kotlin-stdlib:1.6.0 -> 1.6.10 (*)
+|         |         +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.0 (*)
+|         |         \--- org.slf4j:slf4j-api:1.7.32
+|         +--- org.jetbrains.kotlin:kotlin-stdlib:1.6.0 -> 1.6.10 (*)
+|         +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.0 (*)
+|         \--- org.slf4j:slf4j-api:1.7.32
++--- io.ktor:ktor-client-json:1.6.7
+|    \--- io.ktor:ktor-client-json-jvm:1.6.7
+|         +--- org.jetbrains.kotlin:kotlin-stdlib-common:1.6.0 -> 1.6.10
+|         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt (*)
+|         +--- io.ktor:ktor-client-core:1.6.7 (*)
+|         +--- org.jetbrains.kotlin:kotlin-stdlib:1.6.0 -> 1.6.10 (*)
+|         +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.0 (*)
+|         \--- org.slf4j:slf4j-api:1.7.32
++--- io.ktor:ktor-client-jackson:1.6.7
+|    +--- io.ktor:ktor-client-core:1.6.7 (*)
+|    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0 (*)
+|    +--- org.jetbrains.kotlin:kotlin-stdlib:1.6.0 -> 1.6.10 (*)
+|    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.0 (*)
+|    +--- org.slf4j:slf4j-api:1.7.32
+|    +--- io.ktor:ktor-client-json:1.6.7 (*)
+|    +--- com.fasterxml.jackson.core:jackson-databind:2.13.0 (*)
+|    \--- com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0
+|         +--- com.fasterxml.jackson.core:jackson-databind:2.13.0 (*)
+|         +--- com.fasterxml.jackson.core:jackson-annotations:2.13.0 (*)
+|         +--- org.jetbrains.kotlin:kotlin-reflect:1.5.30 -> 1.6.10 (*)
+|         \--- com.fasterxml.jackson:jackson-bom:2.13.0 (*)
++--- com.natpryce:konfig:1.6.10.0
++--- io.github.microutils:kotlin-logging:2.1.21
+|    \--- io.github.microutils:kotlin-logging-jvm:2.1.21
+|         +--- org.slf4j:slf4j-api:1.7.32
+|         +--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0 (*)
+|         \--- org.jetbrains.kotlin:kotlin-stdlib-common:1.6.0 -> 1.6.10
++--- io.ktor:ktor-metrics-micrometer:1.6.7
+|    +--- io.ktor:ktor-server-core-kotlinMultiplatform:1.6.7 (*)
+|    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0 (*)
+|    +--- org.jetbrains.kotlin:kotlin-stdlib:1.6.0 -> 1.6.10 (*)
+|    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.0 (*)
+|    +--- org.slf4j:slf4j-api:1.7.32
+|    +--- io.micrometer:micrometer-core:1.7.5 -> 1.8.2
+|    |    +--- org.hdrhistogram:HdrHistogram:2.1.12
+|    |    \--- org.latencyutils:LatencyUtils:2.0.3
+|    \--- io.ktor:ktor-server-host-common-kotlinMultiplatform:1.6.7 (*)
++--- io.micrometer:micrometer-registry-prometheus:1.8.2
+|    +--- io.micrometer:micrometer-core:1.8.2 (*)
+|    \--- io.prometheus:simpleclient_common:0.12.0
+|         \--- io.prometheus:simpleclient:0.12.0
+|              +--- io.prometheus:simpleclient_tracer_otel:0.12.0
+|              |    \--- io.prometheus:simpleclient_tracer_common:0.12.0
+|              \--- io.prometheus:simpleclient_tracer_otel_agent:0.12.0
+|                   \--- io.prometheus:simpleclient_tracer_common:0.12.0
++--- io.ktor:ktor-jackson:1.6.7
+|    +--- org.jetbrains.kotlin:kotlin-stdlib:1.6.0 -> 1.6.10 (*)
+|    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.0 (*)
+|    +--- org.slf4j:slf4j-api:1.7.32
+|    +--- com.fasterxml.jackson.core:jackson-databind:2.13.0 (*)
+|    +--- com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0 (*)
+|    +--- io.ktor:ktor-server-core-kotlinMultiplatform:1.6.7 (*)
+|    \--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0 (*)
++--- com.nimbusds:oauth2-oidc-sdk:9.24
+|    +--- com.github.stephenc.jcip:jcip-annotations:1.0-1
+|    +--- com.nimbusds:content-type:2.2
+|    +--- net.minidev:json-smart:[1.3.3,2.4.7] -> 2.4.7
+|    |    \--- net.minidev:accessors-smart:2.4.7
+|    |         \--- org.ow2.asm:asm:9.1
+|    +--- com.nimbusds:lang-tag:1.5
+|    \--- com.nimbusds:nimbus-jose-jwt:9.18
+|         \--- com.github.stephenc.jcip:jcip-annotations:1.0-1
++--- com.github.seratch:kotliquery:1.6.1
+|    +--- org.jetbrains.kotlin:kotlin-stdlib:1.5.30 -> 1.6.10 (*)
+|    +--- org.slf4j:slf4j-api:1.7.32
+|    +--- joda-time:joda-time:2.10.10
+|    \--- com.zaxxer:HikariCP:4.0.3 -> 5.0.1
+|         \--- org.slf4j:slf4j-api:1.7.30 -> 1.7.32
++--- com.zaxxer:HikariCP:5.0.1 (*)
++--- org.postgresql:postgresql:42.3.2
+|    \--- org.checkerframework:checker-qual:3.5.0
++--- org.flywaydb:flyway-core:8.4.4
++--- net.logstash.logback:logstash-logback-encoder:7.0.1
+|    \--- com.fasterxml.jackson.core:jackson-databind:2.13.0 (*)
+\--- ch.qos.logback:logback-classic:1.2.10
+     +--- ch.qos.logback:logback-core:1.2.10
+     \--- org.slf4j:slf4j-api:1.7.32

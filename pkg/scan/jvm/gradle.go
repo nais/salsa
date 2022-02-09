@@ -1,19 +1,16 @@
 package jvm
 
 import (
-	"encoding/base64"
 	"encoding/xml"
 	"errors"
 	"fmt"
 	"regexp"
 	"strings"
 
-	"github.com/nais/salsa/pkg/digest"
 	"github.com/nais/salsa/pkg/scan"
 )
 
-// TODO: get gradle checksums
-func GradleDeps(depsOutput string) ([]scan.Dependency, error) {
+func GradleDeps(depsOutput string, checksumXml []byte) ([]scan.Dependency, error) {
 	pattern := regexp.MustCompile(`(?m)---\s[a-zA-Z0-9.]+:.*$`)
 	matches := pattern.FindAllString(depsOutput, -1)
 	if matches == nil {
@@ -21,6 +18,12 @@ func GradleDeps(depsOutput string) ([]scan.Dependency, error) {
 	}
 
 	deps := make([]scan.Dependency, 0)
+
+	sum := GradleChecksum{}
+	err := xml.Unmarshal(checksumXml, &sum)
+	if err != nil {
+		return nil, fmt.Errorf("xml parsing: %v", err)
+	}
 
 	for _, match := range matches {
 		replacedDownGrades := strings.Replace(match, " -> ", ":", -1)
@@ -32,8 +35,8 @@ func GradleDeps(depsOutput string) ([]scan.Dependency, error) {
 			Coordinates: fmt.Sprintf("%s:%s", groupId, artifactId),
 			Version:     version,
 			CheckSum: scan.CheckSum{
-				Algorithm: "todo",
-				Digest:    "todo",
+				Algorithm: "sha256",
+				Digest:    sum.checksum(groupId, artifactId, version),
 			},
 		})
 	}
@@ -41,26 +44,18 @@ func GradleDeps(depsOutput string) ([]scan.Dependency, error) {
 	return deps, nil
 }
 
-// TODO: use some of this for checksums above
-func GradleDepsAndSums(metadata *scan.BuildArtifactMetadata, outputSums []byte) error {
-	sum := GradleChecksum{}
-	err := xml.Unmarshal(outputSums, &sum)
-	if err != nil {
-		return err
-	}
-	for _, c := range sum.Components.Components {
-		depName := fmt.Sprintf("%s:%s", c.Group, c.Name)
-		metadata.Deps[depName] = c.Version
-		for _, a := range c.Artifacts {
-			encodedChecksum := base64.StdEncoding.EncodeToString([]byte(a.Sha256.Value))
-			if a.preferredArtifactType() {
-				metadata.Checksums[depName] = scan.CheckSum{
-					Algorithm: digest.SHA256, Digest: fmt.Sprintf("%s", encodedChecksum),
+func (g GradleChecksum) checksum(groupId, artifactId, version string) string {
+	for _, c := range g.Components.Components {
+		if c.Group == groupId && c.Name == artifactId && c.Version == version {
+			for _, a := range c.Artifacts {
+				if strings.HasSuffix(a.Name, ".jar") {
+					return a.Sha256.Value
 				}
 			}
 		}
 	}
-	return nil
+
+	return ""
 }
 
 type GradleChecksum struct {
