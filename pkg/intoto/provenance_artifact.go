@@ -63,3 +63,16 @@ func (in *ProvenanceArtifact) WithBuilderId(repoURI string) *ProvenanceArtifact 
 	}
 	return in
 }
+
+func (in *ProvenanceArtifact) WithBuilderInvocation(context *vcs.AnyContext) *ProvenanceArtifact {
+	in.Invocation = slsa.ProvenanceInvocation{
+		ConfigSource: slsa.ConfigSource{
+			URI:        vcs.BuildType,
+			Digest:     nil,
+			EntryPoint: context.Workflow,
+		},
+		Parameters:  nil,
+		Environment: nil,
+	}
+	return in
+}

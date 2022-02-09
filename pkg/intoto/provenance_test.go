@@ -31,7 +31,7 @@ func TestCreateProvenanceArtifact_withContext(t *testing.T) {
 
 	provenanceArtifact := CreateProvenanceArtifact("artifact", artDeps).
 		WithRunnerContext(anyContext)
-	slsaPredicate := provenanceArtifact.GenerateSlsaPredicate()
+	slsaPredicate := GenerateSlsaPredicate(provenanceArtifact)
 
 	// VCS Context
 	assert.Equal(t, "https://github.com/nais/salsa/actions/runs/1234", slsaPredicate.Metadata.BuildInvocationID)
@@ -46,7 +46,7 @@ func TestProvenanceArtifact_GenerateSlsaPredicate(t *testing.T) {
 	artDeps := toArtDeps(deps)
 
 	provenanceArtifact := CreateProvenanceArtifact("artifact", artDeps)
-	slsaPredicate := provenanceArtifact.GenerateSlsaPredicate()
+	slsaPredicate := GenerateSlsaPredicate(provenanceArtifact)
 
 	// Predicate
 	expectedConfigSource := slsa.ConfigSource{

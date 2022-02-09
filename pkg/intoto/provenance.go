@@ -1,39 +1,38 @@
 package intoto
 
 import (
-	"github.com/nais/salsa/pkg/vcs"
 	"time"
 
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
 )
 
-func (in *ProvenanceArtifact) GenerateSlsaPredicate() slsa.ProvenancePredicate {
-	return in.withPredicate()
+func GenerateSlsaPredicate(pa *ProvenanceArtifact) slsa.ProvenancePredicate {
+	return withPredicate(pa)
 }
 
-func (in *ProvenanceArtifact) withPredicate() slsa.ProvenancePredicate {
+func withPredicate(pa *ProvenanceArtifact) slsa.ProvenancePredicate {
 	return slsa.ProvenancePredicate{
 		Builder: slsa.ProvenanceBuilder{
-			ID: in.BuilderId,
+			ID: pa.BuilderId,
 		},
-		BuildType:   in.BuildType,
-		Invocation:  in.Invocation,
+		BuildType:   pa.BuildType,
+		Invocation:  pa.Invocation,
 		BuildConfig: nil,
-		Metadata:    in.withMetadata(false, time.Now().UTC()),
-		Materials:   in.withMaterials(),
+		Metadata:    withMetadata(pa, false, time.Now().UTC()),
+		Materials:   pa.withMaterials(pa),
 	}
 }
 
 // TODO: use other type of materials aswell, e.g. github actions run in the build
-func (in *ProvenanceArtifact) withMaterials() []slsa.ProvenanceMaterial {
+func (in *ProvenanceArtifact) withMaterials(pa *ProvenanceArtifact) []slsa.ProvenanceMaterial {
 	materials := make([]slsa.ProvenanceMaterial, 0)
-	in.AppendRuntimeDependencies(&materials)
-	in.AppendBuildContext(&materials)
+	AppendRuntimeDependencies(pa, &materials)
+	AppendBuildContext(pa, &materials)
 	return materials
 }
 
-func (in *ProvenanceArtifact) AppendRuntimeDependencies(materials *[]slsa.ProvenanceMaterial) {
-	for _, dep := range in.Dependencies.RuntimeDeps {
+func AppendRuntimeDependencies(pa *ProvenanceArtifact, materials *[]slsa.ProvenanceMaterial) {
+	for _, dep := range pa.Dependencies.RuntimeDeps {
 		m := slsa.ProvenanceMaterial{
 			URI:    dep.ToUri(),
 			Digest: dep.ToDigestSet(),
@@ -42,16 +41,16 @@ func (in *ProvenanceArtifact) AppendRuntimeDependencies(materials *[]slsa.Proven
 	}
 }
 
-func (in *ProvenanceArtifact) AppendBuildContext(materials *[]slsa.ProvenanceMaterial) {
-	if in.BuilderRepoDigest != nil {
-		*materials = append(*materials, *in.BuilderRepoDigest)
+func AppendBuildContext(pa *ProvenanceArtifact, materials *[]slsa.ProvenanceMaterial) {
+	if pa.BuilderRepoDigest != nil {
+		*materials = append(*materials, *pa.BuilderRepoDigest)
 	}
 }
 
-func (in *ProvenanceArtifact) withMetadata(rp bool, buildFinished time.Time) *slsa.ProvenanceMetadata {
+func withMetadata(pa *ProvenanceArtifact, rp bool, buildFinished time.Time) *slsa.ProvenanceMetadata {
 	return &slsa.ProvenanceMetadata{
-		BuildInvocationID: in.BuildInvocationId,
-		BuildStartedOn:    &in.BuildStartedOn,
+		BuildInvocationID: pa.BuildInvocationId,
+		BuildStartedOn:    &pa.BuildStartedOn,
 		BuildFinishedOn:   &buildFinished,
 		Completeness:      withCompleteness(false, false),
 		Reproducible:      rp,
@@ -63,17 +62,4 @@ func withCompleteness(environment, materials bool) slsa.ProvenanceComplete {
 		Environment: environment,
 		Materials:   materials,
 	}
-}
-
-func (in *ProvenanceArtifact) WithBuilderInvocation(context *vcs.AnyContext) *ProvenanceArtifact {
-	in.Invocation = slsa.ProvenanceInvocation{
-		ConfigSource: slsa.ConfigSource{
-			URI:        vcs.BuildType,
-			Digest:     nil,
-			EntryPoint: context.Workflow,
-		},
-		Parameters:  nil,
-		Environment: nil,
-	}
-	return in
 }
