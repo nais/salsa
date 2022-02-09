@@ -7,6 +7,8 @@ import (
 const (
 	GitHubHostedIdSuffix = "/Attestations/GitHubHostedActions@v1"
 	SelfHostedIdSuffix   = "/Attestations/SelfHostedActions@v1"
+	// BuildType Describes what the invocations buildConfig and materials was created
+	BuildType = "https://github.com/Attestations/GitHubActionsWorkflow@v1"
 )
 
 type GitHubContext struct {

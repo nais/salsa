@@ -37,7 +37,7 @@ func (in *ProvenanceArtifact) withPredicate() slsa.ProvenancePredicate {
 		Builder: slsa.ProvenanceBuilder{
 			ID: in.BuilderId,
 		},
-		BuildType: "yolo",
+		BuildType: in.BuildType,
 		Invocation: slsa.ProvenanceInvocation{
 			ConfigSource: slsa.ConfigSource{},
 			Parameters:   nil,
@@ -100,7 +100,8 @@ func (in *ProvenanceArtifact) WithRunnerContext(context *vcs.AnyContext) *Proven
 	repoURI := "https://github.com/" + context.GitHubContext.Repository
 	return in.WithBuildInvocationId(repoURI, context).
 		WithBuilderRepoDigest(repoURI, context).
-		WithBuilderId(repoURI)
+		WithBuilderId(repoURI).
+		WithBuildType()
 }
 
 func (in *ProvenanceArtifact) WithBuildInvocationId(repoURI string, context *vcs.AnyContext) *ProvenanceArtifact {
@@ -122,5 +123,10 @@ func (in *ProvenanceArtifact) WithBuilderId(repoURI string) *ProvenanceArtifact 
 	} else {
 		in.BuilderId = repoURI + vcs.GitHubHostedIdSuffix
 	}
+	return in
+}
+
+func (in *ProvenanceArtifact) WithBuildType() *ProvenanceArtifact {
+	in.BuildType = vcs.BuildType
 	return in
 }
