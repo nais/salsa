@@ -17,6 +17,7 @@ type ProvenanceArtifact struct {
 	BuildStartedOn    time.Time
 	BuildInvocationId string
 	BuilderRepoDigest *slsa.ProvenanceMaterial
+	Invocation        slsa.ProvenanceInvocation
 }
 
 func CreateProvenanceArtifact(name string, deps *scan.ArtifactDependencies) *ProvenanceArtifact {
@@ -37,12 +38,8 @@ func (in *ProvenanceArtifact) withPredicate() slsa.ProvenancePredicate {
 		Builder: slsa.ProvenanceBuilder{
 			ID: in.BuilderId,
 		},
-		BuildType: in.BuildType,
-		Invocation: slsa.ProvenanceInvocation{
-			ConfigSource: slsa.ConfigSource{},
-			Parameters:   nil,
-			Environment:  nil,
-		},
+		BuildType:   in.BuildType,
+		Invocation:  in.Invocation,
 		BuildConfig: nil,
 		Metadata:    in.withMetadata(false, time.Now().UTC()),
 		Materials:   in.withMaterials(),
@@ -101,7 +98,7 @@ func (in *ProvenanceArtifact) WithRunnerContext(context *vcs.AnyContext) *Proven
 	return in.WithBuildInvocationId(repoURI, context).
 		WithBuilderRepoDigest(repoURI, context).
 		WithBuilderId(repoURI).
-		WithBuildType()
+		WithBuildType(context)
 }
 
 func (in *ProvenanceArtifact) WithBuildInvocationId(repoURI string, context *vcs.AnyContext) *ProvenanceArtifact {
@@ -126,7 +123,15 @@ func (in *ProvenanceArtifact) WithBuilderId(repoURI string) *ProvenanceArtifact 
 	return in
 }
 
-func (in *ProvenanceArtifact) WithBuildType() *ProvenanceArtifact {
-	in.BuildType = vcs.BuildType
+func (in *ProvenanceArtifact) WithBuildType(context *vcs.AnyContext) *ProvenanceArtifact {
+	in.Invocation = slsa.ProvenanceInvocation{
+		ConfigSource: slsa.ConfigSource{
+			URI:        vcs.BuildType,
+			Digest:     nil,
+			EntryPoint: context.Workflow,
+		},
+		Parameters:  nil,
+		Environment: nil,
+	}
 	return in
 }

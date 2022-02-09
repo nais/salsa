@@ -35,10 +35,10 @@ func TestCreateProvenanceArtifact_withContext(t *testing.T) {
 
 	// VCS Context
 	assert.Equal(t, "https://github.com/nais/salsa/actions/runs/1234", slsaPredicate.Metadata.BuildInvocationID)
-	assert.Equal(t, vcs.BuildType, slsaPredicate.BuildType)
+	assert.Equal(t, "todoType", slsaPredicate.BuildType)
+	assert.Equal(t, toExpectedInvocation(), slsaPredicate.Invocation)
 	assert.Equal(t, "https://github.com/nais/salsa/Attestations/GitHubHostedActions@v1", slsaPredicate.Builder.ID)
 	assert.Equal(t, toExpectedMaterials(), slsaPredicate.Materials)
-
 }
 
 func TestProvenanceArtifact_GenerateSlsaPredicate(t *testing.T) {
@@ -111,6 +111,7 @@ func toAnyContext() *vcs.AnyContext {
 			Repository: "nais/salsa",
 			RunId:      "1234",
 			SHA:        "4321",
+			Workflow:   "Create a provenance",
 		},
 		AnyEvent: vcs.AnyEvent{
 			Inputs: nil,
@@ -133,4 +134,15 @@ func toExpectedMaterials() []slsa.ProvenanceMaterial {
 			},
 		},
 	}
+}
+
+func toExpectedInvocation() slsa.ProvenanceInvocation {
+	return slsa.ProvenanceInvocation{
+		ConfigSource: slsa.ConfigSource{
+			URI:        "https://github.com/Attestations/GitHubActionsWorkflow@v1",
+			Digest:     slsa.DigestSet(nil),
+			EntryPoint: "Create a provenance",
+		},
+		Parameters:  interface{}(nil),
+		Environment: interface{}(nil)}
 }
