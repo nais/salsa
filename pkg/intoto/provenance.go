@@ -52,14 +52,31 @@ func withMetadata(pa *ProvenanceArtifact, rp bool, buildFinished time.Time) *sls
 		BuildInvocationID: pa.BuildInvocationId,
 		BuildStartedOn:    &pa.BuildStartedOn,
 		BuildFinishedOn:   &buildFinished,
-		Completeness:      withCompleteness(false, false),
+		Completeness:      withCompleteness(pa),
 		Reproducible:      rp,
 	}
 }
 
-func withCompleteness(environment, materials bool) slsa.ProvenanceComplete {
+func withCompleteness(pa *ProvenanceArtifact) slsa.ProvenanceComplete {
+	environment := false
+	materials := false
+	parameters := false
+
+	if pa.Invocation.Parameters != nil {
+		parameters = true
+	}
+
+	if pa.Invocation.Environment != nil {
+		environment = true
+	}
+
+	if pa.Dependencies != nil && pa.BuilderRepoDigest != nil {
+		materials = true
+	}
+
 	return slsa.ProvenanceComplete{
 		Environment: environment,
 		Materials:   materials,
+		Parameters:  parameters,
 	}
 }

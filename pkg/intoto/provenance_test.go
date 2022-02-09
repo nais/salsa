@@ -1,6 +1,7 @@
 package intoto
 
 import (
+	"encoding/json"
 	"fmt"
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
 	"github.com/nais/salsa/pkg/scan"
@@ -39,6 +40,11 @@ func TestCreateProvenanceArtifact_withContext(t *testing.T) {
 	assert.Equal(t, toExpectedInvocation(), slsaPredicate.Invocation)
 	assert.Equal(t, "https://github.com/nais/salsa/Attestations/GitHubHostedActions@v1", slsaPredicate.Builder.ID)
 	assert.Equal(t, toExpectedMaterials(), slsaPredicate.Materials)
+
+	// completeness
+	assert.Equal(t, false, slsaPredicate.Metadata.Completeness.Environment)
+	assert.Equal(t, true, slsaPredicate.Metadata.Completeness.Materials)
+	assert.Equal(t, true, slsaPredicate.Metadata.Completeness.Parameters)
 }
 
 func TestProvenanceArtifact_GenerateSlsaPredicate(t *testing.T) {
@@ -80,6 +86,7 @@ func TestProvenanceArtifact_GenerateSlsaPredicate(t *testing.T) {
 	// completeness
 	assert.Equal(t, false, slsaPredicate.Metadata.Completeness.Environment)
 	assert.Equal(t, false, slsaPredicate.Metadata.Completeness.Materials)
+	assert.Equal(t, false, slsaPredicate.Metadata.Completeness.Parameters)
 
 	// materials
 	assert.Equal(t, expectedMaterials, slsaPredicate.Materials)
@@ -143,6 +150,6 @@ func toExpectedInvocation() slsa.ProvenanceInvocation {
 			Digest:     slsa.DigestSet(nil),
 			EntryPoint: "Create a provenance",
 		},
-		Parameters:  interface{}(nil),
+		Parameters:  json.RawMessage(nil),
 		Environment: interface{}(nil)}
 }

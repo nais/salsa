@@ -71,7 +71,7 @@ func (in *ProvenanceArtifact) WithBuilderInvocation(context *vcs.AnyContext) *Pr
 			Digest:     nil,
 			EntryPoint: context.Workflow,
 		},
-		Parameters:  nil,
+		Parameters:  context.Inputs,
 		Environment: nil,
 	}
 	return in
