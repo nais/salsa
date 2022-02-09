@@ -34,8 +34,8 @@ func TestCreateProvenanceArtifact_withContext(t *testing.T) {
 	slsaPredicate := provenanceArtifact.GenerateSlsaPredicate()
 
 	// VCS Context
-	assert.Equal(t, "https://github.com/salsa/actions/runs/1234", slsaPredicate.Metadata.BuildInvocationID)
-	assert.Equal(t, "https://github.com/salsa/Attestations/GitHubHostedActions@v1", slsaPredicate.Builder.ID)
+	assert.Equal(t, "https://github.com/nais/salsa/actions/runs/1234", slsaPredicate.Metadata.BuildInvocationID)
+	assert.Equal(t, "https://github.com/nais/salsa/Attestations/GitHubHostedActions@v1", slsaPredicate.Builder.ID)
 	assert.Equal(t, toExpectedMaterials(), slsaPredicate.Materials)
 
 }
@@ -107,7 +107,7 @@ func toArtDeps(deps []scan.Dependency) *scan.ArtifactDependencies {
 func toAnyContext() *vcs.AnyContext {
 	return &vcs.AnyContext{
 		GitHubContext: vcs.GitHubContext{
-			Repository: "salsa",
+			Repository: "nais/salsa",
 			RunId:      "1234",
 			SHA:        "4321",
 		},
@@ -126,7 +126,7 @@ func toExpectedMaterials() []slsa.ProvenanceMaterial {
 			},
 		},
 		{
-			URI: "git+https://github.com/salsa",
+			URI: "git+https://github.com/nais/salsa",
 			Digest: slsa.DigestSet{
 				"sha1": "4321",
 			},

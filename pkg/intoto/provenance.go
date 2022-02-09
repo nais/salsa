@@ -98,10 +98,9 @@ func (in *ProvenanceArtifact) WithRunnerContext(context *vcs.AnyContext) *Proven
 	}
 
 	repoURI := "https://github.com/" + context.GitHubContext.Repository
-	in.WithBuildInvocationId(repoURI, context).
+	return in.WithBuildInvocationId(repoURI, context).
 		WithBuilderRepoDigest(repoURI, context).
 		WithBuilderId(repoURI)
-	return in
 }
 
 func (in *ProvenanceArtifact) WithBuildInvocationId(repoURI string, context *vcs.AnyContext) *ProvenanceArtifact {
