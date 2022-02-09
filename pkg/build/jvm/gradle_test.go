@@ -1,6 +1,7 @@
 package jvm
 
 import (
+	"github.com/nais/salsa/pkg/digest"
 	"io/ioutil"
 	"testing"
 
@@ -33,7 +34,7 @@ func dep(coordinates, version, checksum string) build.Dependency {
 		Coordinates: coordinates,
 		Version:     version,
 		CheckSum: build.CheckSum{
-			Algorithm: "sha256",
+			Algorithm: digest.AlgorithmSHA256,
 			Digest:    checksum,
 		},
 	}

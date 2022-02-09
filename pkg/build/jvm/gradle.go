@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"github.com/nais/salsa/pkg/digest"
 	"io/ioutil"
 	"os/exec"
 	"regexp"
@@ -87,7 +88,7 @@ func GradleDeps(depsOutput string, checksumXml []byte) ([]build.Dependency, erro
 			Coordinates: fmt.Sprintf("%s:%s", groupId, artifactId),
 			Version:     version,
 			CheckSum: build.CheckSum{
-				Algorithm: "sha256",
+				Algorithm: digest.AlgorithmSHA256,
 				Digest:    sum.checksum(groupId, artifactId, version),
 			},
 		})

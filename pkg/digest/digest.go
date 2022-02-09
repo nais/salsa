@@ -10,7 +10,10 @@ import (
 
 type Digest string
 
-const SHA256 = "sha256"
+const (
+	AlgorithmSHA256 = "sha256"
+	AlgorithmSHA1   = "sha1"
+)
 
 func Hash(input string) (Digest, error) {
 	s := strings.NewReader(input)

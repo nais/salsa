@@ -3,6 +3,7 @@ package php
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/nais/salsa/pkg/digest"
 	"os"
 
 	"github.com/nais/salsa/pkg/build"
@@ -70,7 +71,7 @@ func transform(dependencies []dep) []build.Dependency {
 			Coordinates: d.Name,
 			Version:     d.Version,
 			CheckSum: build.CheckSum{
-				Algorithm: "sha1",
+				Algorithm: digest.AlgorithmSHA1,
 				Digest:    d.Dist.Shasum,
 			},
 		})

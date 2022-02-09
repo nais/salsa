@@ -50,7 +50,10 @@ func GoDeps(goSumContents string) []build.Dependency {
 		deps = append(deps, build.Dependency{
 			Coordinates: parts[0],
 			Version:     version,
-			CheckSum:    build.CheckSum{Algorithm: digest.SHA256, Digest: string(stringDecodedDigest)},
+			CheckSum: build.CheckSum{
+				Algorithm: digest.AlgorithmSHA256,
+				Digest:    string(stringDecodedDigest),
+			},
 		})
 	}
 	return deps

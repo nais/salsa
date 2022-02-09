@@ -3,6 +3,7 @@ package intoto
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/nais/salsa/pkg/digest"
 	"os"
 	"testing"
 	"time"
@@ -19,7 +20,7 @@ func TestCreateProvenanceArtifact(t *testing.T) {
 
 	provenanceArtifact := CreateProvenanceArtifact("artifact", artDeps)
 	assert.Equal(t, "artifact", provenanceArtifact.Name)
-	assert.Equal(t, "todoType", provenanceArtifact.BuildType)
+	assert.Equal(t, vcs.AdHocBuildType, provenanceArtifact.BuildType)
 	assert.Equal(t, deps, provenanceArtifact.Dependencies.RuntimeDeps)
 	assert.True(t, time.Now().UTC().After(provenanceArtifact.BuildStartedOn))
 }
@@ -37,7 +38,7 @@ func TestCreateProvenanceArtifact_withContext(t *testing.T) {
 
 	// VCS Context
 	assert.Equal(t, "https://github.com/nais/salsa/actions/runs/1234", slsaPredicate.Metadata.BuildInvocationID)
-	assert.Equal(t, "todoType", slsaPredicate.BuildType)
+	assert.Equal(t, vcs.BuildType, slsaPredicate.BuildType)
 	assert.Equal(t, toExpectedInvocation(), slsaPredicate.Invocation)
 	assert.Equal(t, "https://github.com/nais/salsa/Attestations/GitHubHostedActions@v1", slsaPredicate.Builder.ID)
 	assert.Equal(t, toExpectedMaterials(), slsaPredicate.Materials)
@@ -71,8 +72,8 @@ func TestProvenanceArtifact_GenerateSlsaPredicate(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, "todoType", slsaPredicate.BuildType)
-	assert.Equal(t, "", slsaPredicate.Builder.ID)
+	assert.Equal(t, vcs.AdHocBuildType, slsaPredicate.BuildType)
+	assert.Equal(t, "https://github.com/nais/salsa", slsaPredicate.Builder.ID)
 	assert.Equal(t, nil, slsaPredicate.BuildConfig)
 	assert.Equal(t, expectedConfigSource, slsaPredicate.Invocation.ConfigSource)
 	assert.Equal(t, nil, slsaPredicate.Invocation.Parameters)
@@ -138,7 +139,7 @@ func toExpectedMaterials() []slsa.ProvenanceMaterial {
 		{
 			URI: "git+https://github.com/nais/salsa",
 			Digest: slsa.DigestSet{
-				"sha1": "4321",
+				digest.AlgorithmSHA1: "4321",
 			},
 		},
 	}
@@ -147,8 +148,10 @@ func toExpectedMaterials() []slsa.ProvenanceMaterial {
 func toExpectedInvocation() slsa.ProvenanceInvocation {
 	return slsa.ProvenanceInvocation{
 		ConfigSource: slsa.ConfigSource{
-			URI:        "https://github.com/Attestations/GitHubActionsWorkflow@v1",
-			Digest:     slsa.DigestSet(nil),
+			URI: "git+https://github.com/nais/salsa",
+			Digest: slsa.DigestSet{
+				digest.AlgorithmSHA1: "4321",
+			},
 			EntryPoint: "Create a provenance",
 		},
 		Parameters:  json.RawMessage(nil),

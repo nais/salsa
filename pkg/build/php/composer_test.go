@@ -1,6 +1,7 @@
 package php
 
 import (
+	"github.com/nais/salsa/pkg/digest"
 	"reflect"
 	"testing"
 
@@ -36,7 +37,7 @@ func dependency(coordinates, version string) build.Dependency {
 		Coordinates: coordinates,
 		Version:     version,
 		CheckSum: build.CheckSum{
-			Algorithm: "sha1",
+			Algorithm: digest.AlgorithmSHA1,
 			Digest:    "",
 		},
 	}

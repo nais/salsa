@@ -9,6 +9,8 @@ const (
 	SelfHostedIdSuffix   = "/Attestations/SelfHostedActions@v1"
 	// BuildType Describes what the invocations buildConfig and materials was created
 	BuildType = "https://github.com/Attestations/GitHubActionsWorkflow@v1"
+	// AdHocBuildType no entry point, and the commands were run in an ad-hoc fashion
+	AdHocBuildType = "https://github.com/nais/salsa/ManuallyRunCommands@v1"
 )
 
 type GitHubContext struct {

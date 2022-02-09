@@ -1,6 +1,7 @@
 package golang
 
 import (
+	"github.com/nais/salsa/pkg/digest"
 	"reflect"
 	"testing"
 
@@ -19,13 +20,13 @@ func TestGoDeps(t *testing.T) {
 	}
 }
 
-func dep(coordinates, version, digest string) build.Dependency {
+func dep(coordinates, version, checksum string) build.Dependency {
 	return build.Dependency{
 		Coordinates: coordinates,
 		Version:     version,
 		CheckSum: build.CheckSum{
-			Algorithm: "sha256",
-			Digest:    digest,
+			Algorithm: digest.AlgorithmSHA256,
+			Digest:    checksum,
 		},
 	}
 }
