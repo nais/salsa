@@ -4,12 +4,12 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/nais/salsa/pkg/scan"
+	"github.com/nais/salsa/pkg/scan/common"
 )
 
 func TestMavenDeps(t *testing.T) {
 	got, _ := MavenCompileAndRuntimeTimeDeps(mvnDependencyListOutput)
-	want := []scan.Dependency{
+	want := []common.Dependency{
 		mvnDep("org.apache.logging.log4j:log4j-core", "2.14.1"),
 		mvnDep("org.apache.logging.log4j:log4j-api", "2.14.2"),
 	}
@@ -20,11 +20,11 @@ func TestMavenDeps(t *testing.T) {
 
 }
 
-func mvnDep(coordinates, version string) scan.Dependency {
-	return scan.Dependency{
+func mvnDep(coordinates, version string) common.Dependency {
+	return common.Dependency{
 		Coordinates: coordinates,
 		Version:     version,
-		CheckSum: scan.CheckSum{
+		CheckSum: common.CheckSum{
 			Algorithm: "todo",
 			Digest:    "todo",
 		},

@@ -3,14 +3,14 @@ package nodejs
 import (
 	"testing"
 
-	"github.com/nais/salsa/pkg/scan"
+	"github.com/nais/salsa/pkg/scan/common"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestYarnLockParsing(t *testing.T) {
 
 	got := YarnDeps(yarnlLockContents)
-	want := []scan.Dependency{
+	want := []common.Dependency{
 		yarnDep("js-tokens", "4.0.0", "sha512", "RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ=="),
 		yarnDep("loose-envify", "1.4.0", "sha512", "lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q=="),
 		yarnDep("object-assign", "4.1.1", "sha1", "IQmtx5ZYh8/AXLvUQsrIv7s2CGM="),
@@ -22,11 +22,11 @@ func TestYarnLockParsing(t *testing.T) {
 	}
 }
 
-func yarnDep(coordinates, version, alg, digest string) scan.Dependency {
-	return scan.Dependency{
+func yarnDep(coordinates, version, alg, digest string) common.Dependency {
+	return common.Dependency{
 		Coordinates: coordinates,
 		Version:     version,
-		CheckSum: scan.CheckSum{
+		CheckSum: common.CheckSum{
 			Algorithm: alg,
 			Digest:    digest,
 		},

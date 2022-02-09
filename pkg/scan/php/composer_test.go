@@ -4,12 +4,12 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/nais/salsa/pkg/scan"
+	"github.com/nais/salsa/pkg/scan/common"
 )
 
 func TestComposerLockJsonParsing(t *testing.T) {
 	got, _ := ComposerDeps(composerLockContents)
-	want := []scan.Dependency{
+	want := []common.Dependency{
 		dependency("guzzlehttp/guzzle", "7.4.1"),
 		dependency("guzzlehttp/promises", "1.5.1"),
 		dependency("guzzlehttp/psr7", "2.1.0"),
@@ -31,11 +31,11 @@ func TestComposerLockJsonParsing(t *testing.T) {
 	}
 }
 
-func dependency(coordinates, version string) scan.Dependency {
-	return scan.Dependency{
+func dependency(coordinates, version string) common.Dependency {
+	return common.Dependency{
 		Coordinates: coordinates,
 		Version:     version,
-		CheckSum: scan.CheckSum{
+		CheckSum: common.CheckSum{
 			Algorithm: "sha1",
 			Digest:    "",
 		},

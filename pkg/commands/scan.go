@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/nais/salsa/pkg/build-tool"
 	"github.com/nais/salsa/pkg/intoto"
-	"github.com/nais/salsa/pkg/scan"
+	"github.com/nais/salsa/pkg/scan/common"
+	"github.com/nais/salsa/pkg/scan/deps"
 	"github.com/nais/salsa/pkg/utils"
 	"github.com/nais/salsa/pkg/vcs"
 	log "github.com/sirupsen/logrus"
@@ -35,7 +35,7 @@ var scanCmd = &cobra.Command{
 
 		log.Infof("prepare to scan path %s for project %s...", PathFlags.WorkDir(), project)
 		workDir := PathFlags.WorkDir()
-		deps, err := build_tool.Dependencies(workDir)
+		deps, err := deps.Dependencies(workDir)
 		err = GenerateProvenance(workDir, PathFlags.Repo, deps, &inputContext)
 		if err != nil {
 			return err
@@ -44,7 +44,7 @@ var scanCmd = &cobra.Command{
 	},
 }
 
-func GenerateProvenance(workDir, project string, dependencies *scan.ArtifactDependencies, inputContext *string) error {
+func GenerateProvenance(workDir, project string, dependencies *common.ArtifactDependencies, inputContext *string) error {
 	context, err := vcs.CreateCIContext(inputContext)
 	if err != nil {
 		return err

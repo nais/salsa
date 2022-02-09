@@ -3,13 +3,14 @@ package intoto
 import (
 	"encoding/json"
 	"fmt"
-	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
-	"github.com/nais/salsa/pkg/scan"
-	"github.com/nais/salsa/pkg/vcs"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 	"time"
+
+	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
+	"github.com/nais/salsa/pkg/scan/common"
+	"github.com/nais/salsa/pkg/vcs"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateProvenanceArtifact(t *testing.T) {
@@ -92,12 +93,12 @@ func TestProvenanceArtifact_GenerateSlsaPredicate(t *testing.T) {
 	assert.Equal(t, expectedMaterials, slsaPredicate.Materials)
 }
 
-func toDeps() []scan.Dependency {
-	return []scan.Dependency{
+func toDeps() []common.Dependency {
+	return []common.Dependency{
 		{
 			Coordinates: fmt.Sprintf("%s:%s", "groupId", "artifactId"),
 			Version:     "v01",
-			CheckSum: scan.CheckSum{
+			CheckSum: common.CheckSum{
 				Algorithm: "todo",
 				Digest:    "todo",
 			},
@@ -105,8 +106,8 @@ func toDeps() []scan.Dependency {
 	}
 }
 
-func toArtDeps(deps []scan.Dependency) *scan.ArtifactDependencies {
-	return &scan.ArtifactDependencies{
+func toArtDeps(deps []common.Dependency) *common.ArtifactDependencies {
+	return &common.ArtifactDependencies{
 		Cmd:         "lang list:deps",
 		RuntimeDeps: deps,
 	}

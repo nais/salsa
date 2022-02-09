@@ -4,20 +4,72 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"os/exec"
 	"regexp"
 	"strings"
 
-	"github.com/nais/salsa/pkg/scan"
+	"github.com/nais/salsa/pkg/scan/common"
+	"github.com/nais/salsa/pkg/utils"
 )
 
-func GradleDeps(depsOutput string, checksumXml []byte) ([]scan.Dependency, error) {
+const gradleBuildFileName = "build.gradle.kts"
+
+type Gradle struct {
+	BuildFilePatterns []string
+}
+
+func (g Gradle) ResolveDeps(workDir string) (*common.ArtifactDependencies, error) {
+	cmd := exec.Command(
+		"gradle",
+		"-q", "dependencies", "--configuration", "runtimeClasspath", "-M", "sha256",
+	)
+	cmd.Dir = workDir
+
+	err := utils.RequireCommand("gradle")
+	if err != nil {
+		return nil, fmt.Errorf("exec: %v\n", err)
+	}
+
+	depsOutput, err := utils.Exec(cmd)
+	if err != nil {
+		return nil, fmt.Errorf("exec: %v\n", err)
+	}
+
+	xml, err := ioutil.ReadFile(workDir + "/gradle/verification-metadata.xml")
+	if err != nil {
+		return nil, fmt.Errorf("readfile: %v\n", err)
+	}
+
+	deps, err := GradleDeps(depsOutput, xml)
+	if err != nil {
+		return nil, fmt.Errorf("could not get gradle deps: %w", err)
+	}
+
+	return &common.ArtifactDependencies{
+		Cmd:         fmt.Sprintf("%s %v", cmd.Path, cmd.Args),
+		RuntimeDeps: deps,
+	}, nil
+}
+
+func NewGradle() common.BuildTool {
+	return &Gradle{
+		BuildFilePatterns: []string{gradleBuildFileName},
+	}
+}
+
+func (g Gradle) BuildFiles() []string {
+	return g.BuildFilePatterns
+}
+
+func GradleDeps(depsOutput string, checksumXml []byte) ([]common.Dependency, error) {
 	pattern := regexp.MustCompile(`(?m)---\s[a-zA-Z0-9.]+:.*$`)
 	matches := pattern.FindAllString(depsOutput, -1)
 	if matches == nil {
 		return nil, errors.New("unable to find any dependencies")
 	}
 
-	deps := make([]scan.Dependency, 0)
+	deps := make([]common.Dependency, 0)
 
 	sum := GradleChecksum{}
 	err := xml.Unmarshal(checksumXml, &sum)
@@ -31,10 +83,10 @@ func GradleDeps(depsOutput string, checksumXml []byte) ([]scan.Dependency, error
 		groupId := elements[0]
 		artifactId := elements[1]
 		version := strings.Split(elements[2], " ")[0]
-		deps = append(deps, scan.Dependency{
+		deps = append(deps, common.Dependency{
 			Coordinates: fmt.Sprintf("%s:%s", groupId, artifactId),
 			Version:     version,
-			CheckSum: scan.CheckSum{
+			CheckSum: common.CheckSum{
 				Algorithm: "sha256",
 				Digest:    sum.checksum(groupId, artifactId, version),
 			},

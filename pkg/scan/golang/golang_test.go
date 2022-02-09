@@ -4,12 +4,12 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/nais/salsa/pkg/scan"
+	"github.com/nais/salsa/pkg/scan/common"
 )
 
 func TestGoDeps(t *testing.T) {
 	got := GoDeps(goSumContents)
-	wantDeps := []scan.Dependency{
+	wantDeps := []common.Dependency{
 		dep("github.com/google/uuid", "1.0.0", "b4Gk+7WdP/d3HZH8EJsZpvV7EtDOgaZLtnaNGIu1adA="),
 		dep("github.com/pborman/uuid", "1.2.1", "+ZZIw58t/ozdjRaXh/3awHfmWRbzYxJoAdNJxe/3pvw="),
 	}
@@ -19,11 +19,11 @@ func TestGoDeps(t *testing.T) {
 	}
 }
 
-func dep(coordinates, version, digest string) scan.Dependency {
-	return scan.Dependency{
+func dep(coordinates, version, digest string) common.Dependency {
+	return common.Dependency{
 		Coordinates: coordinates,
 		Version:     version,
-		CheckSum: scan.CheckSum{
+		CheckSum: common.CheckSum{
 			Algorithm: "sha256",
 			Digest:    digest,
 		},
