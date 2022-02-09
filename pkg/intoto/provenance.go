@@ -19,12 +19,12 @@ func withPredicate(pa *ProvenanceArtifact) slsa.ProvenancePredicate {
 		Invocation:  pa.Invocation,
 		BuildConfig: nil,
 		Metadata:    withMetadata(pa, false, time.Now().UTC()),
-		Materials:   pa.withMaterials(pa),
+		Materials:   withMaterials(pa),
 	}
 }
 
 // TODO: use other type of materials aswell, e.g. github actions run in the build
-func (in *ProvenanceArtifact) withMaterials(pa *ProvenanceArtifact) []slsa.ProvenanceMaterial {
+func withMaterials(pa *ProvenanceArtifact) []slsa.ProvenanceMaterial {
 	materials := make([]slsa.ProvenanceMaterial, 0)
 	AppendRuntimeDependencies(pa, &materials)
 	AppendBuildContext(pa, &materials)
