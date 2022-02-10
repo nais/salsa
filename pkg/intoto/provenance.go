@@ -58,7 +58,7 @@ func withCompleteness(pa *ProvenanceArtifact) slsa.ProvenanceComplete {
 	materials := false
 	parameters := false
 
-	if pa.Invocation.Parameters != nil {
+	if pa.HasLegitParameters() {
 		parameters = true
 	}
 
@@ -66,7 +66,7 @@ func withCompleteness(pa *ProvenanceArtifact) slsa.ProvenanceComplete {
 		environment = true
 	}
 
-	if pa.hasLegitDependencies() && pa.hasLegitBuilderRepoDigest() {
+	if pa.HasLegitDependencies() && pa.HasLegitBuilderRepoDigest() {
 		materials = true
 	}
 

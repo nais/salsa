@@ -1,7 +1,6 @@
 package intoto
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/nais/salsa/pkg/digest"
 	"os"
@@ -38,12 +37,15 @@ func TestCreateProvenanceArtifact_withContext(t *testing.T) {
 	// VCS Context
 	assert.Equal(t, "https://github.com/nais/salsa/actions/runs/1234", slsaPredicate.Metadata.BuildInvocationID)
 	assert.Equal(t, vcs.BuildType, slsaPredicate.BuildType)
-	assert.Equal(t, toExpectedInvocation(), slsaPredicate.Invocation)
+	assert.NotEmpty(t, slsaPredicate.Invocation)
+	assert.NotEmpty(t, slsaPredicate.Invocation.Parameters)
+	assert.NotEmpty(t, slsaPredicate.Invocation.Environment)
+	assert.Equal(t, toExpectedConfigSource(), slsaPredicate.Invocation.ConfigSource)
 	assert.Equal(t, "https://github.com/nais/salsa/Attestations/GitHubHostedActions@v1", slsaPredicate.Builder.ID)
 	assert.Equal(t, toExpectedMaterials(), slsaPredicate.Materials)
 
 	// completeness
-	assert.Equal(t, false, slsaPredicate.Metadata.Completeness.Environment)
+	assert.Equal(t, true, slsaPredicate.Metadata.Completeness.Environment)
 	assert.Equal(t, true, slsaPredicate.Metadata.Completeness.Materials)
 	assert.Equal(t, true, slsaPredicate.Metadata.Completeness.Parameters)
 }
@@ -122,8 +124,13 @@ func toVcsEnvironment() *vcs.Environment {
 			Workflow:   "Create a provenance",
 			ServerUrl:  "https://github.com",
 		},
-		AnyEvent: vcs.AnyEvent{
-			Inputs: nil,
+		Event: vcs.Event{
+			Inputs: []byte("some vents"),
+		},
+		RunnerContext: vcs.RunnerContext{
+			OS:        "Linux",
+			Temp:      "/home/runner/work/_temp",
+			ToolCache: "/opt/hostedtoolcache",
 		},
 	}
 }
@@ -145,15 +152,12 @@ func toExpectedMaterials() []slsa.ProvenanceMaterial {
 	}
 }
 
-func toExpectedInvocation() slsa.ProvenanceInvocation {
-	return slsa.ProvenanceInvocation{
-		ConfigSource: slsa.ConfigSource{
-			URI: "git+https://github.com/nais/salsa",
-			Digest: slsa.DigestSet{
-				digest.AlgorithmSHA1: "4321",
-			},
-			EntryPoint: "Create a provenance",
+func toExpectedConfigSource() slsa.ConfigSource {
+	return slsa.ConfigSource{
+		URI: "git+https://github.com/nais/salsa",
+		Digest: slsa.DigestSet{
+			digest.AlgorithmSHA1: "4321",
 		},
-		Parameters:  json.RawMessage(nil),
-		Environment: interface{}(nil)}
+		EntryPoint: "Create a provenance",
+	}
 }

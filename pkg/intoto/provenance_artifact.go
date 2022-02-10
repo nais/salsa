@@ -1,6 +1,7 @@
 package intoto
 
 import (
+	"github.com/mitchellh/mapstructure"
 	"github.com/nais/salsa/pkg/digest"
 	"time"
 
@@ -45,10 +46,10 @@ func CreateProvenanceArtifact(name string, deps *build.ArtifactDependencies, env
 	pa.BuildInvocationId = pa.Environment.BuildInvocationId()
 	pa.BuilderId = pa.Environment.BuilderId()
 
-	return pa.WithBuilderRepoDigest().WithBuilderInvocation()
+	return pa.withBuilderRepoDigest().withBuilderInvocation()
 }
 
-func (in *ProvenanceArtifact) WithBuilderRepoDigest() *ProvenanceArtifact {
+func (in *ProvenanceArtifact) withBuilderRepoDigest() *ProvenanceArtifact {
 	in.BuilderRepoDigest = &slsa.ProvenanceMaterial{
 		URI: "git+" + in.Environment.RepoUri(),
 		Digest: slsa.DigestSet{
@@ -58,7 +59,7 @@ func (in *ProvenanceArtifact) WithBuilderRepoDigest() *ProvenanceArtifact {
 	return in
 }
 
-func (in *ProvenanceArtifact) WithBuilderInvocation() *ProvenanceArtifact {
+func (in *ProvenanceArtifact) withBuilderInvocation() *ProvenanceArtifact {
 	in.Invocation = slsa.ProvenanceInvocation{
 		ConfigSource: slsa.ConfigSource{
 			URI: "git+" + in.Environment.RepoUri(),
@@ -67,14 +68,14 @@ func (in *ProvenanceArtifact) WithBuilderInvocation() *ProvenanceArtifact {
 			},
 			EntryPoint: in.Environment.Workflow,
 		},
-		Parameters: in.Environment.Inputs,
+		Parameters: in.Environment.EventBytes(),
 		// Should contain the architecture of the runner.
-		Environment: nil,
+		Environment: in.Environment.RunnerContext,
 	}
 	return in
 }
 
-func (in *ProvenanceArtifact) hasLegitBuilderRepoDigest() bool {
+func (in *ProvenanceArtifact) HasLegitBuilderRepoDigest() bool {
 	if in.BuilderRepoDigest == nil {
 		return false
 	}
@@ -83,10 +84,21 @@ func (in *ProvenanceArtifact) hasLegitBuilderRepoDigest() bool {
 
 }
 
-func (in *ProvenanceArtifact) hasLegitDependencies() bool {
+func (in *ProvenanceArtifact) HasLegitDependencies() bool {
 	if in.Dependencies == nil {
 		return false
 	}
 
 	return len(in.Dependencies.RuntimeDeps) > 0
+}
+
+func (in *ProvenanceArtifact) HasLegitParameters() bool {
+	if in.Invocation.Parameters == nil {
+		return false
+	}
+
+	event := &vcs.Event{}
+	output := mapstructure.Decode(in.Invocation.Parameters, event.Inputs)
+
+	return output != nil
 }

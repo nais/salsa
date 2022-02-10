@@ -8,23 +8,34 @@ import (
 
 type Environment struct {
 	GitHubContext `json:"github"`
-	AnyEvent      `json:"event"`
+	Event         `json:"event"`
+	RunnerContext `json:"runner_context"`
 }
 
-func CreateCIEnvironment(inputContext *string) (*Environment, error) {
+func CreateCIEnvironment(githubContext, runnerContext *string) (*Environment, error) {
 	env := Environment{}
-	if len(*inputContext) > 0 {
-		if err := json.Unmarshal([]byte(*inputContext), &env.GitHubContext); err != nil {
+
+	if githubContext != nil && len(*githubContext) > 0 {
+		if err := json.Unmarshal([]byte(*githubContext), &env.GitHubContext); err != nil {
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("unmarshal github context json: %w", err)
 			}
 		}
-		if err := json.Unmarshal(env.GitHubContext.Event, &env.AnyEvent); err != nil {
-			if err != nil {
-				return nil, err
+		if env.GitHubContext.Event != nil {
+			if err := json.Unmarshal(env.GitHubContext.Event, &env.Event); err != nil {
+				if err != nil {
+					return nil, fmt.Errorf("unmarshal github event json: %w", err)
+				}
 			}
 		}
 	}
+
+	if runnerContext != nil && len(*runnerContext) > 0 {
+		if err := json.Unmarshal([]byte(*runnerContext), &env.RunnerContext); err != nil {
+			return nil, fmt.Errorf("unmarshal runner context json: %w", err)
+		}
+	}
+
 	return &env, nil
 }
 
@@ -45,4 +56,9 @@ func (in *Environment) BuilderId() string {
 		return in.RepoUri() + GitHubHostedIdSuffix
 	}
 	return in.RepoUri() + GitHubHostedIdSuffix
+}
+
+func (in *Environment) EventBytes() []byte {
+	output, _ := in.Event.Inputs.MarshalJSON()
+	return output
 }

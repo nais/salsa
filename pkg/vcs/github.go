@@ -17,7 +17,6 @@ const (
 type GitHubContext struct {
 	Action          string          `json:"action"`
 	Actor           string          `json:"actor"`
-	BaseRef         string          `json:"base_ref"`
 	Event           json.RawMessage `json:"event"`
 	EventName       string          `json:"event_name"`
 	EventPath       string          `json:"event_path"`
@@ -34,6 +33,12 @@ type GitHubContext struct {
 	Workspace       string          `json:"workspace"`
 }
 
-type AnyEvent struct {
+type Event struct {
 	Inputs json.RawMessage `json:"inputs"`
+}
+
+type RunnerContext struct {
+	OS        string `json:"os"`
+	Temp      string `json:"temp"`
+	ToolCache string `json:"tool_cache"`
 }

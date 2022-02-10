@@ -60,7 +60,7 @@ var scanCmd = &cobra.Command{
 }
 
 func GenerateProvenance(workDir, project string, dependencies *build.ArtifactDependencies, inputContext *string) error {
-	ciEnv, err := vcs.CreateCIEnvironment(inputContext)
+	ciEnv, err := vcs.CreateCIEnvironment(inputContext, nil)
 	if err != nil {
 		return err
 	}
