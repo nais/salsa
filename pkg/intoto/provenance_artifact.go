@@ -1,7 +1,7 @@
 package intoto
 
 import (
-	"github.com/mitchellh/mapstructure"
+	"fmt"
 	"github.com/nais/salsa/pkg/digest"
 	"time"
 
@@ -92,13 +92,15 @@ func (in *ProvenanceArtifact) HasLegitDependencies() bool {
 	return len(in.Dependencies.RuntimeDeps) > 0
 }
 
-func (in *ProvenanceArtifact) HasLegitParameters() bool {
+func (in *ProvenanceArtifact) HasLegitParameters() (bool, error) {
 	if in.Invocation.Parameters == nil {
-		return false
+		return false, nil
 	}
 
-	event := &vcs.Event{}
-	output := mapstructure.Decode(in.Invocation.Parameters, event.Inputs)
+	output, err := in.Environment.Inputs.MarshalJSON()
+	if err != nil {
+		return false, fmt.Errorf("parsing inputs %s", err)
+	}
 
-	return output != nil
+	return output != nil, err
 }
