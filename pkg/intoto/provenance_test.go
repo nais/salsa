@@ -18,7 +18,7 @@ func TestCreateProvenanceArtifact(t *testing.T) {
 	deps := toDeps()
 	artDeps := toArtDeps(deps)
 
-	provenanceArtifact := CreateProvenanceArtifact("artifact", artDeps)
+	provenanceArtifact := CreateProvenanceArtifact("artifact", artDeps, nil)
 	assert.Equal(t, "artifact", provenanceArtifact.Name)
 	assert.Equal(t, vcs.AdHocBuildType, provenanceArtifact.BuildType)
 	assert.Equal(t, deps, provenanceArtifact.Dependencies.RuntimeDeps)
@@ -32,8 +32,7 @@ func TestCreateProvenanceArtifact_withContext(t *testing.T) {
 	err := os.Setenv("GITHUB_ACTIONS", "true")
 	assert.NoError(t, err)
 
-	provenanceArtifact := CreateProvenanceArtifact("artifact", artDeps).
-		WithRunnerContext(anyContext)
+	provenanceArtifact := CreateProvenanceArtifact("artifact", artDeps, anyContext)
 	slsaPredicate := GenerateSlsaPredicate(provenanceArtifact)
 
 	// VCS Context
@@ -53,7 +52,7 @@ func TestProvenanceArtifact_GenerateSlsaPredicate(t *testing.T) {
 	deps := toDeps()
 	artDeps := toArtDeps(deps)
 
-	provenanceArtifact := CreateProvenanceArtifact("artifact", artDeps)
+	provenanceArtifact := CreateProvenanceArtifact("artifact", artDeps, nil)
 	slsaPredicate := GenerateSlsaPredicate(provenanceArtifact)
 
 	// Predicate

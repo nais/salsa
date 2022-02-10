@@ -26,24 +26,28 @@ type ProvenanceArtifact struct {
 	BuildConfig       string
 }
 
-func CreateProvenanceArtifact(name string, deps *build.ArtifactDependencies) *ProvenanceArtifact {
-	return &ProvenanceArtifact{
+func CreateProvenanceArtifact(name string, deps *build.ArtifactDependencies, context *vcs.AnyContext) *ProvenanceArtifact {
+	if context == nil {
+		return &ProvenanceArtifact{
+			Name:           name,
+			BuildType:      vcs.AdHocBuildType,
+			BuildConfig:    "Some commands that made this build",
+			BuilderId:      DefaultBuildId,
+			Dependencies:   deps,
+			BuildStartedOn: time.Now().UTC(),
+		}
+	}
+
+	repoURI := "https://github.com/" + context.GitHubContext.Repository
+	pa := &ProvenanceArtifact{
 		Name:           name,
 		BuildType:      vcs.AdHocBuildType,
 		BuilderId:      DefaultBuildId,
 		Dependencies:   deps,
 		BuildStartedOn: time.Now().UTC(),
 	}
-}
 
-func (in *ProvenanceArtifact) WithRunnerContext(context *vcs.AnyContext) *ProvenanceArtifact {
-	if context == nil {
-		in.BuildConfig = "Some commands to do this build"
-		return in
-	}
-
-	repoURI := "https://github.com/" + context.GitHubContext.Repository
-	return in.WithBuildInvocationId(repoURI, context).
+	return pa.WithBuildInvocationId(repoURI, context).
 		WithBuilderRepoDigest(repoURI, context).
 		WithBuilderId(repoURI).
 		WithBuilderInvocation(repoURI, context).
