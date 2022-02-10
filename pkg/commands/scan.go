@@ -64,6 +64,7 @@ func GenerateProvenance(workDir, project string, dependencies *build.ArtifactDep
 	if err != nil {
 		return err
 	}
+
 	provenanceArtifact := intoto.CreateProvenanceArtifact(project, dependencies, ciEnv)
 	predicate := intoto.GenerateSlsaPredicate(provenanceArtifact)
 	statement, err := json.Marshal(predicate)

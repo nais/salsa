@@ -73,3 +73,20 @@ func (in *ProvenanceArtifact) WithBuilderInvocation() *ProvenanceArtifact {
 	}
 	return in
 }
+
+func (in *ProvenanceArtifact) hasLegitBuilderRepoDigest() bool {
+	if in.BuilderRepoDigest == nil {
+		return false
+	}
+
+	return in.BuilderRepoDigest.Digest != nil && in.BuilderRepoDigest.URI != ""
+
+}
+
+func (in *ProvenanceArtifact) hasLegitDependencies() bool {
+	if in.Dependencies == nil {
+		return false
+	}
+
+	return len(in.Dependencies.RuntimeDeps) > 0
+}

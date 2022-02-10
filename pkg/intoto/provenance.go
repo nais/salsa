@@ -7,10 +7,6 @@ import (
 )
 
 func GenerateSlsaPredicate(pa *ProvenanceArtifact) slsa.ProvenancePredicate {
-	return withPredicate(pa)
-}
-
-func withPredicate(pa *ProvenanceArtifact) slsa.ProvenancePredicate {
 	return slsa.ProvenancePredicate{
 		Builder: slsa.ProvenanceBuilder{
 			ID: pa.BuilderId,
@@ -70,7 +66,7 @@ func withCompleteness(pa *ProvenanceArtifact) slsa.ProvenanceComplete {
 		environment = true
 	}
 
-	if pa.Dependencies != nil && pa.BuilderRepoDigest != nil {
+	if pa.hasLegitDependencies() && pa.hasLegitBuilderRepoDigest() {
 		materials = true
 	}
 
