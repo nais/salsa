@@ -41,8 +41,7 @@ func CreateProvenanceArtifact(name string, deps *build.ArtifactDependencies, con
 	repoURI := "https://github.com/" + context.GitHubContext.Repository
 	pa := &ProvenanceArtifact{
 		Name:           name,
-		BuildType:      vcs.AdHocBuildType,
-		BuilderId:      DefaultBuildId,
+		BuildType:      vcs.BuildType,
 		Dependencies:   deps,
 		BuildStartedOn: time.Now().UTC(),
 	}
@@ -50,13 +49,7 @@ func CreateProvenanceArtifact(name string, deps *build.ArtifactDependencies, con
 	return pa.WithBuildInvocationId(repoURI, context).
 		WithBuilderRepoDigest(repoURI, context).
 		WithBuilderId(repoURI).
-		WithBuilderInvocation(repoURI, context).
-		WithBuildType()
-}
-
-func (in *ProvenanceArtifact) WithBuildType() *ProvenanceArtifact {
-	in.BuildType = vcs.BuildType
-	return in
+		WithBuilderInvocation(repoURI, context)
 }
 
 func (in *ProvenanceArtifact) WithBuildInvocationId(repoURI string, context *vcs.AnyContext) *ProvenanceArtifact {
@@ -92,7 +85,8 @@ func (in *ProvenanceArtifact) WithBuilderInvocation(repoURI string, context *vcs
 			},
 			EntryPoint: context.Workflow,
 		},
-		Parameters:  context.Inputs,
+		Parameters: context.Inputs,
+		// Should contain the architecture of the runner.
 		Environment: nil,
 	}
 	return in
