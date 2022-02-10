@@ -11,6 +11,7 @@ const (
 	BuildType = "https://github.com/Attestations/GitHubActionsWorkflow@v1"
 	// AdHocBuildType no entry point, and the commands were run in an ad-hoc fashion
 	AdHocBuildType = "https://github.com/nais/salsa/ManuallyRunCommands@v1"
+	DefaultBuildId = "https://github.com/nais/salsa"
 )
 
 type GitHubContext struct {
@@ -34,26 +35,4 @@ type GitHubContext struct {
 
 type AnyEvent struct {
 	Inputs json.RawMessage `json:"inputs"`
-}
-
-type AnyContext struct {
-	GitHubContext `json:"github"`
-	AnyEvent      `json:"event"`
-}
-
-func CreateCIContext(inputContext *string) (*AnyContext, error) {
-	context := AnyContext{}
-	if len(*inputContext) > 0 {
-		if err := json.Unmarshal([]byte(*inputContext), &context.GitHubContext); err != nil {
-			if err != nil {
-				return nil, err
-			}
-		}
-		if err := json.Unmarshal(context.GitHubContext.Event, &context.AnyEvent); err != nil {
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-	return &context, nil
 }

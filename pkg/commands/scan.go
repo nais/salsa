@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/nais/salsa/pkg/vcs"
 	"os"
 
 	"github.com/nais/salsa/pkg/build"
@@ -13,7 +14,6 @@ import (
 	"github.com/nais/salsa/pkg/build/php"
 	"github.com/nais/salsa/pkg/intoto"
 	"github.com/nais/salsa/pkg/utils"
-	"github.com/nais/salsa/pkg/vcs"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -60,11 +60,11 @@ var scanCmd = &cobra.Command{
 }
 
 func GenerateProvenance(workDir, project string, dependencies *build.ArtifactDependencies, inputContext *string) error {
-	context, err := vcs.CreateCIContext(inputContext)
+	ciEnv, err := vcs.CreateCIEnvironment(inputContext)
 	if err != nil {
 		return err
 	}
-	provenanceArtifact := intoto.CreateProvenanceArtifact(project, dependencies, context)
+	provenanceArtifact := intoto.CreateProvenanceArtifact(project, dependencies, ciEnv)
 	predicate := intoto.GenerateSlsaPredicate(provenanceArtifact)
 	statement, err := json.Marshal(predicate)
 	if err != nil {

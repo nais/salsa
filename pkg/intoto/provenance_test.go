@@ -28,11 +28,11 @@ func TestCreateProvenanceArtifact(t *testing.T) {
 func TestCreateProvenanceArtifact_withContext(t *testing.T) {
 	deps := toDeps()
 	artDeps := toArtDeps(deps)
-	anyContext := toAnyContext()
+	env := toVcsEnvironment()
 	err := os.Setenv("GITHUB_ACTIONS", "true")
 	assert.NoError(t, err)
 
-	provenanceArtifact := CreateProvenanceArtifact("artifact", artDeps, anyContext)
+	provenanceArtifact := CreateProvenanceArtifact("artifact", artDeps, env)
 	slsaPredicate := GenerateSlsaPredicate(provenanceArtifact)
 
 	// VCS Context
@@ -113,8 +113,8 @@ func toArtDeps(deps []build.Dependency) *build.ArtifactDependencies {
 	}
 }
 
-func toAnyContext() *vcs.AnyContext {
-	return &vcs.AnyContext{
+func toVcsEnvironment() *vcs.Environment {
+	return &vcs.Environment{
 		GitHubContext: vcs.GitHubContext{
 			Repository: "nais/salsa",
 			RunId:      "1234",

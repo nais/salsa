@@ -10,82 +10,83 @@ import (
 	"github.com/nais/salsa/pkg/vcs"
 )
 
-const (
-	DefaultBuildId = "https://github.com/nais/salsa"
-)
-
 type ProvenanceArtifact struct {
-	Name              string
+	BuildConfig       string
 	BuilderId         string
+	BuilderRepoDigest *slsa.ProvenanceMaterial
+	BuildInvocationId string
+	BuildStartedOn    time.Time
 	BuildType         string
 	Dependencies      *build.ArtifactDependencies
-	BuildStartedOn    time.Time
-	BuildInvocationId string
-	BuilderRepoDigest *slsa.ProvenanceMaterial
+	Environment       *vcs.Environment
 	Invocation        slsa.ProvenanceInvocation
-	BuildConfig       string
+	Name              string
 }
 
-func CreateProvenanceArtifact(name string, deps *build.ArtifactDependencies, context *vcs.AnyContext) *ProvenanceArtifact {
-	if context == nil {
+func CreateProvenanceArtifact(name string, deps *build.ArtifactDependencies, env *vcs.Environment) *ProvenanceArtifact {
+	if env == nil {
 		return &ProvenanceArtifact{
-			Name:           name,
-			BuildType:      vcs.AdHocBuildType,
 			BuildConfig:    "Some commands that made this build",
-			BuilderId:      DefaultBuildId,
-			Dependencies:   deps,
+			BuilderId:      vcs.DefaultBuildId,
 			BuildStartedOn: time.Now().UTC(),
+			BuildType:      vcs.AdHocBuildType,
+			Dependencies:   deps,
+			Name:           name,
 		}
 	}
 
-	repoURI := "https://github.com/" + context.GitHubContext.Repository
 	pa := &ProvenanceArtifact{
-		Name:           name,
 		BuildType:      vcs.BuildType,
-		Dependencies:   deps,
 		BuildStartedOn: time.Now().UTC(),
+		Dependencies:   deps,
+		Environment:    env,
+		Name:           name,
 	}
 
-	return pa.WithBuildInvocationId(repoURI, context).
-		WithBuilderRepoDigest(repoURI, context).
-		WithBuilderId(repoURI).
-		WithBuilderInvocation(repoURI, context)
+	return pa.WithBuildInvocationId().
+		WithBuilderRepoDigest().
+		WithBuilderId().
+		WithBuilderInvocation()
 }
 
-func (in *ProvenanceArtifact) WithBuildInvocationId(repoURI string, context *vcs.AnyContext) *ProvenanceArtifact {
-	in.BuildInvocationId = repoURI + "/actions/runs/" + context.GitHubContext.RunId
+func (in *ProvenanceArtifact) repoUri() string {
+	return "https://github.com/" + in.Environment.GitHubContext.Repository
+}
+
+func (in *ProvenanceArtifact) WithBuildInvocationId() *ProvenanceArtifact {
+	in.BuildInvocationId = in.repoUri() + "/actions/runs/" + in.Environment.GitHubContext.RunId
 	return in
 }
 
-func (in *ProvenanceArtifact) WithBuilderRepoDigest(repoURI string, context *vcs.AnyContext) *ProvenanceArtifact {
+func (in *ProvenanceArtifact) WithBuilderRepoDigest() *ProvenanceArtifact {
 	in.BuilderRepoDigest = &slsa.ProvenanceMaterial{
-		URI: "git+" + repoURI,
+		URI: "git+" + in.repoUri(),
 		Digest: slsa.DigestSet{
-			digest.AlgorithmSHA1: context.GitHubContext.SHA,
+			digest.AlgorithmSHA1: in.Environment.GitHubContext.SHA,
 		},
 	}
 	return in
 }
 
-func (in *ProvenanceArtifact) WithBuilderId(repoURI string) *ProvenanceArtifact {
+func (in *ProvenanceArtifact) WithBuilderId() *ProvenanceArtifact {
 	if os.Getenv("GITHUB_ACTIONS") == "true" {
-		in.BuilderId = repoURI + vcs.GitHubHostedIdSuffix
+		in.BuilderId = in.repoUri() + vcs.GitHubHostedIdSuffix
 	} else {
-		in.BuilderId = repoURI + vcs.GitHubHostedIdSuffix
+		in.BuilderId = in.repoUri() + vcs.GitHubHostedIdSuffix
 	}
 	return in
 }
 
-func (in *ProvenanceArtifact) WithBuilderInvocation(repoURI string, context *vcs.AnyContext) *ProvenanceArtifact {
+func (in *ProvenanceArtifact) WithBuilderInvocation() *ProvenanceArtifact {
 	in.Invocation = slsa.ProvenanceInvocation{
 		ConfigSource: slsa.ConfigSource{
-			URI: "git+" + repoURI,
+			URI: "git+" + in.repoUri(),
 			Digest: slsa.DigestSet{
-				digest.AlgorithmSHA1: context.GitHubContext.SHA,
+				digest.AlgorithmSHA1: in.Environment.GitHubContext.SHA,
 			},
-			EntryPoint: context.Workflow,
+			EntryPoint: in.Environment.Workflow,
 		},
-		Parameters: context.Inputs,
+		Parameters: in.Environment.Inputs,
 		// Should contain the architecture of the runner.
 		Environment: nil,
 	}
