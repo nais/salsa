@@ -2,6 +2,8 @@ package vcs
 
 import (
 	"encoding/json"
+	"fmt"
+	"os"
 )
 
 type Environment struct {
@@ -24,4 +26,23 @@ func CreateCIEnvironment(inputContext *string) (*Environment, error) {
 		}
 	}
 	return &env, nil
+}
+
+func (in *Environment) RepoUri() string {
+	return fmt.Sprintf("%s/%s", in.GitHubContext.ServerUrl, in.GitHubContext.Repository)
+}
+
+func (in *Environment) BuildInvocationId() string {
+	return fmt.Sprintf("%s/actions/runs/%s", in.RepoUri(), in.GitHubContext.RunId)
+}
+
+func (in *Environment) GithubSha() string {
+	return in.GitHubContext.SHA
+}
+
+func (in *Environment) BuilderId() string {
+	if os.Getenv("GITHUB_ACTIONS") == "true" {
+		return in.RepoUri() + GitHubHostedIdSuffix
+	}
+	return in.RepoUri() + GitHubHostedIdSuffix
 }

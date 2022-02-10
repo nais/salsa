@@ -120,6 +120,7 @@ func toVcsEnvironment() *vcs.Environment {
 			RunId:      "1234",
 			SHA:        "4321",
 			Workflow:   "Create a provenance",
+			ServerUrl:  "https://github.com",
 		},
 		AnyEvent: vcs.AnyEvent{
 			Inputs: nil,

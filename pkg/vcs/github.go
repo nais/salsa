@@ -27,6 +27,7 @@ type GitHubContext struct {
 	RepositoryOwner string          `json:"repository_owner"`
 	RunId           string          `json:"run_id"`
 	RunNumber       string          `json:"run_number"`
+	ServerUrl       string          `json:"server_url"`
 	SHA             string          `json:"sha"`
 	Token           string          `json:"token,omitempty"`
 	Workflow        string          `json:"workflow"`

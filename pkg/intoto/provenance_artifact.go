@@ -2,7 +2,6 @@ package intoto
 
 import (
 	"github.com/nais/salsa/pkg/digest"
-	"os"
 	"time"
 
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
@@ -43,36 +42,18 @@ func CreateProvenanceArtifact(name string, deps *build.ArtifactDependencies, env
 		Name:           name,
 	}
 
-	return pa.WithBuildInvocationId().
-		WithBuilderRepoDigest().
-		WithBuilderId().
-		WithBuilderInvocation()
-}
+	pa.BuildInvocationId = pa.Environment.BuildInvocationId()
+	pa.BuilderId = pa.Environment.BuilderId()
 
-func (in *ProvenanceArtifact) repoUri() string {
-	return "https://github.com/" + in.Environment.GitHubContext.Repository
-}
-
-func (in *ProvenanceArtifact) WithBuildInvocationId() *ProvenanceArtifact {
-	in.BuildInvocationId = in.repoUri() + "/actions/runs/" + in.Environment.GitHubContext.RunId
-	return in
+	return pa.WithBuilderRepoDigest().WithBuilderInvocation()
 }
 
 func (in *ProvenanceArtifact) WithBuilderRepoDigest() *ProvenanceArtifact {
 	in.BuilderRepoDigest = &slsa.ProvenanceMaterial{
-		URI: "git+" + in.repoUri(),
+		URI: "git+" + in.Environment.RepoUri(),
 		Digest: slsa.DigestSet{
-			digest.AlgorithmSHA1: in.Environment.GitHubContext.SHA,
+			digest.AlgorithmSHA1: in.Environment.GithubSha(),
 		},
-	}
-	return in
-}
-
-func (in *ProvenanceArtifact) WithBuilderId() *ProvenanceArtifact {
-	if os.Getenv("GITHUB_ACTIONS") == "true" {
-		in.BuilderId = in.repoUri() + vcs.GitHubHostedIdSuffix
-	} else {
-		in.BuilderId = in.repoUri() + vcs.GitHubHostedIdSuffix
 	}
 	return in
 }
@@ -80,9 +61,9 @@ func (in *ProvenanceArtifact) WithBuilderId() *ProvenanceArtifact {
 func (in *ProvenanceArtifact) WithBuilderInvocation() *ProvenanceArtifact {
 	in.Invocation = slsa.ProvenanceInvocation{
 		ConfigSource: slsa.ConfigSource{
-			URI: "git+" + in.repoUri(),
+			URI: "git+" + in.Environment.RepoUri(),
 			Digest: slsa.DigestSet{
-				digest.AlgorithmSHA1: in.Environment.GitHubContext.SHA,
+				digest.AlgorithmSHA1: in.Environment.GithubSha(),
 			},
 			EntryPoint: in.Environment.Workflow,
 		},
