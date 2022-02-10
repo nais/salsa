@@ -17,7 +17,7 @@ func withPredicate(pa *ProvenanceArtifact) slsa.ProvenancePredicate {
 		},
 		BuildType:   pa.BuildType,
 		Invocation:  pa.Invocation,
-		BuildConfig: nil,
+		BuildConfig: pa.BuildConfig,
 		Metadata:    withMetadata(pa, false, time.Now().UTC()),
 		Materials:   withMaterials(pa),
 	}

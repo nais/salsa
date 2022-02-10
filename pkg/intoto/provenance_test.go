@@ -73,7 +73,7 @@ func TestProvenanceArtifact_GenerateSlsaPredicate(t *testing.T) {
 
 	assert.Equal(t, vcs.AdHocBuildType, slsaPredicate.BuildType)
 	assert.Equal(t, "https://github.com/nais/salsa", slsaPredicate.Builder.ID)
-	assert.Equal(t, nil, slsaPredicate.BuildConfig)
+	assert.Equal(t, "Some commands that made this build", slsaPredicate.BuildConfig)
 	assert.Equal(t, expectedConfigSource, slsaPredicate.Invocation.ConfigSource)
 	assert.Equal(t, nil, slsaPredicate.Invocation.Parameters)
 	assert.Equal(t, nil, slsaPredicate.Invocation.Environment)
