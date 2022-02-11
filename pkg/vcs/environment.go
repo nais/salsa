@@ -58,7 +58,6 @@ func (in *Environment) BuilderId() string {
 	return in.RepoUri() + GitHubHostedIdSuffix
 }
 
-func (in *Environment) EventBytes() []byte {
-	output, _ := in.Event.Inputs.MarshalJSON()
-	return output
+func (in *Environment) EventInputJson() json.RawMessage {
+	return in.Event.Inputs
 }

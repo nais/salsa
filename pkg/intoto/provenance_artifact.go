@@ -1,7 +1,6 @@
 package intoto
 
 import (
-	"fmt"
 	"github.com/nais/salsa/pkg/digest"
 	"time"
 
@@ -18,59 +17,53 @@ type ProvenanceArtifact struct {
 	BuildStartedOn    time.Time
 	BuildType         string
 	Dependencies      *build.ArtifactDependencies
-	Environment       *vcs.Environment
 	Invocation        slsa.ProvenanceInvocation
 	Name              string
 }
 
 func CreateProvenanceArtifact(name string, deps *build.ArtifactDependencies, env *vcs.Environment) *ProvenanceArtifact {
-	if env == nil {
-		return &ProvenanceArtifact{
-			BuildConfig:    "Some commands that made this build",
-			BuilderId:      vcs.DefaultBuildId,
-			BuildStartedOn: time.Now().UTC(),
-			BuildType:      vcs.AdHocBuildType,
-			Dependencies:   deps,
-			Name:           name,
-		}
-	}
-
 	pa := &ProvenanceArtifact{
-		BuildType:      vcs.BuildType,
 		BuildStartedOn: time.Now().UTC(),
 		Dependencies:   deps,
-		Environment:    env,
 		Name:           name,
 	}
 
-	pa.BuildInvocationId = pa.Environment.BuildInvocationId()
-	pa.BuilderId = pa.Environment.BuilderId()
+	if env != nil {
+		pa.BuildType = vcs.BuildType
+		pa.BuildInvocationId = env.BuildInvocationId()
+		pa.BuilderId = env.BuilderId()
+		pa.withBuilderRepoDigest(env).withBuilderInvocation(env)
+		return pa
+	}
 
-	return pa.withBuilderRepoDigest().withBuilderInvocation()
+	pa.BuildConfig = "Some commands that made this build"
+	pa.BuilderId = vcs.DefaultBuildId
+	pa.BuildType = vcs.AdHocBuildType
+	return pa
 }
 
-func (in *ProvenanceArtifact) withBuilderRepoDigest() *ProvenanceArtifact {
+func (in *ProvenanceArtifact) withBuilderRepoDigest(env *vcs.Environment) *ProvenanceArtifact {
 	in.BuilderRepoDigest = &slsa.ProvenanceMaterial{
-		URI: "git+" + in.Environment.RepoUri(),
+		URI: "git+" + env.RepoUri(),
 		Digest: slsa.DigestSet{
-			digest.AlgorithmSHA1: in.Environment.GithubSha(),
+			digest.AlgorithmSHA1: env.GithubSha(),
 		},
 	}
 	return in
 }
 
-func (in *ProvenanceArtifact) withBuilderInvocation() *ProvenanceArtifact {
+func (in *ProvenanceArtifact) withBuilderInvocation(env *vcs.Environment) *ProvenanceArtifact {
 	in.Invocation = slsa.ProvenanceInvocation{
 		ConfigSource: slsa.ConfigSource{
-			URI: "git+" + in.Environment.RepoUri(),
+			URI: "git+" + env.RepoUri(),
 			Digest: slsa.DigestSet{
-				digest.AlgorithmSHA1: in.Environment.GithubSha(),
+				digest.AlgorithmSHA1: env.GithubSha(),
 			},
-			EntryPoint: in.Environment.Workflow,
+			EntryPoint: env.Workflow,
 		},
-		Parameters: in.Environment.EventBytes(),
+		Parameters: env.EventInputJson(),
 		// Should contain the architecture of the runner.
-		Environment: in.Environment.RunnerContext,
+		Environment: env.RunnerContext,
 	}
 	return in
 }
@@ -92,15 +85,6 @@ func (in *ProvenanceArtifact) HasLegitDependencies() bool {
 	return len(in.Dependencies.RuntimeDeps) > 0
 }
 
-func (in *ProvenanceArtifact) HasLegitParameters() (bool, error) {
-	if in.Invocation.Parameters == nil {
-		return false, nil
-	}
-
-	output, err := in.Environment.Inputs.MarshalJSON()
-	if err != nil {
-		return false, fmt.Errorf("parsing inputs %s", err)
-	}
-
-	return output != nil, err
+func (in *ProvenanceArtifact) HasLegitParameters() bool {
+	return in.Invocation.Parameters != nil
 }

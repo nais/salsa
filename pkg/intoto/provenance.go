@@ -1,18 +1,12 @@
 package intoto
 
 import (
-	"fmt"
 	"time"
 
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
 )
 
-func GenerateSlsaPredicate(pa *ProvenanceArtifact) (*slsa.ProvenancePredicate, error) {
-	metadata, err := withMetadata(pa, false, time.Now().UTC())
-	if err != nil {
-		return nil, err
-	}
-
+func GenerateSlsaPredicate(pa *ProvenanceArtifact) *slsa.ProvenancePredicate {
 	return &slsa.ProvenancePredicate{
 		Builder: slsa.ProvenanceBuilder{
 			ID: pa.BuilderId,
@@ -20,9 +14,9 @@ func GenerateSlsaPredicate(pa *ProvenanceArtifact) (*slsa.ProvenancePredicate, e
 		BuildType:   pa.BuildType,
 		Invocation:  pa.Invocation,
 		BuildConfig: pa.BuildConfig,
-		Metadata:    metadata,
+		Metadata:    withMetadata(pa, false, time.Now().UTC()),
 		Materials:   withMaterials(pa),
-	}, nil
+	}
 }
 
 // TODO: use other type of materials aswell, e.g. github actions run in the build
@@ -49,30 +43,23 @@ func AppendBuildContext(pa *ProvenanceArtifact, materials *[]slsa.ProvenanceMate
 	}
 }
 
-func withMetadata(pa *ProvenanceArtifact, rp bool, buildFinished time.Time) (*slsa.ProvenanceMetadata, error) {
-	completeness, err := withCompleteness(pa)
-	if err != nil {
-		return nil, fmt.Errorf("creating completeness")
-	}
-
+func withMetadata(pa *ProvenanceArtifact, rp bool, buildFinished time.Time) *slsa.ProvenanceMetadata {
 	return &slsa.ProvenanceMetadata{
 		BuildInvocationID: pa.BuildInvocationId,
 		BuildStartedOn:    &pa.BuildStartedOn,
 		BuildFinishedOn:   &buildFinished,
-		Completeness:      completeness,
+		Completeness:      withCompleteness(pa),
 		Reproducible:      rp,
-	}, nil
+	}
 }
 
-func withCompleteness(pa *ProvenanceArtifact) (slsa.ProvenanceComplete, error) {
+func withCompleteness(pa *ProvenanceArtifact) slsa.ProvenanceComplete {
 	environment := false
 	materials := false
 	parameters := false
 
-	if ok, err := pa.HasLegitParameters(); err != nil {
-		return slsa.ProvenanceComplete{}, fmt.Errorf("checking parameters")
-	} else {
-		parameters = ok
+	if pa.HasLegitParameters() {
+		parameters = true
 	}
 
 	if pa.Invocation.Environment != nil {
@@ -87,5 +74,5 @@ func withCompleteness(pa *ProvenanceArtifact) (slsa.ProvenanceComplete, error) {
 		Environment: environment,
 		Materials:   materials,
 		Parameters:  parameters,
-	}, nil
+	}
 }
