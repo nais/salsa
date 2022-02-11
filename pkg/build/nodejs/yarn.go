@@ -73,10 +73,14 @@ func parseDependency(depLine string) string {
 	if len(strings.Split(depLine, ", ")) > 1 {
 		depLine = parseName(depLine)
 		allPossibilities := strings.Split(depLine, ", ")
-		return lastElementInSlice(allPossibilities)
+		return trim(lastElementInSlice(allPossibilities))
 	} else {
 		return parseName(depLine)
 	}
+}
+
+func trim(line string) string {
+	return strings.TrimPrefix(line, "\"")
 }
 
 func lastElementInSlice(slice []string) string {
