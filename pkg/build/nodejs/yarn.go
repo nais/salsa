@@ -38,12 +38,6 @@ func (y Yarn) BuildFiles() []string {
 	return y.BuildFilePatterns
 }
 
-// TODO: Does not parse correct
-// output:
-// pkg:@xtuc/long:4.2.2
-// pkg:"statuses@>= 1.5.0 < 2":1.5.0
-// ...
-// checked with nais/nada
 func YarnDeps(yarnLockContents string) []build.Dependency {
 	deps := make([]build.Dependency, 0)
 	lines := strings.Split(yarnLockContents, "\n")
@@ -62,6 +56,9 @@ func YarnDeps(yarnLockContents string) []build.Dependency {
 	return deps
 }
 
+// TODO: Find answer to why dependencies has either '"' or starts without in header of dependencies, what's the difference?
+// strings.HasPrefix(line, "\"") || strings.Contains(line, "@^") || strings.Contains(line, "@~")
+// full files all, ut to what cost?
 func blockLineNumbers(yarnLockLines []string) []int {
 	var startsOfEntries []int
 	for index, line := range yarnLockLines {
@@ -75,10 +72,15 @@ func blockLineNumbers(yarnLockLines []string) []int {
 func parseDependency(depLine string) string {
 	if len(strings.Split(depLine, ", ")) > 1 {
 		depLine = parseName(depLine)
-		return strings.Split(depLine, ", ")[1]
+		allPossibilities := strings.Split(depLine, ", ")
+		return lastElementInSlice(allPossibilities)
 	} else {
 		return parseName(depLine)
 	}
+}
+
+func lastElementInSlice(slice []string) string {
+	return fmt.Sprintf("%v", slice[len(slice)-1])
 }
 
 func parseName(line string) string {
@@ -89,6 +91,7 @@ func parseName(line string) string {
 }
 
 func parseVersion(line string) string {
+	//fmt.Println(line)
 	regex := regexp.MustCompile(`.*"(?P<pkgversion>.*)"$`)
 	matches := regex.FindStringSubmatch(line)
 	pkgversionIndex := regex.SubexpIndex("pkgversion")
