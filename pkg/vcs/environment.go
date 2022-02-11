@@ -13,9 +13,13 @@ type Environment struct {
 }
 
 func CreateCIEnvironment(githubContext, runnerContext *string) (*Environment, error) {
+	if githubContext == nil || runnerContext == nil {
+		return nil, nil
+	}
+
 	env := Environment{}
 
-	if githubContext != nil && len(*githubContext) > 0 {
+	if len(*githubContext) > 0 {
 		if err := json.Unmarshal([]byte(*githubContext), &env.GitHubContext); err != nil {
 			if err != nil {
 				return nil, fmt.Errorf("unmarshal github context json: %w", err)
@@ -30,7 +34,7 @@ func CreateCIEnvironment(githubContext, runnerContext *string) (*Environment, er
 		}
 	}
 
-	if runnerContext != nil && len(*runnerContext) > 0 {
+	if len(*runnerContext) > 0 {
 		if err := json.Unmarshal([]byte(*runnerContext), &env.RunnerContext); err != nil {
 			return nil, fmt.Errorf("unmarshal runner context json: %w", err)
 		}

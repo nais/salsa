@@ -80,12 +80,9 @@ func TestCreateProvenanceArtifact(t *testing.T) {
 				assert.Equal(t, test.buildTimerIsSet, time.Now().UTC().After(provenanceArtifact.BuildStartedOn))
 				assert.Equal(t, test.buildInvocationId, provenanceArtifact.BuildInvocationId)
 				assert.Equal(t, test.buildConfig, provenanceArtifact.BuildConfig)
-				assert.Equal(t, slsa.ProvenanceInvocation{}, provenanceArtifact.Invocation)
-				assert.Empty(t, provenanceArtifact.Invocation.Parameters)
-				assert.Empty(t, provenanceArtifact.Invocation.Environment)
+				assert.Empty(t, provenanceArtifact.Invocation)
 				assert.Equal(t, test.builderId, provenanceArtifact.BuilderId)
 				assert.Equal(t, test.builderRepoDigest, provenanceArtifact.BuilderRepoDigest)
-				assert.Equal(t, test.configSource, provenanceArtifact.Invocation.ConfigSource)
 			}
 		})
 	}

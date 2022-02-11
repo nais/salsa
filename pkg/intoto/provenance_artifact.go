@@ -17,7 +17,7 @@ type ProvenanceArtifact struct {
 	BuildStartedOn    time.Time
 	BuildType         string
 	Dependencies      *build.ArtifactDependencies
-	Invocation        slsa.ProvenanceInvocation
+	Invocation        *slsa.ProvenanceInvocation
 	Name              string
 }
 
@@ -39,6 +39,7 @@ func CreateProvenanceArtifact(name string, deps *build.ArtifactDependencies, env
 	pa.BuildConfig = "Some commands that made this build"
 	pa.BuilderId = vcs.DefaultBuildId
 	pa.BuildType = vcs.AdHocBuildType
+	pa.Invocation = nil
 	return pa
 }
 
@@ -53,7 +54,7 @@ func (in *ProvenanceArtifact) withBuilderRepoDigest(env *vcs.Environment) *Prove
 }
 
 func (in *ProvenanceArtifact) withBuilderInvocation(env *vcs.Environment) *ProvenanceArtifact {
-	in.Invocation = slsa.ProvenanceInvocation{
+	in.Invocation = &slsa.ProvenanceInvocation{
 		ConfigSource: slsa.ConfigSource{
 			URI: "git+" + env.RepoUri(),
 			Digest: slsa.DigestSet{
@@ -86,5 +87,10 @@ func (in *ProvenanceArtifact) HasLegitDependencies() bool {
 }
 
 func (in *ProvenanceArtifact) HasLegitParameters() bool {
-	return in.Invocation.Parameters != nil
+	if in.Invocation != nil {
+		if in.Invocation.Parameters != nil {
+			return true
+		}
+	}
+	return false
 }

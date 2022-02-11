@@ -9,8 +9,8 @@ import (
 func TestCreateGithubContext(t *testing.T) {
 	githubContext, err := os.ReadFile("testdata/github-context.json")
 	assert.NoError(t, err)
-	s := string(githubContext)
-	context, err := CreateCIEnvironment(&s, nil)
+	parsedContext := string(githubContext)
+	context, err := CreateCIEnvironment(&parsedContext, &runnerContext)
 	assert.NoError(t, err)
 
 	assert.Equal(t, "ebe231e64736728ac2d6f3ae779fd29ad52d178f", context.GitHubContext.SHA)
@@ -26,7 +26,10 @@ func TestCreateGithubContext(t *testing.T) {
 }
 
 func TestCreateRunnerContext(t *testing.T) {
-	context, err := CreateCIEnvironment(nil, &runnerContext)
+	githubContext, err := os.ReadFile("testdata/github-context.json")
+	assert.NoError(t, err)
+	parsedContext := string(githubContext)
+	context, err := CreateCIEnvironment(&parsedContext, &runnerContext)
 	assert.NoError(t, err)
 	assert.Equal(t, "Linux", context.RunnerContext.OS)
 	assert.Equal(t, "/opt/hostedtoolcache", context.RunnerContext.ToolCache)

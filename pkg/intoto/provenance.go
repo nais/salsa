@@ -7,19 +7,24 @@ import (
 )
 
 func GenerateSlsaPredicate(pa *ProvenanceArtifact) *slsa.ProvenancePredicate {
-	return &slsa.ProvenancePredicate{
+	predicate := &slsa.ProvenancePredicate{
 		Builder: slsa.ProvenanceBuilder{
 			ID: pa.BuilderId,
 		},
 		BuildType:   pa.BuildType,
-		Invocation:  pa.Invocation,
 		BuildConfig: pa.BuildConfig,
 		Metadata:    withMetadata(pa, false, time.Now().UTC()),
 		Materials:   withMaterials(pa),
 	}
+
+	if pa.Invocation != nil {
+		predicate.Invocation = *pa.Invocation
+		return predicate
+	}
+
+	return predicate
 }
 
-// TODO: use other type of materials aswell, e.g. github actions run in the build
 func withMaterials(pa *ProvenanceArtifact) []slsa.ProvenanceMaterial {
 	materials := make([]slsa.ProvenanceMaterial, 0)
 	AppendRuntimeDependencies(pa, &materials)
@@ -62,8 +67,10 @@ func withCompleteness(pa *ProvenanceArtifact) slsa.ProvenanceComplete {
 		parameters = true
 	}
 
-	if pa.Invocation.Environment != nil {
-		environment = true
+	if pa.Invocation != nil {
+		if pa.Invocation.Environment != nil {
+			environment = true
+		}
 	}
 
 	if pa.HasLegitDependencies() && pa.HasLegitBuilderRepoDigest() {

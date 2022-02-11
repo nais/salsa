@@ -38,6 +38,12 @@ func (y Yarn) BuildFiles() []string {
 	return y.BuildFilePatterns
 }
 
+// TODO: Does not parse correct
+// output:
+// pkg:@xtuc/long:4.2.2
+// pkg:"statuses@>= 1.5.0 < 2":1.5.0
+// ...
+// checked with nais/nada
 func YarnDeps(yarnLockContents string) []build.Dependency {
 	deps := make([]build.Dependency, 0)
 	lines := strings.Split(yarnLockContents, "\n")
