@@ -53,12 +53,14 @@ func YarnDeps(yarnLockContents string) []build.Dependency {
 			CheckSum:    yarnShaDigest(integrityLine),
 		})
 	}
-	return deps
+	return deduplicate(deps)
 }
 
-// TODO: Find answer to why dependencies has either '"' or starts without in header of dependencies, what's the difference?
+// TODO: Find answer to why header of dependencies in yarn.lock starts with either '"' or without,
 // strings.HasPrefix(line, "\"") || strings.Contains(line, "@^") || strings.Contains(line, "@~")
-// full files all, ut to what cost?
+// fulfills all cases, but to what cost?
+// several of the dependencies come in duplicates with several versions.
+// see: func deduplicate(deps []build.Dependency) []build.Dependency
 func blockLineNumbers(yarnLockLines []string) []int {
 	var startsOfEntries []int
 	for index, line := range yarnLockLines {
@@ -73,18 +75,10 @@ func parseDependency(depLine string) string {
 	if len(strings.Split(depLine, ", ")) > 1 {
 		depLine = parseName(depLine)
 		allPossibilities := strings.Split(depLine, ", ")
-		return trim(lastElementInSlice(allPossibilities))
+		return lastElementInSlice(allPossibilities)
 	} else {
 		return parseName(depLine)
 	}
-}
-
-func trim(line string) string {
-	return strings.TrimPrefix(line, "\"")
-}
-
-func lastElementInSlice(slice []string) string {
-	return fmt.Sprintf("%v", slice[len(slice)-1])
 }
 
 func parseName(line string) string {
@@ -94,8 +88,15 @@ func parseName(line string) string {
 	return matches[pkgnameIndex]
 }
 
+func lastElementInSlice(slice []string) string {
+	return trim(fmt.Sprintf("%v", slice[len(slice)-1]))
+}
+
+func trim(line string) string {
+	return strings.TrimPrefix(line, "\"")
+}
+
 func parseVersion(line string) string {
-	//fmt.Println(line)
 	regex := regexp.MustCompile(`.*"(?P<pkgversion>.*)"$`)
 	matches := regex.FindStringSubmatch(line)
 	pkgversionIndex := regex.SubexpIndex("pkgversion")
@@ -105,11 +106,27 @@ func parseVersion(line string) string {
 func yarnShaDigest(line string) build.CheckSum {
 	trimPrefixIntegrity := strings.TrimPrefix(line, "  integrity ")
 	fields := strings.Split(trimPrefixIntegrity, "-")
-	// Better to keep the digest base64 encoded when signing envelope
-	// decodedDigest, _ := base64.StdEncoding.DecodeString(algoDigest[1])
-	// s.Digest = fmt.Sprintf("%x", decodedDigest)
 	return build.CheckSum{
 		Algorithm: fields[0],
 		Digest:    fields[1],
 	}
+}
+
+func deduplicate(deps []build.Dependency) []build.Dependency {
+	type DependencyKey struct{ coordinate string }
+	var unique []build.Dependency
+	transients := make(map[DependencyKey]int)
+
+	for _, d := range deps {
+		k := DependencyKey{d.Coordinates}
+		// Overwrite with last
+		if i, ok := transients[k]; ok {
+			unique[i] = d
+		} else {
+			// recalculate size
+			transients[k] = len(unique)
+			unique = append(unique, d)
+		}
+	}
+	return unique
 }
