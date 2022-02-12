@@ -65,15 +65,15 @@ func GenerateProvenance(workDir, project string, dependencies *build.ArtifactDep
 		return err
 	}
 
-	provenanceArtifact := intoto.CreateProvenanceArtifact(project, dependencies, ciEnv)
-	predicate := intoto.GenerateSlsaPredicate(provenanceArtifact)
+	opts := intoto.CreateProvenanceOptions(project, dependencies, ciEnv)
+	predicate := intoto.GenerateSlsaPredicate(opts)
 	statement, err := json.Marshal(predicate)
 	if err != nil {
 		return fmt.Errorf("marshal: %v\n", err)
 	}
 
 	provenanceFileName := utils.ProvenanceFile(project)
-	err = os.WriteFile(workDir+"/"+provenanceFileName, statement, 0644)
+	err = os.WriteFile(fmt.Sprintf("%s/%s", workDir, provenanceFileName), statement, 0644)
 	if err != nil {
 		return fmt.Errorf("write to file: %v\n", err)
 	}

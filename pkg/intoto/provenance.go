@@ -6,34 +6,52 @@ import (
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
 )
 
-func GenerateSlsaPredicate(pa *ProvenanceArtifact) *slsa.ProvenancePredicate {
+func GenerateSlsaPredicate(opts *ProvenanceOptions) *slsa.ProvenancePredicate {
 	predicate := &slsa.ProvenancePredicate{
 		Builder: slsa.ProvenanceBuilder{
-			ID: pa.BuilderId,
+			ID: opts.BuilderId,
 		},
-		BuildType:   pa.BuildType,
-		BuildConfig: pa.BuildConfig,
-		Metadata:    withMetadata(pa, false, time.Now().UTC()),
-		Materials:   withMaterials(pa),
+		BuildType:   opts.BuildType,
+		BuildConfig: opts.BuildConfig,
+		Metadata:    withMetadata(opts, false, time.Now().UTC()),
+		Materials:   withMaterials(opts),
 	}
 
-	if pa.Invocation != nil {
-		predicate.Invocation = *pa.Invocation
+	if opts.Invocation != nil {
+		predicate.Invocation = *opts.Invocation
 		return predicate
 	}
 
 	return predicate
 }
 
-func withMaterials(pa *ProvenanceArtifact) []slsa.ProvenanceMaterial {
+func withMetadata(opts *ProvenanceOptions, rp bool, buildFinished time.Time) *slsa.ProvenanceMetadata {
+	return &slsa.ProvenanceMetadata{
+		BuildInvocationID: opts.BuildInvocationId,
+		BuildStartedOn:    &opts.BuildStartedOn,
+		BuildFinishedOn:   &buildFinished,
+		Completeness:      withCompleteness(opts),
+		Reproducible:      rp,
+	}
+}
+
+func withCompleteness(opts *ProvenanceOptions) slsa.ProvenanceComplete {
+	return slsa.ProvenanceComplete{
+		Environment: opts.HasEnvironment(),
+		Materials:   opts.HasDependencies() && opts.HasBuilderRepoDigest(),
+		Parameters:  opts.HasParameters(),
+	}
+}
+
+func withMaterials(opts *ProvenanceOptions) []slsa.ProvenanceMaterial {
 	materials := make([]slsa.ProvenanceMaterial, 0)
-	AppendRuntimeDependencies(pa, &materials)
-	AppendBuildContext(pa, &materials)
+	AppendRuntimeDependencies(opts, &materials)
+	AppendBuildContext(opts, &materials)
 	return materials
 }
 
-func AppendRuntimeDependencies(pa *ProvenanceArtifact, materials *[]slsa.ProvenanceMaterial) {
-	for _, dep := range pa.Dependencies.RuntimeDeps {
+func AppendRuntimeDependencies(opts *ProvenanceOptions, materials *[]slsa.ProvenanceMaterial) {
+	for _, dep := range opts.Dependencies.RuntimeDeps {
 		m := slsa.ProvenanceMaterial{
 			URI:    dep.ToUri(),
 			Digest: dep.ToDigestSet(),
@@ -42,44 +60,8 @@ func AppendRuntimeDependencies(pa *ProvenanceArtifact, materials *[]slsa.Provena
 	}
 }
 
-func AppendBuildContext(pa *ProvenanceArtifact, materials *[]slsa.ProvenanceMaterial) {
-	if pa.BuilderRepoDigest != nil {
-		*materials = append(*materials, *pa.BuilderRepoDigest)
-	}
-}
-
-func withMetadata(pa *ProvenanceArtifact, rp bool, buildFinished time.Time) *slsa.ProvenanceMetadata {
-	return &slsa.ProvenanceMetadata{
-		BuildInvocationID: pa.BuildInvocationId,
-		BuildStartedOn:    &pa.BuildStartedOn,
-		BuildFinishedOn:   &buildFinished,
-		Completeness:      withCompleteness(pa),
-		Reproducible:      rp,
-	}
-}
-
-func withCompleteness(pa *ProvenanceArtifact) slsa.ProvenanceComplete {
-	environment := false
-	materials := false
-	parameters := false
-
-	if pa.HasLegitParameters() {
-		parameters = true
-	}
-
-	if pa.Invocation != nil {
-		if pa.Invocation.Environment != nil {
-			environment = true
-		}
-	}
-
-	if pa.HasLegitDependencies() && pa.HasLegitBuilderRepoDigest() {
-		materials = true
-	}
-
-	return slsa.ProvenanceComplete{
-		Environment: environment,
-		Materials:   materials,
-		Parameters:  parameters,
+func AppendBuildContext(opts *ProvenanceOptions, materials *[]slsa.ProvenanceMaterial) {
+	if opts.BuilderRepoDigest != nil {
+		*materials = append(*materials, *opts.BuilderRepoDigest)
 	}
 }

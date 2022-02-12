@@ -60,8 +60,8 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			if test.runnerContext {
 				env := Environment()
-				provenanceArtifact := CreateProvenanceArtifact("artifact", artDeps, env)
-				slsaPredicate := GenerateSlsaPredicate(provenanceArtifact)
+				opts := CreateProvenanceOptions("artifact", artDeps, env)
+				slsaPredicate := GenerateSlsaPredicate(opts)
 				err := os.Setenv("GITHUB_ACTIONS", "true")
 				assert.NoError(t, err)
 
@@ -90,8 +90,8 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 
 			} else {
 
-				provenanceArtifact := CreateProvenanceArtifact("artifact", artDeps, nil)
-				slsaPredicate := GenerateSlsaPredicate(provenanceArtifact)
+				opts := CreateProvenanceOptions("artifact", artDeps, nil)
+				slsaPredicate := GenerateSlsaPredicate(opts)
 
 				// Predicate
 				assert.Equal(t, test.buildType, slsaPredicate.BuildType)

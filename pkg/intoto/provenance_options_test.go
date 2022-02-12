@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateProvenanceArtifact(t *testing.T) {
+func TestCreateProvenanceOptions(t *testing.T) {
 	deps := ExpectedDeps()
 	artDeps := ExpectedArtDeps(deps)
 
@@ -57,7 +57,7 @@ func TestCreateProvenanceArtifact(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			if test.runnerContext {
 				env := Environment()
-				provenanceArtifact := CreateProvenanceArtifact("artifact", artDeps, env)
+				provenanceArtifact := CreateProvenanceOptions("artifact", artDeps, env)
 				assert.Equal(t, "artifact", provenanceArtifact.Name)
 				assert.Equal(t, test.buildType, provenanceArtifact.BuildType)
 				assert.Equal(t, deps, provenanceArtifact.Dependencies.RuntimeDeps)
@@ -73,7 +73,7 @@ func TestCreateProvenanceArtifact(t *testing.T) {
 
 			} else {
 
-				provenanceArtifact := CreateProvenanceArtifact("artifact", artDeps, nil)
+				provenanceArtifact := CreateProvenanceOptions("artifact", artDeps, nil)
 				assert.Equal(t, "artifact", provenanceArtifact.Name)
 				assert.Equal(t, test.buildType, provenanceArtifact.BuildType)
 				assert.Equal(t, deps, provenanceArtifact.Dependencies.RuntimeDeps)
