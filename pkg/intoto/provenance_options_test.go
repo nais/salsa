@@ -21,7 +21,7 @@ func TestCreateProvenanceOptions(t *testing.T) {
 		buildType         string
 		buildInvocationId string
 		builderId         string
-		buildConfig       string
+		buildConfig       *BuildConfig
 		builderRepoDigest *slsa.ProvenanceMaterial
 		configSource      slsa.ConfigSource
 		buildTimerIsSet   bool
@@ -32,7 +32,10 @@ func TestCreateProvenanceOptions(t *testing.T) {
 			buildType:         vcs.AdHocBuildType,
 			buildInvocationId: "",
 			builderId:         vcs.DefaultBuildId,
-			buildConfig:       "Some commands that made this build",
+			buildConfig: &BuildConfig{
+				Commands: []string{"make salsa"},
+				Shell:    "bash",
+			},
 			builderRepoDigest: (*slsa.ProvenanceMaterial)(nil),
 			configSource: slsa.ConfigSource{
 				URI:        "",
@@ -47,7 +50,7 @@ func TestCreateProvenanceOptions(t *testing.T) {
 			buildType:         vcs.BuildType,
 			buildInvocationId: "https://github.com/nais/salsa/actions/runs/1234",
 			builderId:         "https://github.com/nais/salsa/Attestations/GitHubHostedActions@v1",
-			buildConfig:       "",
+			buildConfig:       nil,
 			builderRepoDigest: ExpectedBuilderRepoDigestMaterial(),
 			configSource:      ExpectedConfigSource(),
 			buildTimerIsSet:   true,
@@ -125,9 +128,10 @@ func Environment() *vcs.Environment {
 			SHA:        "4321",
 			Workflow:   "Create a provenance",
 			ServerUrl:  "https://github.com",
+			EventName:  "workflow_dispatch",
 		},
-		Event: vcs.Event{
-			Inputs: []byte("some vents"),
+		Event: &vcs.Event{
+			Inputs: []byte("some user inputs"),
 		},
 		RunnerContext: vcs.RunnerContext{
 			OS:        "Linux",

@@ -38,6 +38,8 @@ type Event struct {
 }
 
 type RunnerContext struct {
+	Name      string `json:"name"`
+	Arch      string `json:"arch"`
 	OS        string `json:"os"`
 	Temp      string `json:"temp"`
 	ToolCache string `json:"tool_cache"`

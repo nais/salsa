@@ -21,7 +21,7 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 		buildType               string
 		buildInvocationId       string
 		builderId               string
-		buildConfig             string
+		buildConfig             *BuildConfig
 		materials               []slsa.ProvenanceMaterial
 		configSource            slsa.ConfigSource
 		buildTimerIsSet         bool
@@ -33,8 +33,11 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 			buildType:         vcs.AdHocBuildType,
 			buildInvocationId: "",
 			builderId:         vcs.DefaultBuildId,
-			buildConfig:       "Some commands that made this build",
-			materials:         ExpectedDependenciesMaterial(),
+			buildConfig: &BuildConfig{
+				Commands: []string{"make salsa"},
+				Shell:    "bash",
+			},
+			materials: ExpectedDependenciesMaterial(),
 			configSource: slsa.ConfigSource{
 				URI:        "",
 				Digest:     slsa.DigestSet(nil),
@@ -49,7 +52,7 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 			buildType:               vcs.BuildType,
 			buildInvocationId:       "https://github.com/nais/salsa/actions/runs/1234",
 			builderId:               "https://github.com/nais/salsa/Attestations/GitHubHostedActions@v1",
-			buildConfig:             "",
+			buildConfig:             nil,
 			materials:               ToExpectedMaterials(),
 			configSource:            ExpectedConfigSource(),
 			buildTimerIsSet:         true,

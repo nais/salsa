@@ -51,6 +51,7 @@ var scanCmd = &cobra.Command{
 		}
 
 		deps, err := tools.DetectDeps(workDir)
+		// TODO send in runnerContext and consider sending in 'env' and filter them for reproducing in 'Environment'.
 		err = GenerateProvenance(workDir, PathFlags.Repo, deps, &inputContext)
 		if err != nil {
 			return err

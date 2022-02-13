@@ -8,8 +8,8 @@ import (
 
 type Environment struct {
 	GitHubContext `json:"github"`
-	Event         `json:"event"`
-	RunnerContext `json:"runner_context"`
+	*Event        `json:"event,omitempty"`
+	RunnerContext `json:"context"`
 }
 
 func CreateCIEnvironment(githubContext, runnerContext *string) (*Environment, error) {
@@ -33,6 +33,9 @@ func CreateCIEnvironment(githubContext, runnerContext *string) (*Environment, er
 			}
 		}
 	}
+
+	// Ensure we dont misuse token.
+	env.Token = ""
 
 	if len(*runnerContext) > 0 {
 		if err := json.Unmarshal([]byte(*runnerContext), &env.RunnerContext); err != nil {
@@ -62,6 +65,22 @@ func (in *Environment) BuilderId() string {
 	return in.RepoUri() + GitHubHostedIdSuffix
 }
 
-func (in *Environment) EventInputJson() json.RawMessage {
+func (in *Environment) EventInputs() json.RawMessage {
+	if in.EventName != "workflow_dispatch" {
+		return nil
+	}
 	return in.Event.Inputs
+}
+
+func (in *Environment) FilteredEnvironment() *Environment {
+	// Should also contain environment variables.
+	// These are always set because it is not possible
+	// to know whether they were referenced or not.
+	return &Environment{
+		GitHubContext: GitHubContext{
+			RunId: in.RunId,
+		},
+		Event:         nil,
+		RunnerContext: in.RunnerContext,
+	}
 }

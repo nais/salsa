@@ -146,11 +146,3 @@ type Sha256 struct {
 	XMLName xml.Name `xml:"sha256"`
 	Value   string   `xml:"value,attr"`
 }
-
-// for now, only jar is added, pom is also an alternativ
-func (a Artifact) preferredArtifactType() bool {
-	if strings.Contains(a.Name, ".pom") {
-		return false
-	}
-	return true
-}

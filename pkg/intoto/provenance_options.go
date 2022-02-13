@@ -10,7 +10,7 @@ import (
 )
 
 type ProvenanceOptions struct {
-	BuildConfig       string
+	BuildConfig       *BuildConfig
 	BuilderId         string
 	BuilderRepoDigest *slsa.ProvenanceMaterial
 	BuildInvocationId string
@@ -19,6 +19,12 @@ type ProvenanceOptions struct {
 	Dependencies      *build.ArtifactDependencies
 	Invocation        *slsa.ProvenanceInvocation
 	Name              string
+}
+
+type BuildConfig struct {
+	Commands []string `json:"commands"`
+	// Indicates how to parse the strings in commands.
+	Shell string `json:"shell"`
 }
 
 func CreateProvenanceOptions(name string, deps *build.ArtifactDependencies, env *vcs.Environment) *ProvenanceOptions {
@@ -36,7 +42,10 @@ func CreateProvenanceOptions(name string, deps *build.ArtifactDependencies, env 
 		return opts
 	}
 
-	opts.BuildConfig = "Some commands that made this build"
+	opts.BuildConfig = &BuildConfig{
+		Commands: []string{"make salsa"},
+		Shell:    "bash",
+	}
 	opts.BuilderId = vcs.DefaultBuildId
 	opts.BuildType = vcs.AdHocBuildType
 	opts.Invocation = nil
@@ -62,9 +71,8 @@ func (in *ProvenanceOptions) withBuilderInvocation(env *vcs.Environment) *Proven
 			},
 			EntryPoint: env.Workflow,
 		},
-		Parameters: env.EventInputJson(),
-		// Should contain the architecture of the runner.
-		Environment: env.RunnerContext,
+		Parameters:  env.EventInputs(),
+		Environment: env.FilteredEnvironment(),
 	}
 	return in
 }
