@@ -11,37 +11,38 @@ func TestCreateGithubContext(t *testing.T) {
 	githubContext, err := os.ReadFile("testdata/github-context.json")
 	assert.NoError(t, err)
 	parsedContext := string(githubContext)
-	context, err := CreateCIEnvironment(&parsedContext, &runnerContext)
+	env := Environment{}
+	gh := GitHubContext{}
+	err = gh.Parse(&parsedContext, &env)
 	assert.NoError(t, err)
 
-	assert.Equal(t, "ebe231e64736728ac2d6f3ae779fd29ad52d178f", context.GitHubContext.SHA)
-	assert.Equal(t, "build", context.GitHubContext.Job)
-	assert.Equal(t, "refs/heads/main", context.GitHubContext.Ref)
-	assert.Equal(t, "nais/salsa", context.GitHubContext.Repository)
-	assert.Equal(t, "nais", context.GitHubContext.RepositoryOwner)
-	assert.Equal(t, "1691669140", context.GitHubContext.RunId)
-	assert.Equal(t, "11", context.GitHubContext.RunNumber)
-	assert.Equal(t, "jdoe", context.GitHubContext.Actor)
+	assert.Equal(t, "90dc9f2bc4007d1099a941ba3d408d2c896fe8dd", env.GitHubContext.SHA)
+	assert.Equal(t, "build", env.GitHubContext.Job)
+	assert.Equal(t, "refs/heads/main", env.GitHubContext.Ref)
+	assert.Equal(t, "nais/salsa", env.GitHubContext.Repository)
+	assert.Equal(t, "nais", env.GitHubContext.RepositoryOwner)
+	assert.Equal(t, "1839977840", env.GitHubContext.RunId)
+	assert.Equal(t, "57", env.GitHubContext.RunNumber)
+	assert.Equal(t, "jdoe", env.GitHubContext.Actor)
 
-	assert.Equal(t, "https://github.com/nais/salsa", context.RepoUri())
-	assert.Equal(t, "https://github.com/nais/salsa/Attestations/GitHubHostedActions@v1", context.BuilderId())
-	assert.Equal(t, "https://github.com/nais/salsa/actions/runs/1691669140", context.BuildInvocationId())
-	assert.Equal(t, json.RawMessage(nil), context.EventInputs())
-	assert.Equal(t, "ebe231e64736728ac2d6f3ae779fd29ad52d178f", context.GithubSha())
+	assert.Equal(t, "https://github.com/nais/salsa", env.RepoUri())
+	assert.Equal(t, "https://github.com/nais/salsa/Attestations/GitHubHostedActions@v1", env.BuilderId())
+	assert.Equal(t, "https://github.com/nais/salsa/actions/runs/1839977840", env.BuildInvocationId())
+	assert.Equal(t, json.RawMessage(nil), env.EventInputs())
+	assert.Equal(t, "90dc9f2bc4007d1099a941ba3d408d2c896fe8dd", env.GithubSha())
 
 }
 
 func TestCreateRunnerContext(t *testing.T) {
-	githubContext, err := os.ReadFile("testdata/github-context.json")
+	env := Environment{}
+	rc := RunnerContext{}
+	err := rc.Parse(&runnerContext, &env)
 	assert.NoError(t, err)
-	parsedContext := string(githubContext)
-	context, err := CreateCIEnvironment(&parsedContext, &runnerContext)
-	assert.NoError(t, err)
-	assert.Equal(t, "Hosted Agent", context.RunnerContext.Name)
-	assert.Equal(t, "Linux", context.RunnerContext.OS)
-	assert.Equal(t, "X64", context.RunnerContext.Arch)
-	assert.Equal(t, "/opt/hostedtoolcache", context.RunnerContext.ToolCache)
-	assert.Equal(t, "/home/runner/work/_temp", context.RunnerContext.Temp)
+	assert.Equal(t, "Hosted Agent", env.RunnerContext.Name)
+	assert.Equal(t, "Linux", env.RunnerContext.OS)
+	assert.Equal(t, "X64", env.RunnerContext.Arch)
+	assert.Equal(t, "/opt/hostedtoolcache", env.RunnerContext.ToolCache)
+	assert.Equal(t, "/home/runner/work/_temp", env.RunnerContext.Temp)
 }
 
 var runnerContext = `{
@@ -51,4 +52,20 @@ var runnerContext = `{
 		"tool_cache": "/opt/hostedtoolcache",
 		"temp": "/home/runner/work/_temp",
 		"workspace": "/home/runner/work/nais-salsa-action"
+	  }`
+
+func TestCreateCurrentEnvironmentContext(t *testing.T) {
+	env := Environment{}
+	ce := CurrentEnvironment{}
+	expected := make(map[string]string)
+	expected["GOVERSION"] = "1.17"
+	expected["GOROOT"] = "/opt/hostedtoolcache/go/1.17.6/x64"
+	err := ce.Parse(&envContext, &env)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(env.CurrentEnvironment.Envs))
+}
+
+var envContext = `{
+  		"GOVERSION": "1.17",
+		"GOROOT": "/opt/hostedtoolcache/go/1.17.6/x64"
 	  }`

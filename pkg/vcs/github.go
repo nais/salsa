@@ -2,6 +2,7 @@ package vcs
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
 const (
@@ -37,10 +38,65 @@ type Event struct {
 	Inputs json.RawMessage `json:"inputs"`
 }
 
+func (in *GitHubContext) Parse(github *string, env *Environment) error {
+	if len(*github) == 0 {
+		return nil
+	}
+
+	if err := json.Unmarshal([]byte(*github), &env.GitHubContext); err != nil {
+		if err != nil {
+			return fmt.Errorf("unmarshal github context json: %w", err)
+		}
+	}
+	if env.GitHubContext.Event != nil {
+		if err := json.Unmarshal(env.GitHubContext.Event, &env.Event); err != nil {
+			if err != nil {
+				return fmt.Errorf("unmarshal github event json: %w", err)
+			}
+		}
+	}
+
+	// Ensure we dont misuse token.
+	env.GitHubContext.Token = ""
+	return nil
+}
+
 type RunnerContext struct {
 	Name      string `json:"name"`
 	Arch      string `json:"arch"`
 	OS        string `json:"os"`
 	Temp      string `json:"temp"`
 	ToolCache string `json:"tool_cache"`
+}
+
+func (in *RunnerContext) Parse(runner *string, env *Environment) error {
+	if len(*runner) == 0 {
+		return nil
+	}
+
+	if err := json.Unmarshal([]byte(*runner), &env.RunnerContext); err != nil {
+		return fmt.Errorf("unmarshal runner context json: %w", err)
+	}
+
+	return nil
+}
+
+type CurrentEnvironment struct {
+	Envs map[string]string
+}
+
+func (in *CurrentEnvironment) Parse(envs *string, env *Environment) error {
+	if len(*envs) == 0 {
+		return nil
+	}
+
+	env.CurrentEnvironment = &CurrentEnvironment{
+		make(map[string]string),
+	}
+
+	if err := json.Unmarshal([]byte(*envs), &env.CurrentEnvironment.Envs); err != nil {
+		return fmt.Errorf("unmarshal environmental context json: %w", err)
+	}
+
+	return nil
 }

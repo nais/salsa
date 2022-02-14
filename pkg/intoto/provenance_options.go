@@ -69,7 +69,7 @@ func (in *ProvenanceOptions) withBuilderInvocation(env *vcs.Environment) *Proven
 			Digest: slsa.DigestSet{
 				digest.AlgorithmSHA1: env.GithubSha(),
 			},
-			EntryPoint: env.Workflow,
+			EntryPoint: env.GitHubContext.Workflow,
 		},
 		Parameters:  env.EventInputs(),
 		Environment: env.FilteredEnvironment(),

@@ -6,41 +6,34 @@ import (
 	"os"
 )
 
-type Environment struct {
-	GitHubContext `json:"github"`
-	*Event        `json:"event,omitempty"`
-	RunnerContext `json:"context"`
+type ContinuesIntegration interface {
+	Parse(context *string, env *Environment) error
 }
 
-func CreateCIEnvironment(githubContext, runnerContext *string) (*Environment, error) {
-	if githubContext == nil || runnerContext == nil {
+type Environment struct {
+	GitHubContext      GitHubContext       `json:"github"`
+	Event              *Event              `json:"event,omitempty"`
+	RunnerContext      RunnerContext       `json:"context"`
+	CurrentEnvironment *CurrentEnvironment `json:"env,omitempty"`
+}
+
+func CreateCIEnvironment(githubContext, runnerContext, envsContext *string) (*Environment, error) {
+	// Required when creating CI environment
+	if len(*githubContext) == 0 || len(*runnerContext) == 0 {
 		return nil, nil
 	}
-
 	env := Environment{}
 
-	if len(*githubContext) > 0 {
-		if err := json.Unmarshal([]byte(*githubContext), &env.GitHubContext); err != nil {
-			if err != nil {
-				return nil, fmt.Errorf("unmarshal github context json: %w", err)
-			}
-		}
-		if env.GitHubContext.Event != nil {
-			if err := json.Unmarshal(env.GitHubContext.Event, &env.Event); err != nil {
-				if err != nil {
-					return nil, fmt.Errorf("unmarshal github event json: %w", err)
-				}
-			}
-		}
+	if err := env.GitHubContext.Parse(githubContext, &env); err != nil {
+		return nil, fmt.Errorf("parsing github: %w", err)
 	}
 
-	// Ensure we dont misuse token.
-	env.Token = ""
+	if err := env.RunnerContext.Parse(runnerContext, &env); err != nil {
+		return nil, fmt.Errorf("parsing runner: %w", err)
+	}
 
-	if len(*runnerContext) > 0 {
-		if err := json.Unmarshal([]byte(*runnerContext), &env.RunnerContext); err != nil {
-			return nil, fmt.Errorf("unmarshal runner context json: %w", err)
-		}
+	if err := env.CurrentEnvironment.Parse(envsContext, &env); err != nil {
+		return nil, fmt.Errorf("parsing envs: %w", err)
 	}
 
 	return &env, nil
@@ -66,7 +59,7 @@ func (in *Environment) BuilderId() string {
 }
 
 func (in *Environment) EventInputs() json.RawMessage {
-	if in.EventName != "workflow_dispatch" {
+	if in.GitHubContext.EventName != "workflow_dispatch" {
 		return nil
 	}
 	return in.Event.Inputs
@@ -78,9 +71,10 @@ func (in *Environment) FilteredEnvironment() *Environment {
 	// to know whether they were referenced or not.
 	return &Environment{
 		GitHubContext: GitHubContext{
-			RunId: in.RunId,
+			RunId: in.GitHubContext.RunId,
 		},
-		Event:         nil,
-		RunnerContext: in.RunnerContext,
+		Event:              nil,
+		RunnerContext:      in.RunnerContext,
+		CurrentEnvironment: in.CurrentEnvironment,
 	}
 }
