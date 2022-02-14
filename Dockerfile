@@ -10,11 +10,11 @@ RUN go mod download
 RUN git clone https://github.com/sigstore/cosign && cd cosign && go install ./cmd/cosign && $(go env GOPATH)/bin/cosign
 
 # Add source code
-ADD .. $APP_ROOT/src/
+ADD ../.. $APP_ROOT/src/
 
-RUN go build -o bin/salsa cmd/main.go
+RUN make salsa
 
-COPY entrypoint.sh /entrypoint.sh
+COPY .github/actions/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # Set the binary as the entrypoint of the container

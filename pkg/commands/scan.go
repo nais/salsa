@@ -19,7 +19,9 @@ import (
 )
 
 var project string
-var inputContext string
+var githubContext string
+var runnerContext string
+var envContext string
 
 var scanCmd = &cobra.Command{
 	Use:   "scan",
@@ -32,12 +34,17 @@ var scanCmd = &cobra.Command{
 			artifact = args[0]
 		}
 
-		if PathFlags.Repo == "" {
-			return errors.New("repo name must be specified")
+		var workDir = ""
+		if PathFlags.RepoDir == "tmp" {
+			if PathFlags.Repo == "" {
+				return errors.New("repo name must be specified")
+			}
+			workDir = PathFlags.WorkDir()
 		}
 
+		workDir = PathFlags.RepoDir
+
 		log.Infof("prepare to scan path %s for project %s...", PathFlags.WorkDir(), project)
-		workDir := PathFlags.WorkDir()
 
 		tools := build.SupportedBuildTools{
 			Tools: []build.BuildTool{
@@ -51,8 +58,18 @@ var scanCmd = &cobra.Command{
 		}
 
 		deps, err := tools.DetectDeps(workDir)
-		// TODO send in runnerContext and consider sending in 'env' and filter them for reproducing in 'Environment'.
-		err = GenerateProvenance(workDir, PathFlags.Repo, deps, &inputContext)
+		if deps == nil {
+			return errors.New("could not find any supported build tools in " + workDir)
+		} else if err != nil {
+			return fmt.Errorf("detecting dependecies")
+		}
+
+		ciEnv, err := vcs.CreateCIEnvironment(&githubContext, &runnerContext, &envContext)
+		if err != nil {
+			return err
+		}
+
+		err = GenerateProvenance(workDir, PathFlags.Repo, deps, ciEnv)
 		if err != nil {
 			return err
 		}
@@ -60,14 +77,7 @@ var scanCmd = &cobra.Command{
 	},
 }
 
-func GenerateProvenance(workDir, project string, dependencies *build.ArtifactDependencies, inputContext *string) error {
-	runnerContext := ""
-	envs := ""
-	ciEnv, err := vcs.CreateCIEnvironment(inputContext, &runnerContext, &envs)
-	if err != nil {
-		return err
-	}
-
+func GenerateProvenance(workDir, project string, dependencies *build.ArtifactDependencies, ciEnv *vcs.Environment) error {
 	opts := intoto.CreateProvenanceOptions(project, dependencies, ciEnv)
 	predicate := intoto.GenerateSlsaPredicate(opts)
 	statement, err := json.Marshal(predicate)
@@ -85,5 +95,7 @@ func GenerateProvenance(workDir, project string, dependencies *build.ArtifactDep
 
 func init() {
 	rootCmd.AddCommand(scanCmd)
-	scanCmd.Flags().StringVar(&inputContext, "context", "", "context of build environment")
+	scanCmd.Flags().StringVar(&githubContext, "github_context", "", "context of github environment")
+	scanCmd.Flags().StringVar(&runnerContext, "runner_context", "", "context of runner environment")
+	scanCmd.Flags().StringVar(&envContext, "env_context", "", "environmental variables of current context")
 }
