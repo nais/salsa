@@ -25,7 +25,7 @@ jobs:
 
       # - name: Print github context
       #  run: echo ${{ toJSON(github) }}
-      - name: Print runner context
-        run: echo ${{ toJSON(runner) }}
+      # - name: Print runner context
+      #  run: echo ${{ toJSON(runner) }}
       - name: Print env context
         run: echo ${{ toJSON(env) }}
