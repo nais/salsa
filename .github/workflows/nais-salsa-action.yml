@@ -5,6 +5,9 @@ on:
     branches:
       - master
 
+env:
+  IMAGE: ghcr.io/navikt/gandalf/gandalf-security-token-service:90b27f4bb7d23e81b70442c7cfd76090843b68b3
+
 jobs:
   generate-provenance:
     runs-on: ubuntu-20.04
@@ -13,7 +16,9 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Generate provenance
-        uses: nais/salsa@v0.1
+        uses: nais/salsa@main
+        with:
+          image: ${{ env.IMAGE }}
 
       - name: Upload provenance
         uses: actions/upload-artifact@v2

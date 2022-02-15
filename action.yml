@@ -15,7 +15,6 @@ inputs:
   image:
     description: 'docker image to pull and sign'
     required: true
-    default: ${{ IMAGE }}
   github_context:
     description: 'internal (do not set): the "github" context object in json'
     required: true
