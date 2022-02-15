@@ -12,8 +12,7 @@ func TestCreateGithubContext(t *testing.T) {
 	assert.NoError(t, err)
 	parsedContext := string(githubContext)
 	env := Environment{}
-	gh := GitHubContext{}
-	err = gh.Parse(&parsedContext, &env)
+	err = ParseGithub(&parsedContext, &env)
 	assert.NoError(t, err)
 
 	assert.Equal(t, "90dc9f2bc4007d1099a941ba3d408d2c896fe8dd", env.GitHubContext.SHA)
@@ -35,8 +34,7 @@ func TestCreateGithubContext(t *testing.T) {
 
 func TestCreateRunnerContext(t *testing.T) {
 	env := Environment{}
-	rc := RunnerContext{}
-	err := rc.Parse(&runnerContext, &env)
+	err := ParseRunner(&runnerContext, &env)
 	assert.NoError(t, err)
 	assert.Equal(t, "Hosted Agent", env.RunnerContext.Name)
 	assert.Equal(t, "Linux", env.RunnerContext.OS)
@@ -56,11 +54,10 @@ var runnerContext = `{
 
 func TestCreateCurrentEnvironmentContext(t *testing.T) {
 	env := Environment{}
-	ce := CurrentEnvironment{}
 	expected := make(map[string]string)
 	expected["GOVERSION"] = "1.17"
 	expected["GOROOT"] = "/opt/hostedtoolcache/go/1.17.6/x64"
-	err := ce.Parse(&envContext, &env)
+	err := ParseEnv(&envContext, &env)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(env.CurrentEnvironment.Envs))
 }

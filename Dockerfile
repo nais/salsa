@@ -14,7 +14,7 @@ ADD ../.. $APP_ROOT/src/
 
 RUN make salsa
 
-COPY .github/actions/entrypoint.sh /entrypoint.sh
+COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # Set the binary as the entrypoint of the container

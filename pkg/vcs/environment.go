@@ -6,10 +6,6 @@ import (
 	"os"
 )
 
-type ContinuesIntegration interface {
-	Parse(context *string, env *Environment) error
-}
-
 type Environment struct {
 	GitHubContext      GitHubContext       `json:"github"`
 	Event              *Event              `json:"event,omitempty"`
@@ -24,15 +20,15 @@ func CreateCIEnvironment(githubContext, runnerContext, envsContext *string) (*En
 	}
 	env := Environment{}
 
-	if err := env.GitHubContext.Parse(githubContext, &env); err != nil {
+	if err := ParseGithub(githubContext, &env); err != nil {
 		return nil, fmt.Errorf("parsing github: %w", err)
 	}
 
-	if err := env.RunnerContext.Parse(runnerContext, &env); err != nil {
+	if err := ParseRunner(runnerContext, &env); err != nil {
 		return nil, fmt.Errorf("parsing runner: %w", err)
 	}
 
-	if err := env.CurrentEnvironment.Parse(envsContext, &env); err != nil {
+	if err := ParseEnv(envsContext, &env); err != nil {
 		return nil, fmt.Errorf("parsing envs: %w", err)
 	}
 

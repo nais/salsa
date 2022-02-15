@@ -38,7 +38,7 @@ type Event struct {
 	Inputs json.RawMessage `json:"inputs"`
 }
 
-func (in *GitHubContext) Parse(github *string, env *Environment) error {
+func ParseGithub(github *string, env *Environment) error {
 	if len(*github) == 0 {
 		return nil
 	}
@@ -69,7 +69,7 @@ type RunnerContext struct {
 	ToolCache string `json:"tool_cache"`
 }
 
-func (in *RunnerContext) Parse(runner *string, env *Environment) error {
+func ParseRunner(runner *string, env *Environment) error {
 	if len(*runner) == 0 {
 		return nil
 	}
@@ -85,7 +85,7 @@ type CurrentEnvironment struct {
 	Envs map[string]string
 }
 
-func (in *CurrentEnvironment) Parse(envs *string, env *Environment) error {
+func ParseEnv(envs *string, env *Environment) error {
 	if len(*envs) == 0 {
 		return nil
 	}
