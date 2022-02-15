@@ -64,11 +64,15 @@ func YarnDeps(yarnLockContents string) []build.Dependency {
 func blockLineNumbers(yarnLockLines []string) []int {
 	var startsOfEntries []int
 	for index, line := range yarnLockLines {
-		if strings.HasPrefix(line, "\"") {
+		if isNewEntry(line) {
 			startsOfEntries = append(startsOfEntries, index)
 		}
 	}
 	return startsOfEntries
+}
+
+func isNewEntry(str string) bool {
+	return !strings.HasPrefix(str, " ") && strings.HasSuffix(str, ":")
 }
 
 func parseDependency(depLine string) string {

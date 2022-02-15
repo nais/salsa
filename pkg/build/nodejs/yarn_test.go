@@ -17,11 +17,11 @@ func TestYarnLockParsing(t *testing.T) {
 		yarnDep("react", "17.0.2", "sha512", "gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA=="),
 		yarnDep("@babel/helper-annotate-as-pure", "7.16.7", "sha512", "s6t2w/IPQVTAET1HitoowRGXooX8mCgtuP5195wD/QJPV6wYjpujCGF7JuMODVX2ZAJOf1GT6DT9MHEZvLOFSw=="),
 		yarnDep("@babel/helper-builder-binary-assignment-operator-visitor", "7.16.7", "sha512", "C6FdbRaxYjwVu/geKW4ZeQ0Q31AftgRcdSnZ5/jsH6BzCJbtvXvhpfkbkThYSuutZA7nCXpPR6AD9zd1dprMkA=="),
-		// yarnDep("range-parser", "1.2.1", "sha512", "Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg=="),
-		// yarnDep("webpack-sources", "1.4.3", "sha512", "lgTS3Xhv1lCOKo7SA5TjKXMjpSM4sBjNV5+q2bqesbSPs5FjGmU6jjtBSkX9b4qW87vDIsCIlUPOEhbZrMdjeQ=="),
-		// yarnDep("util-deprecate", "1.0.2", "sha1", "RQ1Nyfpw3nMnYvvS1KKJgUGaDM8="),
-		// yarnDep("unist-util-visit", "2.0.3", "sha512", "iJ4/RczbJMkD0712mGktuGpm/U4By4FfDonL7N/9tATGIF4imikjOuagyMY53tnZq3NP6BcmlrHhEKAfGWjh7Q=="),
-		// yarnDep("source-map", "0.6.1", "sha512", "UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g=="),
+		yarnDep("range-parser", "1.2.1", "sha512", "Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg=="),
+		yarnDep("webpack-sources", "1.4.3", "sha512", "lgTS3Xhv1lCOKo7SA5TjKXMjpSM4sBjNV5+q2bqesbSPs5FjGmU6jjtBSkX9b4qW87vDIsCIlUPOEhbZrMdjeQ=="),
+		yarnDep("util-deprecate", "1.0.2", "sha1", "RQ1Nyfpw3nMnYvvS1KKJgUGaDM8="),
+		yarnDep("unist-util-visit", "2.0.3", "sha512", "iJ4/RczbJMkD0712mGktuGpm/U4By4FfDonL7N/9tATGIF4imikjOuagyMY53tnZq3NP6BcmlrHhEKAfGWjh7Q=="),
+		yarnDep("source-map", "0.6.1", "sha512", "UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g=="),
 	}
 
 	if !assert.ElementsMatch(t, got, want) {
