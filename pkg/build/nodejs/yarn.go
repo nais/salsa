@@ -56,11 +56,6 @@ func YarnDeps(yarnLockContents string) []build.Dependency {
 	return deduplicate(deps)
 }
 
-// TODO: Find answer to why header of dependencies in yarn.lock starts with either '"' or without,
-// strings.HasPrefix(line, "\"") || strings.Contains(line, "@^") || strings.Contains(line, "@~")
-// fulfills all cases, but to what cost?
-// several of the dependencies come in duplicates with several versions.
-// see: func deduplicate(deps []build.Dependency) []build.Dependency
 func blockLineNumbers(yarnLockLines []string) []int {
 	var startsOfEntries []int
 	for index, line := range yarnLockLines {
