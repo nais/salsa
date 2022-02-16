@@ -4,8 +4,8 @@
 
 # Run salsa commands
 salsa scan \
-  --repoDir "$INPUT_REPO_DIR" \
-  --repo "$INPUT_REPO_NAME" \
+  --repoDir "$1" \
+  --repo "$2" \
   --github_context "$INPUT_GITHUB_CONTEXT" \
   --runner_context "$INPUT_RUNNER_CONTEXT" \
   --env_context "$INPUT_ENV_CONTEXT"
