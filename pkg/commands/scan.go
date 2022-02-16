@@ -34,15 +34,11 @@ var scanCmd = &cobra.Command{
 			artifact = args[0]
 		}
 
-		var workDir = ""
-		if PathFlags.RepoDir == "tmp" {
-			if PathFlags.Repo == "" {
-				return errors.New("repo name must be specified")
-			}
-			workDir = PathFlags.WorkDir()
+		if PathFlags.Repo == "" {
+			return errors.New("repo name must be specified")
 		}
 
-		workDir = PathFlags.RepoDir
+		workDir := PathFlags.WorkDir()
 
 		log.Infof("prepare to scan path %s for project %s...", PathFlags.WorkDir(), project)
 
