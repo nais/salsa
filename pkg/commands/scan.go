@@ -18,7 +18,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var project string
 var githubContext string
 var runnerContext string
 var envContext string
@@ -38,9 +37,8 @@ var scanCmd = &cobra.Command{
 			return errors.New("repo name must be specified")
 		}
 
+		log.Infof("prepare to scan path %s for project %s...", PathFlags.WorkDir(), PathFlags.Repo)
 		workDir := PathFlags.WorkDir()
-
-		log.Infof("prepare to scan path %s for project %s...", PathFlags.WorkDir(), project)
 
 		tools := build.SupportedBuildTools{
 			Tools: []build.BuildTool{
