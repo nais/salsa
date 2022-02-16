@@ -33,3 +33,4 @@ runs:
   args:
     - ${{ inputs.repo_dir }}
     - ${{ inputs.repo_name }}
+    - 'yolo'
