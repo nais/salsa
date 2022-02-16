@@ -33,4 +33,5 @@ runs:
   args:
     - ${{ inputs.repo_dir }}
     - ${{ inputs.repo_name }}
-    - 'yolo'
+    - ${{ inputs.github_context }}
+    - ${{ inputs.runner_context }}
