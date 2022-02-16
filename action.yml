@@ -11,7 +11,7 @@ inputs:
   repo_name:
     description: 'path to write build provenance file'
     required: true
-    default: '${{ github.repository.name }}.provenance'
+    default: '${{ github.repository.name }}'
   image:
     description: 'docker image to pull and sign'
     required: true
@@ -31,5 +31,5 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - {{inputs.repo_dir}}
-    - {{inputs.repo_name}}
+    - ${{ inputs.repo_dir }}
+    - ${{ inputs.repo_name }}
