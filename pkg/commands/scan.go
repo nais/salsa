@@ -82,10 +82,13 @@ func GenerateProvenance(workDir, project string, dependencies *build.ArtifactDep
 	}
 
 	provenanceFileName := utils.ProvenanceFile(project)
-	err = os.WriteFile(fmt.Sprintf("%s/%s", workDir, provenanceFileName), statement, 0644)
+	path := fmt.Sprintf("%s/%s", workDir, provenanceFileName)
+	err = os.WriteFile(path, statement, 0644)
 	if err != nil {
 		return fmt.Errorf("write to file: %v\n", err)
 	}
+
+	log.Infof("generated provenance in file: %s", path)
 	return nil
 }
 

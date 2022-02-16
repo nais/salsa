@@ -19,8 +19,9 @@ jobs:
         uses: nais/salsa@main
         with:
           image: ${{ env.IMAGE }}
+          repo_name: salsa
 
       - name: Upload provenance
         uses: actions/upload-artifact@v2
         with:
-          path: tmp/${{ github.event.repository.name }}.provenance
+          path: tmp/salsa.provenance
