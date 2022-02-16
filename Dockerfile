@@ -20,7 +20,7 @@ RUN curl -L -f https://github.com/sigstore/cosign/releases/download/v1.5.1/cosig
 
 RUN chmod +x /usr/local/bin/salsa
 
-COPY entrypoint.sh .
+COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # Set the binary as the entrypoint of the container
