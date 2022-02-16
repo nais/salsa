@@ -7,7 +7,7 @@ inputs:
   repo_dir:
     description: 'path to directory of artifacts'
     required: true
-    default: '$ {{ github.workspace }}'
+    default: '${{ github.workspace }}'
   repo_name:
     description: 'path to write build provenance file'
     required: true
