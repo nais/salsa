@@ -1,15 +1,18 @@
 #!/bin/sh -l
 
 #IMAGE=ttl.sh/nais-salsa-"$INPUT_REPO_NAME":1h
+REPO_DIR="$1"
+REPO_NAME="$2"
+GITHUB=$(echo "${3}" | base64 -w 0)
+RUNNER=$(echo "${4}" | base64 -w 0)
 
-sh -c "echo $*"
 # Run salsa commands
 salsa scan \
-  --repoDir "$1" \
-  --repo "$2" \
-  --github_context "$3" \
-  --runner_context "$4" \
-  --env_context ""
+  --repoDir "$REPO_DIR" \
+  --repo "$REPO_NAME" \
+#  --github_context "$GITHUB" \
+#  --runner_context "$RUNNER" \
+#  --env_context ""
 
 # For private repo
 # echo "$INPUT_PASSWORD" | docker login --username foo --password-stdin

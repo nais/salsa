@@ -42,6 +42,7 @@ type SupportedBuildTools struct {
 func (t SupportedBuildTools) DetectDeps(workDir string) (*ArtifactDependencies, error) {
 	for _, tool := range t.Tools {
 		log.Infof("search for build files '%s'\n", tool.BuildFiles())
+		// TODO handle error
 		if match(tool, workDir) {
 			log.Infof("found build type")
 			deps, err := tool.ResolveDeps(workDir)
