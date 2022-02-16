@@ -2,6 +2,7 @@
 
 #IMAGE=ttl.sh/nais-salsa-"$INPUT_REPO_NAME":1h
 
+echo "hello $1"
 # Run salsa commands
 salsa scan \
   --repoDir "$1" \
