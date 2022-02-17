@@ -5,6 +5,7 @@ REPO_DIR="$1"
 REPO_NAME="$2"
 GITHUB=$(echo "${3}" | base64 -w 0)
 RUNNER=$(echo "${4}" | base64 -w 0)
+ENVS=$(echo "${5}" | base64 -w 0)
 
 # Run salsa commands
 salsa scan \
@@ -12,7 +13,7 @@ salsa scan \
   --repo "$REPO_NAME" \
   --github_context "$GITHUB" \
   --runner_context "$RUNNER" \
-  --env_context ""
+  --env_context "$ENVS"
 
 # For private repo
 # echo "$INPUT_PASSWORD" | docker login --username foo --password-stdin
