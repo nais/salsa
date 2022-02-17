@@ -12,7 +12,7 @@ salsa scan \
   --repo "$REPO_NAME" \
   --github_context "$GITHUB" \
   --runner_context "$RUNNER" \
-#  --env_context ""
+  --env_context ""
 
 # For private repo
 # echo "$INPUT_PASSWORD" | docker login --username foo --password-stdin

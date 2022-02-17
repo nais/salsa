@@ -23,10 +23,10 @@ inputs:
     description: 'internal (do not set): the "runner" context object in json'
     required: true
     default: ${{ toJSON(runner) }}
-  env_context:
-    description: 'internal (do not set): the "env" context object in json'
-    required: true
-    default: ${{ toJSON(env) }}
+  #env_context:
+  #  description: 'internal (do not set): the "env" context object in json'
+  #  required: true
+  #  default: ${{ toJSON(env) }}
 runs:
   using: 'docker'
   image: 'Dockerfile'
