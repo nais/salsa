@@ -40,15 +40,20 @@ type SupportedBuildTools struct {
 }
 
 func (t SupportedBuildTools) DetectDeps(workDir string) (*ArtifactDependencies, error) {
+	log.Info("search for build files\n")
 	for _, tool := range t.Tools {
-		log.Infof("search for build files '%s'\n", tool.BuildFiles())
-		// TODO handle error
-		if match(tool, workDir) {
-			log.Infof("found build type")
+		foundMatch, err := match(tool, workDir)
+		if err != nil {
+			return nil, fmt.Errorf("could not find match, %v", err)
+		}
+
+		if foundMatch {
+			log.Infof("found build type '%s'\n", tool.BuildFiles())
 			deps, err := tool.ResolveDeps(workDir)
 			if err != nil {
 				return nil, fmt.Errorf("could not resolve deps, %v", err)
 			}
+
 			return deps, nil
 		}
 	}
@@ -63,20 +68,26 @@ func (d Dependency) ToDigestSet() slsa.DigestSet {
 	return slsa.DigestSet{d.CheckSum.Algorithm: d.CheckSum.Digest}
 }
 
-func match(t BuildTool, workDir string) bool {
+func match(t BuildTool, workDir string) (bool, error) {
 	for _, file := range t.BuildFiles() {
-		buildFile := findBuildFile(workDir, file)
+		buildFile, err := findBuildFile(workDir, file)
+
+		if err != nil {
+			return false, err
+		}
+
 		if buildFile != "" {
-			return true
+			return true, nil
 		}
 	}
-	return false
+	return false, nil
 }
 
-func findBuildFile(root, pattern string) (result string) {
+func findBuildFile(root, pattern string) (string, error) {
+	var result = ""
 	files, err := ioutil.ReadDir(root)
 	if err != nil {
-		log.Fatal(err)
+		return "", fmt.Errorf("reading dir %v", err)
 	}
 
 	for _, file := range files {
@@ -85,14 +96,5 @@ func findBuildFile(root, pattern string) (result string) {
 			break
 		}
 	}
-	return result
-}
-
-func concat(slices ...[]string) (result []string) {
-	for _, slice := range slices {
-		for _, s := range slice {
-			result = append(result, s)
-		}
-	}
-	return result
+	return result, nil
 }
