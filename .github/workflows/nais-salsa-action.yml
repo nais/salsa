@@ -19,7 +19,7 @@ jobs:
         uses: nais/salsa@main
         with:
           image: ${{ env.IMAGE }}
-          repo_dir: ${{ github.workspace }}/tmp
+          # repo_dir: ${{ github.workspace }}
           repo_name: salsa
 
       - name: Upload provenance

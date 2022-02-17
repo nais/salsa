@@ -39,7 +39,7 @@ var rootCmd = &cobra.Command{
 }
 
 func (r RootFlags) WorkDir() string {
-	return r.RepoDir + "/" + r.Repo
+	return r.RepoDir //  + "/" + r.Repo
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
