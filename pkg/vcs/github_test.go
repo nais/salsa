@@ -1,7 +1,7 @@
 package vcs
 
 import (
-	"encoding/json"
+	"encoding/base64"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -10,9 +10,9 @@ import (
 func TestCreateGithubContext(t *testing.T) {
 	githubContext, err := os.ReadFile("testdata/github-context.json")
 	assert.NoError(t, err)
-	parsedContext := string(githubContext)
+	encodedContext := base64.StdEncoding.EncodeToString(githubContext)
 	env := Environment{}
-	err = ParseGithub(&parsedContext, &env)
+	err = ParseGithub(&encodedContext, &env)
 	assert.NoError(t, err)
 
 	assert.Equal(t, "90dc9f2bc4007d1099a941ba3d408d2c896fe8dd", env.GitHubContext.SHA)
@@ -27,14 +27,17 @@ func TestCreateGithubContext(t *testing.T) {
 	assert.Equal(t, "https://github.com/nais/salsa", env.RepoUri())
 	assert.Equal(t, "https://github.com/nais/salsa/Attestations/GitHubHostedActions@v1", env.BuilderId())
 	assert.Equal(t, "https://github.com/nais/salsa/actions/runs/1839977840", env.BuildInvocationId())
-	assert.Equal(t, json.RawMessage(nil), env.EventInputs())
+	marsInputs, err := env.EventInputs().MarshalJSON()
+	assert.NoError(t, err)
+	assert.NotEmpty(t, marsInputs)
 	assert.Equal(t, "90dc9f2bc4007d1099a941ba3d408d2c896fe8dd", env.GithubSha())
 
 }
 
 func TestCreateRunnerContext(t *testing.T) {
 	env := Environment{}
-	err := ParseRunner(&runnerContext, &env)
+	encodedContext := base64.StdEncoding.EncodeToString([]byte(runnerContext))
+	err := ParseRunner(&encodedContext, &env)
 	assert.NoError(t, err)
 	assert.Equal(t, "Hosted Agent", env.RunnerContext.Name)
 	assert.Equal(t, "Linux", env.RunnerContext.OS)
@@ -57,7 +60,8 @@ func TestCreateCurrentEnvironmentContext(t *testing.T) {
 	expected := make(map[string]string)
 	expected["GOVERSION"] = "1.17"
 	expected["GOROOT"] = "/opt/hostedtoolcache/go/1.17.6/x64"
-	err := ParseEnv(&envContext, &env)
+	encodedContext := base64.StdEncoding.EncodeToString([]byte(envContext))
+	err := ParseEnv(&encodedContext, &env)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(env.CurrentEnvironment.Envs))
 }

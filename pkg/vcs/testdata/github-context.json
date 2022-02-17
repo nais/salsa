@@ -14,7 +14,7 @@
   "workflow": "Salsa CI",
   "head_ref": "",
   "base_ref": "",
-  "event_name": "push",
+  "event_name": "workflow_dispatch",
   "event": {
     "after": "90dc9f2bc4007d1099a941ba3d408d2c896fe8dd",
     "base_ref": null,

@@ -10,8 +10,8 @@ RUNNER=$(echo "${4}" | base64 -w 0)
 salsa scan \
   --repoDir "$REPO_DIR" \
   --repo "$REPO_NAME" \
-#  --github_context "$GITHUB" \
-#  --runner_context "$RUNNER" \
+  --github_context "$GITHUB" \
+  --runner_context "$RUNNER" \
 #  --env_context ""
 
 # For private repo

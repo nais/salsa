@@ -1,6 +1,7 @@
 package vcs
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 )
@@ -43,16 +44,21 @@ func ParseGithub(github *string, env *Environment) error {
 		return nil
 	}
 
-	if err := json.Unmarshal([]byte(*github), &env.GitHubContext); err != nil {
+	decodedGithubBytes, err := base64.StdEncoding.DecodeString(*github)
+	if err != nil {
+		return fmt.Errorf("decoding github context: %w", err)
+	}
+
+	if err := json.Unmarshal(decodedGithubBytes, &env.GitHubContext); err != nil {
 		if err != nil {
 			return fmt.Errorf("unmarshal github context json: %w", err)
 		}
 	}
+
+	// TODO check if this data is useful, Unmarshal to struct
 	if env.GitHubContext.Event != nil {
-		if err := json.Unmarshal(env.GitHubContext.Event, &env.Event); err != nil {
-			if err != nil {
-				return fmt.Errorf("unmarshal github event json: %w", err)
-			}
+		env.Event = &Event{
+			Inputs: env.GitHubContext.Event,
 		}
 	}
 
@@ -74,7 +80,12 @@ func ParseRunner(runner *string, env *Environment) error {
 		return nil
 	}
 
-	if err := json.Unmarshal([]byte(*runner), &env.RunnerContext); err != nil {
+	decodedRunnerBytes, err := base64.StdEncoding.DecodeString(*runner)
+	if err != nil {
+		return fmt.Errorf("decoding runner context: %w", err)
+	}
+
+	if err := json.Unmarshal(decodedRunnerBytes, &env.RunnerContext); err != nil {
 		return fmt.Errorf("unmarshal runner context json: %w", err)
 	}
 
@@ -90,11 +101,16 @@ func ParseEnv(envs *string, env *Environment) error {
 		return nil
 	}
 
+	decodedEnvsBytes, err := base64.StdEncoding.DecodeString(*envs)
+	if err != nil {
+		return fmt.Errorf("decoding envs context: %w", err)
+	}
+
 	env.CurrentEnvironment = &CurrentEnvironment{
 		make(map[string]string),
 	}
 
-	if err := json.Unmarshal([]byte(*envs), &env.CurrentEnvironment.Envs); err != nil {
+	if err := json.Unmarshal(decodedEnvsBytes, &env.CurrentEnvironment.Envs); err != nil {
 		return fmt.Errorf("unmarshal environmental context json: %w", err)
 	}
 
