@@ -98,7 +98,12 @@ func (o AttestOptions) Verify(a []string) (string, error) {
 		args...,
 	)
 
-	cmd.Dir = PathFlags.WorkDir()
+	cmd.Dir, err = PathFlags.WorkDir()
+
+	if err != nil {
+		return "", err
+	}
+
 	return utils.Exec(cmd)
 }
 
@@ -124,7 +129,11 @@ func (o AttestOptions) Exec(a []string) (string, error) {
 		args...,
 	)
 
-	cmd.Dir = PathFlags.WorkDir()
+	cmd.Dir, err = PathFlags.WorkDir()
+	if err != nil {
+		return "", err
+	}
+
 	return utils.Exec(cmd)
 }
 

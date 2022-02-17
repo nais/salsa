@@ -37,8 +37,12 @@ var scanCmd = &cobra.Command{
 			return errors.New("repo name must be specified")
 		}
 
-		log.Infof("prepare to scan path %s ...", PathFlags.WorkDir())
-		workDir := PathFlags.WorkDir()
+		workDir, err := PathFlags.WorkDir()
+		if err != nil {
+			return err
+		}
+
+		log.Infof("prepare to scan path %s ...", workDir)
 
 		tools := build.SupportedBuildTools{
 			Tools: []build.BuildTool{

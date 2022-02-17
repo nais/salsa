@@ -13,9 +13,9 @@ import (
 )
 
 const (
-	envVarPrefix   = "SALSA"
-	cmdName        = "salsa"
-	defaultRepoDir = "tmp"
+	envVarPrefix = "SALSA"
+	cmdName      = "salsa"
+	// defaultRepoDir = "tmp"
 )
 
 type RootFlags struct {
@@ -38,8 +38,25 @@ var rootCmd = &cobra.Command{
 	},
 }
 
-func (r RootFlags) WorkDir() string {
-	return r.RepoDir //  + "/" + r.Repo
+func (r RootFlags) WorkDir() (string, error) {
+	if r.RepoDir != "" {
+		return r.RepoDir, nil
+	}
+
+	path, err := currentPath()
+	if err != nil {
+		return "", err
+	}
+
+	return path, nil
+}
+
+func currentPath() (string, error) {
+	root, err := os.Getwd()
+	if err != nil {
+		return "", fmt.Errorf("getting root path %v", err)
+	}
+	return root, nil
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -51,7 +68,7 @@ func Execute() {
 func init() {
 	PathFlags = &RootFlags{}
 	rootCmd.PersistentFlags().StringVar(&PathFlags.Repo, "repo", "", "name of git repo")
-	rootCmd.PersistentFlags().StringVar(&PathFlags.RepoDir, "repoDir", defaultRepoDir, "path to folder for cloned projects")
+	rootCmd.PersistentFlags().StringVar(&PathFlags.RepoDir, "repoDir", "", "path to folder for cloned projects")
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/."+cmdName+".yaml)")
 }
 
