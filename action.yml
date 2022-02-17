@@ -11,7 +11,6 @@ inputs:
   repo_name:
     description: 'path to write build provenance file'
     required: true
-    default: '${{ github.repository.name }}'
   image:
     description: 'docker image to pull and sign'
     required: true
