@@ -3,7 +3,7 @@ name: NAIS SALSA
 on:
   push:
     branches:
-      - master
+      - main
 
 env:
   IMAGE: ghcr.io/navikt/gandalf/gandalf-security-token-service:90b27f4bb7d23e81b70442c7cfd76090843b68b3
