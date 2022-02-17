@@ -52,10 +52,12 @@ var scanCmd = &cobra.Command{
 		}
 
 		deps, err := tools.DetectDeps(workDir)
+		if err != nil {
+			return fmt.Errorf("detecting dependecies: %v", err)
+		}
+
 		if deps == nil {
 			return errors.New("could not find any supported build tools in " + workDir)
-		} else if err != nil {
-			return fmt.Errorf("detecting dependecies")
 		}
 
 		ciEnv, err := vcs.CreateCIEnvironment(&githubContext, &runnerContext, &envContext)
