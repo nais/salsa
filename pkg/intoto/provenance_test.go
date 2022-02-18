@@ -2,7 +2,9 @@ package intoto
 
 import (
 	"fmt"
+	"github.com/nais/salsa/pkg/config"
 	"github.com/nais/salsa/pkg/digest"
+	"github.com/spf13/cobra"
 	"os"
 	"testing"
 	"time"
@@ -34,11 +36,8 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 			buildType:         vcs.AdHocBuildType,
 			buildInvocationId: "",
 			builderId:         vcs.DefaultBuildId,
-			buildConfig: &BuildConfig{
-				Commands: []string{"make salsa"},
-				Shell:    "bash",
-			},
-			materials: ExpectedDependenciesMaterial(),
+			buildConfig:       buildConfig(),
+			materials:         ExpectedDependenciesMaterial(),
 			configSource: slsa.ConfigSource{
 				URI:        "",
 				Digest:     slsa.DigestSet(nil),
@@ -64,7 +63,16 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			if test.runnerContext {
 				env := Environment()
-				opts := CreateProvenanceOptions("artifact", artDeps, env)
+
+				scanCfg := &config.ScanConfiguration{
+					WorkDir:       "",
+					RepoName:      "artifact",
+					Dependencies:  artDeps,
+					CiEnvironment: env,
+					Cmd:           nil,
+				}
+
+				opts := CreateProvenanceOptions(scanCfg)
 				slsaPredicate := GenerateSlsaPredicate(opts)
 				err := os.Setenv("GITHUB_ACTIONS", "true")
 				assert.NoError(t, err)
@@ -99,7 +107,15 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 
 			} else {
 
-				opts := CreateProvenanceOptions("artifact", artDeps, nil)
+				scanCfg := &config.ScanConfiguration{
+					WorkDir:       "",
+					RepoName:      "artifact",
+					Dependencies:  artDeps,
+					CiEnvironment: nil,
+					Cmd:           &cobra.Command{Use: "salsa"},
+				}
+
+				opts := CreateProvenanceOptions(scanCfg)
 				slsaPredicate := GenerateSlsaPredicate(opts)
 
 				// Predicate

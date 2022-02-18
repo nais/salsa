@@ -4,18 +4,18 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/nais/salsa/pkg/vcs"
-	"os"
-
 	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/build/golang"
 	"github.com/nais/salsa/pkg/build/jvm"
 	"github.com/nais/salsa/pkg/build/nodejs"
 	"github.com/nais/salsa/pkg/build/php"
+	"github.com/nais/salsa/pkg/config"
 	"github.com/nais/salsa/pkg/intoto"
 	"github.com/nais/salsa/pkg/utils"
+	"github.com/nais/salsa/pkg/vcs"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 var githubContext string
@@ -69,7 +69,15 @@ var scanCmd = &cobra.Command{
 			return err
 		}
 
-		err = GenerateProvenance(workDir, PathFlags.Repo, deps, ciEnv)
+		scanConfiguration := &config.ScanConfiguration{
+			WorkDir:       workDir,
+			RepoName:      PathFlags.Repo,
+			Dependencies:  deps,
+			CiEnvironment: ciEnv,
+			Cmd:           cmd,
+		}
+
+		err = GenerateProvenance(scanConfiguration)
 		if err != nil {
 			return err
 		}
@@ -77,16 +85,16 @@ var scanCmd = &cobra.Command{
 	},
 }
 
-func GenerateProvenance(workDir, project string, dependencies *build.ArtifactDependencies, ciEnv *vcs.Environment) error {
-	opts := intoto.CreateProvenanceOptions(project, dependencies, ciEnv)
+func GenerateProvenance(scanCfg *config.ScanConfiguration) error {
+	opts := intoto.CreateProvenanceOptions(scanCfg)
 	predicate := intoto.GenerateSlsaPredicate(opts)
 	statement, err := json.Marshal(predicate)
 	if err != nil {
 		return fmt.Errorf("marshal: %v\n", err)
 	}
 
-	provenanceFileName := utils.ProvenanceFile(project)
-	path := fmt.Sprintf("%s/%s", workDir, provenanceFileName)
+	provenanceFileName := utils.ProvenanceFile(scanCfg.RepoName)
+	path := fmt.Sprintf("%s/%s", scanCfg.WorkDir, provenanceFileName)
 	err = os.WriteFile(path, statement, 0644)
 	if err != nil {
 		return fmt.Errorf("write to file: %v\n", err)

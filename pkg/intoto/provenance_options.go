@@ -1,6 +1,7 @@
 package intoto
 
 import (
+	"github.com/nais/salsa/pkg/config"
 	"github.com/nais/salsa/pkg/digest"
 	"time"
 
@@ -21,31 +22,22 @@ type ProvenanceOptions struct {
 	Name              string
 }
 
-type BuildConfig struct {
-	Commands []string `json:"commands"`
-	// Indicates how to parse the strings in commands.
-	Shell string `json:"shell"`
-}
-
-func CreateProvenanceOptions(name string, deps *build.ArtifactDependencies, env *vcs.Environment) *ProvenanceOptions {
+func CreateProvenanceOptions(scanCfg *config.ScanConfiguration) *ProvenanceOptions {
 	opts := &ProvenanceOptions{
 		BuildStartedOn: time.Now().UTC(),
-		Dependencies:   deps,
-		Name:           name,
+		Dependencies:   scanCfg.Dependencies,
+		Name:           scanCfg.RepoName,
 	}
 
-	if env != nil {
+	if scanCfg.CiEnvironment != nil {
 		opts.BuildType = vcs.BuildType
-		opts.BuildInvocationId = env.BuildInvocationId()
-		opts.BuilderId = env.BuilderId()
-		opts.withBuilderRepoDigest(env).withBuilderInvocation(env)
+		opts.BuildInvocationId = scanCfg.CiEnvironment.BuildInvocationId()
+		opts.BuilderId = scanCfg.CiEnvironment.BuilderId()
+		opts.withBuilderRepoDigest(scanCfg.CiEnvironment).withBuilderInvocation(scanCfg.CiEnvironment)
 		return opts
 	}
 
-	opts.BuildConfig = &BuildConfig{
-		Commands: []string{"make salsa"},
-		Shell:    "bash",
-	}
+	opts.BuildConfig = GenerateBuildConfig(scanCfg.Cmd)
 	opts.BuilderId = vcs.DefaultBuildId
 	opts.BuildType = vcs.AdHocBuildType
 	opts.Invocation = nil
@@ -72,7 +64,7 @@ func (in *ProvenanceOptions) withBuilderInvocation(env *vcs.Environment) *Proven
 			EntryPoint: env.GitHubContext.Workflow,
 		},
 		Parameters:  env.AddUserDefinedParameters(),
-		Environment: ReproducibleMetadata(env),
+		Environment: NonReproducibleMetadata(env),
 	}
 	return in
 }
@@ -118,7 +110,7 @@ func (in *ProvenanceOptions) HasEnvironment() bool {
 	return in.Invocation.Environment != nil
 }
 
-func ReproducibleMetadata(env *vcs.Environment) *Metadata {
+func NonReproducibleMetadata(env *vcs.Environment) *Metadata {
 	// Other variables that are required to reproduce the build and that cannot be
 	// recomputed using existing information.
 	//(Documentation would explain how to recompute the rest of the fields.)

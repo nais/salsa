@@ -2,7 +2,9 @@ package intoto
 
 import (
 	"fmt"
+	"github.com/nais/salsa/pkg/config"
 	"github.com/nais/salsa/pkg/digest"
+	"github.com/spf13/cobra"
 	"testing"
 	"time"
 
@@ -32,10 +34,7 @@ func TestCreateProvenanceOptions(t *testing.T) {
 			buildType:         vcs.AdHocBuildType,
 			buildInvocationId: "",
 			builderId:         vcs.DefaultBuildId,
-			buildConfig: &BuildConfig{
-				Commands: []string{"make salsa"},
-				Shell:    "bash",
-			},
+			buildConfig:       buildConfig(),
 			builderRepoDigest: (*slsa.ProvenanceMaterial)(nil),
 			configSource: slsa.ConfigSource{
 				URI:        "",
@@ -60,7 +59,14 @@ func TestCreateProvenanceOptions(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			if test.runnerContext {
 				env := Environment()
-				provenanceArtifact := CreateProvenanceOptions("artifact", artDeps, env)
+				scanCfg := &config.ScanConfiguration{
+					WorkDir:       "",
+					RepoName:      "artifact",
+					Dependencies:  artDeps,
+					CiEnvironment: env,
+					Cmd:           nil,
+				}
+				provenanceArtifact := CreateProvenanceOptions(scanCfg)
 				assert.Equal(t, "artifact", provenanceArtifact.Name)
 				assert.Equal(t, test.buildType, provenanceArtifact.BuildType)
 				assert.Equal(t, deps, provenanceArtifact.Dependencies.RuntimeDeps)
@@ -76,7 +82,15 @@ func TestCreateProvenanceOptions(t *testing.T) {
 
 			} else {
 
-				provenanceArtifact := CreateProvenanceOptions("artifact", artDeps, nil)
+				scanCfg := &config.ScanConfiguration{
+					WorkDir:       "",
+					RepoName:      "artifact",
+					Dependencies:  artDeps,
+					CiEnvironment: nil,
+					Cmd:           &cobra.Command{Use: "salsa"},
+				}
+
+				provenanceArtifact := CreateProvenanceOptions(scanCfg)
 				assert.Equal(t, "artifact", provenanceArtifact.Name)
 				assert.Equal(t, test.buildType, provenanceArtifact.BuildType)
 				assert.Equal(t, deps, provenanceArtifact.Dependencies.RuntimeDeps)
@@ -148,5 +162,12 @@ func ExpectedConfigSource() slsa.ConfigSource {
 			digest.AlgorithmSHA1: "4321",
 		},
 		EntryPoint: "Create a provenance",
+	}
+}
+
+func buildConfig() *BuildConfig {
+	return &BuildConfig{
+		Commands: []string{"salsa "},
+		Shell:    "bash",
 	}
 }
