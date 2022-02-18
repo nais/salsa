@@ -2,6 +2,7 @@ package vcs
 
 import (
 	"encoding/base64"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -27,9 +28,9 @@ func TestCreateGithubContext(t *testing.T) {
 	assert.Equal(t, "https://github.com/nais/salsa", env.RepoUri())
 	assert.Equal(t, "https://github.com/nais/salsa/Attestations/GitHubHostedActions@v1", env.BuilderId())
 	assert.Equal(t, "https://github.com/nais/salsa/actions/runs/1839977840", env.BuildInvocationId())
-	marsInputs, err := env.EventInputs().MarshalJSON()
+	marshalJSON, err := env.AddUserDefinedParameters().Inputs.MarshalJSON()
 	assert.NoError(t, err)
-	assert.NotEmpty(t, marsInputs)
+	assert.NotEmpty(t, fmt.Sprintf("%s", marshalJSON))
 	assert.Equal(t, "90dc9f2bc4007d1099a941ba3d408d2c896fe8dd", env.GithubSha())
 
 }

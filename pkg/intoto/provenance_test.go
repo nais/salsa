@@ -1,6 +1,7 @@
 package intoto
 
 import (
+	"fmt"
 	"github.com/nais/salsa/pkg/digest"
 	"os"
 	"testing"
@@ -71,7 +72,12 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 				// VCS Context
 				assert.Equal(t, test.buildType, slsaPredicate.BuildType)
 				assert.NotEmpty(t, slsaPredicate.Invocation)
-				assert.NotEmpty(t, slsaPredicate.Invocation.Parameters)
+				i, err := slsaPredicate.Invocation.Parameters.(*vcs.Event).Inputs.MarshalJSON()
+				assert.NoError(t, err)
+				assert.Equal(t, "some user inputs", fmt.Sprintf("%s", i))
+				e := slsaPredicate.Invocation.Environment.(*Metadata)
+				assert.NoError(t, err)
+				assert.Equal(t, expectedMetadata(), e)
 				assert.NotEmpty(t, slsaPredicate.Invocation.Environment)
 				assert.Equal(t, test.configSource, slsaPredicate.Invocation.ConfigSource)
 				assert.Equal(t, test.builderId, slsaPredicate.Builder.ID)
@@ -121,6 +127,21 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 			}
 		})
 
+	}
+}
+
+func expectedMetadata() *Metadata {
+	return &Metadata{
+		Arch: "",
+		Env:  map[string]string{},
+		Context: Context{
+			Github: Github{
+				RunId: "1234",
+			},
+			Runner: Runner{
+				Os:   "Linux",
+				Temp: "/home/runner/work/_temp"},
+		},
 	}
 }
 

@@ -1,7 +1,6 @@
 package vcs
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 )
@@ -54,23 +53,12 @@ func (in *Environment) BuilderId() string {
 	return in.RepoUri() + GitHubHostedIdSuffix
 }
 
-func (in *Environment) EventInputs() json.RawMessage {
+func (in *Environment) AddUserDefinedParameters() *Event {
+	// Only possible user-defined parameters
+	// This is unset/null for all other events.
 	if in.GitHubContext.EventName != "workflow_dispatch" {
 		return nil
 	}
-	return in.Event.Inputs
-}
 
-func (in *Environment) FilteredEnvironment() *Environment {
-	// Should also contain environment variables.
-	// These are always set because it is not possible
-	// to know whether they were referenced or not.
-	return &Environment{
-		GitHubContext: GitHubContext{
-			RunId: in.GitHubContext.RunId,
-		},
-		Event:              nil,
-		RunnerContext:      in.RunnerContext,
-		CurrentEnvironment: in.CurrentEnvironment,
-	}
+	return in.Event
 }

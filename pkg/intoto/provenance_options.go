@@ -71,8 +71,8 @@ func (in *ProvenanceOptions) withBuilderInvocation(env *vcs.Environment) *Proven
 			},
 			EntryPoint: env.GitHubContext.Workflow,
 		},
-		Parameters:  env.EventInputs(),
-		Environment: ReproduceData(env),
+		Parameters:  env.AddUserDefinedParameters(),
+		Environment: ReproducibleMetadata(env),
 	}
 	return in
 }
@@ -99,7 +99,15 @@ func (in *ProvenanceOptions) HasParameters() bool {
 		return false
 	}
 
-	return in.Invocation.Parameters != nil
+	if in.Invocation.Parameters == nil {
+		return false
+	}
+
+	if in.Invocation.Parameters.(*vcs.Event) == nil {
+		return false
+	}
+
+	return in.Invocation.Parameters.(*vcs.Event).Inputs != nil
 }
 
 func (in *ProvenanceOptions) HasEnvironment() bool {
@@ -110,7 +118,7 @@ func (in *ProvenanceOptions) HasEnvironment() bool {
 	return in.Invocation.Environment != nil
 }
 
-func ReproduceData(env *vcs.Environment) *Metadata {
+func ReproducibleMetadata(env *vcs.Environment) *Metadata {
 	// Other variables that are required to reproduce the build and that cannot be
 	// recomputed using existing information.
 	//(Documentation would explain how to recompute the rest of the fields.)
