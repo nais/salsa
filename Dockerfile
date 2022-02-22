@@ -21,8 +21,8 @@ ARG github
 ENV SALSA_SCAN_GITHUB_CONTEXT=$github
 ARG runner
 ENV SALSA_SCAN_RUNNER_CONTEXT=$runner
-ARG gha_cred_path
-ENV GOOGLE_APPLICATION_CREDENTIALS=$gha_cred_path
+ARG gcp_cred_path
+ENV GOOGLE_APPLICATION_CREDENTIALS=$gcp_cred_path
 
 COPY --from=builder /src/bin/salsa /usr/local/bin/
 

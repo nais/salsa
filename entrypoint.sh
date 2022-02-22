@@ -23,5 +23,3 @@ salsa attest \
   --config salsa-sample.yaml "$SALSA_REPO_IMAGE" &&
 
 echo "------- Attest $SALSA_SCAN_REPO fetch and generated -------"
-
-ls -l

@@ -13,6 +13,7 @@ jobs:
         uses: ./
         with:
           repo_name: salsa
+          gcp_credentials:  ${{ secrets.GCP_CREDENTIALS }}
 
       - name: Upload provenance
         uses: actions/upload-artifact@v2
