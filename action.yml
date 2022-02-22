@@ -43,7 +43,6 @@ runs:
       id: cosign-ttl
       shell: bash
       run: |
-        echo "YELLO ${{ inputs.gcp_credentials }}"
         image=ttl.sh/${IMAGE_NAME}:1h
         echo "::set-output name=image::${image}"
       env:
