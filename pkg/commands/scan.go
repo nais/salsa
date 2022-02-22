@@ -34,7 +34,11 @@ var scanCmd = &cobra.Command{
 		}
 
 		if PathFlags.Repo == "" {
-			return errors.New("repo name must be specified")
+			if os.Getenv("SALSA_SCAN_REPO") == "" {
+				return errors.New("repo name must be specified")
+			} else {
+				PathFlags.Repo = os.Getenv("SALSA_SCAN_REPO")
+			}
 		}
 
 		workDir, err := PathFlags.WorkDir()

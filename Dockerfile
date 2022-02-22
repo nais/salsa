@@ -11,6 +11,17 @@ RUN make salsa
 
 FROM alpine:3.14
 
+ARG repo
+ENV SALSA_SCAN_REPO=$repo
+ARG dir
+ENV SALSA_SCAN_REPO_DIR=$dir
+ARG image
+ENV SALSA_REPO_IMAGE=$image
+ARG github
+ENV SALSA_SCAN_GITHUB_CONTEXT=$github
+ARG runner
+ENV SALSA_SCAN_RUNNER_CONTEXT=$runner
+
 COPY --from=builder /src/bin/salsa /usr/local/bin/
 
 RUN apk add --no-cache ca-certificates git curl
@@ -22,6 +33,13 @@ RUN chmod +x /usr/local/bin/salsa
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+
+RUN echo "REPO $repo"
+RUN echo "IMAGE $image"
+RUN echo "GITHUB $github"
+RUN echo "RUNNER $runner"
+
+ADD . /
 
 # Set the binary as the entrypoint of the container
 ENTRYPOINT ["/entrypoint.sh"]
