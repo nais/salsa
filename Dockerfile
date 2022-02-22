@@ -21,6 +21,8 @@ ARG github
 ENV SALSA_SCAN_GITHUB_CONTEXT=$github
 ARG runner
 ENV SALSA_SCAN_RUNNER_CONTEXT=$runner
+ARG gha_cred_path
+ENV GOOGLE_APPLICATION_CREDENTIALS=$gha_cred_path
 
 COPY --from=builder /src/bin/salsa /usr/local/bin/
 
@@ -33,11 +35,6 @@ RUN chmod +x /usr/local/bin/salsa
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-
-RUN echo "REPO $repo"
-RUN echo "IMAGE $image"
-RUN echo "GITHUB $github"
-RUN echo "RUNNER $runner"
 
 ADD . /
 

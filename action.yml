@@ -5,20 +5,30 @@ branding:
   color: red
 inputs:
   repo_dir:
-    description: 'path to directory of artifacts'
+    description: |-
+      path to directory of artifacts
     required: false
   repo_name:
-    description: 'path to write build provenance file'
+    description: |-
+      path to write build provenance file
     required: true
   image:
-    description: 'docker image to pull and sign'
+    description: |-
+      docker image to pull and sign
     required: true
+  gcp_credentials:
+    description: |-
+      user credentials for signing the slsa provenance
+    required: true
+    default: ${{ secrets.GCP_CREDENTIALS }}
   github_context:
-    description: 'internal (do not set): the "github" context object in json'
+    description: |-
+      internal (do not set): the "github" context object in json
     required: true
     default: ${{ toJSON(github) }}
   runner_context:
-    description: 'internal (do not set): the "runner" context object in json'
+    description: |-
+      internal (do not set): the "runner" context object in json
     required: true
     default: ${{ toJSON(runner) }}
   # env_context:
@@ -28,17 +38,41 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    # 1. Needed for attest command, prepare here
+
+    # Prepare image
+    - name: Image Name
+      id: cosign-ttl
+      shell: bash
+      run: |
+        echo "YELLO ${{ inputs.gcp_credentials }}"
+        image=ttl.sh/${IMAGE_NAME}:1h
+        echo "::set-output name=image::${image}"
+      env:
+        IMAGE_NAME: ${{ inputs.repo_name }}
+
+    # Needed for attest command, prepare here
     - name: Build and push
+      id: ttl
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: ttl.sh/${{ inputs.repo_name }}:1h
-    # 2. checkout salsa
+        tags: ${{ steps.cosign-ttl.outputs.image }}
+
+    # checkout salsa
     - uses: actions/checkout@v2
       with:
         repository: nais/salsa
         path: salsa
+
+    # auth to and google credentials
+    - name: Google auth
+      id: google
+      uses: 'google-github-actions/auth@v0'
+      with:
+        credentials_json: ${{ inputs.gcp_credentials }}
+        export_default_credentials: true
+        credentials_file_path: /gha-credentials.json
+
     # Prepare args for docker run
     - name: docker arguments
       id: docker-args
@@ -46,47 +80,33 @@ runs:
       run: |
         encoded_github="$(echo ${GITHUB_CONTEXT} | base64 -w 0)"
         encoded_runner="$(echo ${RUNNER_CONTEXT} | base64 -w 0)"
+        gha_path="${GHA_CREDENTIAL_PATH##*/}"
         echo "::set-output name=github::${encoded_github}"
         echo "::set-output name=runner::${encoded_runner}"
+        echo "::set-output name=gha_creds::${gha_path}"
       env:
         GITHUB_CONTEXT: ${{ inputs.github_context }}
         RUNNER_CONTEXT: ${{ inputs.runner_context }}
-    # 3. Build container we need to perform commands
+        GHA_CREDENTIAL_PATH: ${{ steps.google.outputs.credentials_file_path }}
+
+    # Build container we need to perform commands
     # Can be done more smooth with download of binary from repo
     # and installation files
     - name: Build Salsa
+      id: salsa
       uses: docker/build-push-action@v2
       with:
         push: false
         tags: nais/salsa:latest
         context: .
         build-args: |
-          repo="${{ inputs.repo_name }}"
-          image="${{ inputs.image }}"
+          repo=${{ inputs.repo_name }}
+          image=${{ steps.cosign-ttl.outputs.image }}
           github=${{ steps.docker-args.outputs.github }}
-          github=${{ steps.docker-args.outputs.runner }}
+          runner=${{ steps.docker-args.outputs.runner }}
+          gha_cred_path=${{ steps.docker-args.outputs.gha_creds }}
 
     - name: Make Salsa
       run: |
         docker run nais/salsa:latest
       shell: bash
-
-
-    # Run Salsa container
-  ##   - name: Make Salsa
-  ##     uses: addnab/docker-run-action@v3
-  ##     with:
-  ##       image: nais/salsa:latest
-  ##       options: -e repo="${{ inputs.repo_name }}" -e image="${{ inputs.image }}" -e github="$(echo ${GITHUB_CONTEXT} | base64 -w 0)" -e runner="$(echo ${RUNNER_CONTEXT} | base64 -w 0)"
-  ##     env:
-  ##       GITHUB_CONTEXT: ${{ inputs.github_context }}
-  ##       RUNNER_CONTEXT: ${{ inputs.runner_context }}
-
-  #using: 'docker'
-  #image: 'Dockerfile'
-  #args:
-  #  - ${{ inputs.repo_dir }}
-  #  - ${{ inputs.repo_name }}
-  #  - ${{ inputs.github_context }}
-  #  - ${{ inputs.runner_context }}
-  ##  - ${{ inputs.env_context }}
