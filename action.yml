@@ -4,37 +4,61 @@ branding:
   icon: lock
   color: red
 inputs:
+
   repo_dir:
     description: |-
-      path to directory of artifacts
+      Path to other than root directory.
     required: false
+
   repo_name:
     description: |-
-      path to write build provenance file
+      Name of the file and path to provenance.
+      Used as an relative path under $GITHUB_WORKSPACE 
+      to place the genrated files.
+      Defaults to '${{ github.repository }}'.
     required: true
     default: ${{ github.repository }}
-  image:
-    description: |-
-      docker image to pull and sign
-    required: true
+
   gcp_credentials:
     description: |-
-      gcp serviceuser credentials to sign and upload the slsa provenance
+      Gcp serviceuser account key in json. This is required credentials and are used for 
+      
+       We recommend using a service account with the least permissions necessary.
+      
+      signing and verifying the generated slsa provenance.
     required: true
+
   github_context:
     description: |-
-      internal (do not set): the "github" context object in json
+      Internal value (do not set): the 'github' context object in json.
+      The context is used when generating provenance.
     required: true
     default: ${{ toJSON(github) }}
+
   runner_context:
     description: |-
-      internal (do not set): the "runner" context object in json
+      Internal value (do not set): the 'runner' context object in json.
+      The context is used when generating provenance.
     required: true
     default: ${{ toJSON(runner) }}
   # env_context:
   #   description: 'internal (do not set): the "env" context object in json'
   #   required: false
   #   default: ${{ toJSON(env) }}
+outputs:
+  provenance:
+    description: |-
+      The path to the provenance file relative to $GITHUB_WORKSPACE.
+    value: ${{ steps.served-salsa.outputs.provenance }}
+  raw:
+    description: |-
+      The path to the raw signed and encoded dss envelope file relative to $GITHUB_WORKSPACE.
+    value: ${{ steps.served-salsa.outputs.raw }}
+  att:
+    description: |-
+      The path to attestation file relative to $GITHUB_WORKSPACE.
+    value: ${{ steps.served-salsa.outputs.att }}
+
 runs:
   using: 'composite'
   steps:
@@ -93,6 +117,7 @@ runs:
         GCP_CREDENTIAL_PATH: ${{ steps.google.outputs.credentials_file_path }}
 
     - name: Build Salsa
+      id: docker-salsa
       uses: docker/build-push-action@v2
       with:
         push: false
@@ -113,10 +138,28 @@ runs:
       run: |
         docker run ${{ steps.docker-envs.outputs.salsa_image_with_tag }}
       shell: bash
-      #env:
+        #env:
         # SALSA_SCAN_REPO_DIR: ${{ github.workspace }}
-        #SALSA_SCAN_REPO: ${{ steps.cosign-ttl.outputs.repo_name }}
-        #SALSA_SCAN_GITHUB_CONTEXT: ${{ steps.docker-envs.outputs.github }}
-        #SALSA_SCAN_RUNNER_CONTEXT: ${{ steps.docker-envs.outputs.runner }}
-        #SALSA_REPO_IMAGE: ${{ steps.cosign-ttl.outputs.image }}
-        #GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.docker-envs.outputs.gcp_creds }}
+      #SALSA_SCAN_REPO: ${{ steps.cosign-ttl.outputs.repo_name }}
+      #SALSA_SCAN_GITHUB_CONTEXT: ${{ steps.docker-envs.outputs.github }}
+      #SALSA_SCAN_RUNNER_CONTEXT: ${{ steps.docker-envs.outputs.runner }}
+      #SALSA_REPO_IMAGE: ${{ steps.cosign-ttl.outputs.image }}
+      #GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.docker-envs.outputs.gcp_creds }}
+
+    # Serving salsa lovers
+    - name: Serving salsa lovers
+      id: served-salsa
+      run: |
+        provenance=${{ steps.cosign-ttl.outputs.repo_name }}.provenance
+        raw=${{ steps.cosign-ttl.outputs.repo_name }}.raw.txt
+        att=${{ steps.cosign-ttl.outputs.repo_name }}.att
+        containerId=${{ steps.docker-salsa.outputs.digest }}
+        
+        docker cp "${containerId}":./"${provenance}" .
+        docker cp "${containerId}":./"${raw}" .
+        docker cp "${containerId}":./"${att}" .
+        
+        echo "::set-output name=provenance::${provenance}"
+        echo "::set-output name=raw::${raw}"
+        echo "::set-output name=att::${att}"
+      shell: bash
