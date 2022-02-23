@@ -45,7 +45,7 @@ runs:
       shell: bash
       run: |
         repo="${REPO_NAME##*/}"
-        image=ttl.sh/${repo##*/}:1h
+        image=ttl.sh/"${repo}":1h
         echo "::set-output name=image::${image}"
         echo "::set-output name=repo_name::${repo}"
       env:
