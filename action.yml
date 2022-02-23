@@ -12,6 +12,7 @@ inputs:
     description: |-
       path to write build provenance file
     required: true
+    default: ${{ github.repository }}
   image:
     description: |-
       docker image to pull and sign
@@ -39,17 +40,17 @@ runs:
   steps:
 
     # Prepare image
-    - name: Image Name
+    - name: Prepare Image Name
       id: cosign-ttl
       shell: bash
       run: |
-        image=ttl.sh/${IMAGE_NAME}:1h
+        image=ttl.sh/${IMAGE_NAME##*/}:1h
         echo "::set-output name=image::${image}"
       env:
         IMAGE_NAME: ${{ inputs.repo_name }}
 
     # Needed for attest command, prepare here
-    - name: Build and push
+    - name: Build and push current provenance container to sign
       id: ttl
       uses: docker/build-push-action@v2
       with:
@@ -63,7 +64,7 @@ runs:
         path: salsa
 
     # auth to and google credentials
-    - name: Google auth
+    - name: Google auth and credentials
       id: google
       uses: 'google-github-actions/auth@v0'
       with:
@@ -76,16 +77,19 @@ runs:
       id: docker-args
       shell: bash
       run: |
+        repo="${REPO_NAME##*/}"
         encoded_github="$(echo ${GITHUB_CONTEXT} | base64 -w 0)"
         encoded_runner="$(echo ${RUNNER_CONTEXT} | base64 -w 0)"
         gcp_path="${GCP_CREDENTIAL_PATH##*/}"
         echo "::set-output name=github::${encoded_github}"
         echo "::set-output name=runner::${encoded_runner}"
         echo "::set-output name=gcp_creds::${gcp_path}"
+        echo "::set-output name=repo_name::${repo}"
       env:
         GITHUB_CONTEXT: ${{ inputs.github_context }}
         RUNNER_CONTEXT: ${{ inputs.runner_context }}
         GCP_CREDENTIAL_PATH: ${{ steps.google.outputs.credentials_file_path }}
+        REPO_NAME: ${{ inputs.repo_name }}
 
     # Build container we need to perform commands
     # Can be done more smooth with download of binary from repo
@@ -98,14 +102,15 @@ runs:
         tags: nais/salsa:latest
         context: .
         build-args: |
-          repo=${{ inputs.repo_name }}
+          dir=${{ github.workspace }}
+          repo=${{  steps.docker-args.outputs.repo_name }}
           image=${{ steps.cosign-ttl.outputs.image }}
           github=${{ steps.docker-args.outputs.github }}
           runner=${{ steps.docker-args.outputs.runner }}
           gcp_cred_path=${{ steps.docker-args.outputs.gcp_creds }}
 
     # Pico-de-gallo
-    - name: Make Salsa
+    - name: Make Salsa - Pico-de-Gallo
       run: |
         docker run nais/salsa:latest
       shell: bash
