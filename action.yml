@@ -40,16 +40,18 @@ runs:
   steps:
 
     # Prepare image
-    - name: Prepare Image Name
+    - name: Prepare current repository image and repo name
       id: cosign-ttl
       shell: bash
       run: |
-        image=ttl.sh/${IMAGE_NAME##*/}:1h
+        repo="${REPO_NAME##*/}"
+        image=ttl.sh/${repo##*/}:1h
         echo "::set-output name=image::${image}"
+        echo "::set-output name=repo_name::${repo}"
       env:
-        IMAGE_NAME: ${{ inputs.repo_name }}
+        REPO_NAME: ${{ inputs.repo_name }}
 
-    # Needed for attest command, prepare here
+    # Needed for attest to sign and verify command
     - name: Build and push current provenance container to sign
       id: ttl
       uses: docker/build-push-action@v2
@@ -57,7 +59,7 @@ runs:
         push: true
         tags: ${{ steps.cosign-ttl.outputs.image }}
 
-    # checkout salsa
+    # checkout salsa / could be done with binary
     - uses: actions/checkout@v2
       with:
         repository: nais/salsa
@@ -72,45 +74,52 @@ runs:
         export_default_credentials: true
         credentials_file_path: /gha-credentials.json
 
-    # Prepare args for docker run
-    - name: docker arguments
-      id: docker-args
+    # Prepare environment variables for docker run
+    - name: docker container environment
+      id: docker-envs
       shell: bash
       run: |
-        repo="${REPO_NAME##*/}"
+        salsa_docker_image=nais/salsa:latest
         encoded_github="$(echo ${GITHUB_CONTEXT} | base64 -w 0)"
         encoded_runner="$(echo ${RUNNER_CONTEXT} | base64 -w 0)"
         gcp_path="${GCP_CREDENTIAL_PATH##*/}"
         echo "::set-output name=github::${encoded_github}"
         echo "::set-output name=runner::${encoded_runner}"
         echo "::set-output name=gcp_creds::${gcp_path}"
-        echo "::set-output name=repo_name::${repo}"
+        echo "::set-output name=salsa_image_with_tag::${salsa_docker_image}"
       env:
         GITHUB_CONTEXT: ${{ inputs.github_context }}
         RUNNER_CONTEXT: ${{ inputs.runner_context }}
         GCP_CREDENTIAL_PATH: ${{ steps.google.outputs.credentials_file_path }}
-        REPO_NAME: ${{ inputs.repo_name }}
 
     # Build container we need to perform commands
-    # Can be done more smooth with download of binary from repo
-    # and installation files
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+
     - name: Build Salsa
-      id: salsa
       uses: docker/build-push-action@v2
       with:
         push: false
-        tags: nais/salsa:latest
+        tags: ${{ steps.docker-envs.outputs.salsa_image_with_tag }}
         context: .
         build-args: |
           dir=${{ github.workspace }}
-          repo=${{  steps.docker-args.outputs.repo_name }}
+          repo=${{ steps.cosign-ttl.outputs.repo_name }}
           image=${{ steps.cosign-ttl.outputs.image }}
-          github=${{ steps.docker-args.outputs.github }}
-          runner=${{ steps.docker-args.outputs.runner }}
-          gcp_cred_path=${{ steps.docker-args.outputs.gcp_creds }}
+          github=${{ steps.docker-envs.outputs.github  }}
+          runner=${{ steps.docker-envs.outputs.runner }}
+          gcp_cred_path=${{ steps.docker-envs.outputs.gcp_creds }}
 
     # Pico-de-gallo
     - name: Make Salsa - Pico-de-Gallo
       run: |
-        docker run nais/salsa:latest
+        docker run ${{ steps.docker-envs.outputs.salsa_image_with_tag }}
       shell: bash
+      env:
+        # SALSA_SCAN_REPO_DIR: ${{ github.workspace }}
+        #SALSA_SCAN_REPO: ${{ steps.cosign-ttl.outputs.repo_name }}
+        #SALSA_SCAN_GITHUB_CONTEXT: ${{ steps.docker-envs.outputs.github }}
+        #SALSA_SCAN_RUNNER_CONTEXT: ${{ steps.docker-envs.outputs.runner }}
+        #SALSA_REPO_IMAGE: ${{ steps.cosign-ttl.outputs.image }}
+        #GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.docker-envs.outputs.gcp_creds }}

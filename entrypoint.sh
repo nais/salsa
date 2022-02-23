@@ -1,23 +1,22 @@
 #!/bin/sh -l
 
-echo "------- Running container with repo $SALSA_SCAN_REPO -------"
+echo "------- Preparing spicy Slsa in container with repository: $SALSA_SCAN_REPO -------"
 
+ls -l
 # Run salsa commands
+# --repoDir "$SALSA_SCAN_REPO_DIR" \
 salsa scan \
-  --repoDir "$SALSA_SCAN_REPO_DIR" \
   --repo "$SALSA_SCAN_REPO" \
   --github_context "$SALSA_SCAN_GITHUB_CONTEXT" \
   --runner_context "$SALSA_SCAN_RUNNER_CONTEXT" \
   --env_context "" &&
-  echo "------- Salsa provenance $SALSA_SCAN_REPO generated -------" &&
+  echo "------- Slsa provenance for repository $SALSA_SCAN_REPO generated -------" &&
   salsa attest \
-    --repoDir "$SALSA_SCAN_REPO_DIR" \
     --repo "$SALSA_SCAN_REPO" \
     --config salsa-sample.yaml "$SALSA_REPO_IMAGE" &&
-  echo "------- Salsa provenance $SALSA_SCAN_REPO uploaded -------" &&
+  echo "------- Slsa provenance $SALSA_SCAN_REPO signed and uploaded -------" &&
   salsa attest \
     --verify \
-    --repoDir "$SALSA_SCAN_REPO_DIR" \
     --repo "$SALSA_SCAN_REPO" \
     --config salsa-sample.yaml "$SALSA_REPO_IMAGE" &&
-  echo "------- Attest $SALSA_SCAN_REPO fetch and generated -------"
+  echo "------- Attest verified for $SALSA_SCAN_REPO -------"

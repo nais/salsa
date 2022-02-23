@@ -12,7 +12,6 @@ jobs:
       - name: Generate provenance
         uses: ./
         with:
-          # repo_name: ${{ github.repository }}
           # for org or for each repo?
           gcp_credentials:  ${{ secrets.GCP_CREDENTIALS }}
 
