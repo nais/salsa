@@ -15,11 +15,6 @@ jobs:
           # for org or for each repo?
           gcp_credentials:  ${{ secrets.GCP_CREDENTIALS }}
 
-      - name: Check
-        run: |
-          cd prepped-salsa && ls -l
-          echo ${GITHUB_WORKSPACE}
-
       - name: Upload provenance
         uses: actions/upload-artifact@v2
         with:
