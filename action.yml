@@ -92,9 +92,9 @@ runs:
         RUNNER_CONTEXT: ${{ inputs.runner_context }}
         GCP_CREDENTIAL_PATH: ${{ steps.google.outputs.credentials_file_path }}
 
-    # Build container we need to perform commands
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+   # # Build container we need to perform commands
+   # - name: Set up Docker Buildx
+   #   uses: docker/setup-buildx-action@v1
 
     - name: Build Salsa
       uses: docker/build-push-action@v2

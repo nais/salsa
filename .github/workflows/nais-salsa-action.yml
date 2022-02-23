@@ -17,7 +17,7 @@ jobs:
 
       - name: Check
         run: |
-          ls -l
+          cd prepped-salsa && ls -l
           echo ${GITHUB_WORKSPACE}
 
       - name: Upload provenance
