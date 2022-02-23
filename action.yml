@@ -120,10 +120,3 @@ runs:
         #SALSA_SCAN_RUNNER_CONTEXT: ${{ steps.docker-envs.outputs.runner }}
         #SALSA_REPO_IMAGE: ${{ steps.cosign-ttl.outputs.image }}
         #GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.docker-envs.outputs.gcp_creds }}
-
-    - name: Check
-      run: |
-        ls -l
-        cd prepped-salsa && ls -l
-        echo ${GITHUB_WORKSPACE}
-      shell: bash
