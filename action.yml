@@ -140,8 +140,11 @@ runs:
 
     # Serving salsa lovers
     - name: Serving salsa lovers
-      uses: shrink/actions-docker-extract@v1
       id: served-salsa
-      with:
-        image: ${{ steps.docker-envs.outputs.salsa_image_with_tag }}
-        path: 'artifacts/.'
+      run: |
+        output=extracted-artifacts-$(date +'%Y-%m-%d')
+        docker cp $(docker create "$SALSA_IMAGE"):/salsa/artifacts/ ./${output}
+        echo "::set-output name=artifacts::${output}"
+      shell: bash
+      env:
+        SALSA_IMAGE: ${{ steps.docker-envs.outputs.salsa_image_with_tag }}

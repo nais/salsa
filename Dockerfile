@@ -34,7 +34,8 @@ RUN chmod +x /usr/local/bin/salsa
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-ADD . .
+WORKDIR /salsa
+COPY . /salsa
 
 # Set the binary as the entrypoint of the container
 ENTRYPOINT ["/entrypoint.sh"]
