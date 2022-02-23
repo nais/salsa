@@ -146,7 +146,7 @@ runs:
 
     # Serving salsa lovers
     - name: Serving salsa lovers
-      if: $REQUIRED == "true"
+      if: ${{ inputs.generate_artifacts }} == "true"
       id: served-salsa
       run: |
         output=extracted-artifacts-$(date +'%Y-%m-%d')
@@ -155,4 +155,3 @@ runs:
       shell: bash
       env:
         SALSA_IMAGE: ${{ steps.docker-envs.outputs.salsa_image_with_tag }}
-        REQUIRED: ${{ inputs.generate_artifacts }}
