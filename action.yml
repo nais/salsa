@@ -66,12 +66,6 @@ runs:
         repository: nais/salsa
         path: './prepped-salsa'
 
-    - name: Check
-      run: |
-        ls -l
-        echo ${GITHUB_WORKSPACE}
-      shell: bash
-
     # env to file google credentials
     - name: Google auth and credentials
       id: google
