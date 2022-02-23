@@ -64,7 +64,6 @@ runs:
       uses: actions/checkout@v2
       with:
         repository: nais/salsa
-        submodules: true
         path: './prepped-salsa'
 
     - name: Check
@@ -107,6 +106,7 @@ runs:
       uses: docker/build-push-action@v2
       with:
         push: false
+        load: true
         tags: ${{ steps.docker-envs.outputs.salsa_image_with_tag }}
         file: './prepped-salsa/Dockerfile'
         context: .
