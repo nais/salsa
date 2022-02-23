@@ -1,0 +1,6 @@
+  **/*
+  !*.json
+- !prisma
+- !src
++ !prisma/**
++ !src/**

@@ -9,6 +9,8 @@ WORKDIR /src
 COPY . /src
 RUN make salsa
 
+RUN ls -l
+
 FROM alpine:3.14
 
 ARG repo
