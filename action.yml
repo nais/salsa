@@ -116,7 +116,7 @@ runs:
       run: |
         docker run ${{ steps.docker-envs.outputs.salsa_image_with_tag }}
       shell: bash
-      env:
+      #env:
         # SALSA_SCAN_REPO_DIR: ${{ github.workspace }}
         #SALSA_SCAN_REPO: ${{ steps.cosign-ttl.outputs.repo_name }}
         #SALSA_SCAN_GITHUB_CONTEXT: ${{ steps.docker-envs.outputs.github }}
