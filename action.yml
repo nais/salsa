@@ -46,18 +46,10 @@ inputs:
   #   required: false
   #   default: ${{ toJSON(env) }}
 outputs:
-  provenance:
+  artifacts:
     description: |-
-      The path to the provenance file relative to $GITHUB_WORKSPACE.
-    value: ${{ steps.served-salsa.outputs.provenance }}
-  raw:
-    description: |-
-      The path to the raw signed and encoded dss envelope file relative to $GITHUB_WORKSPACE.
-    value: ${{ steps.served-salsa.outputs.raw }}
-  att:
-    description: |-
-      The path to attestation file relative to $GITHUB_WORKSPACE.
-    value: ${{ steps.served-salsa.outputs.att }}
+      The path to provenance artifacts generated relative to $GITHUB_WORKSPACE.
+    value: ${{ steps.served-salsa.outputs.artifacts }}
 
 runs:
   using: 'composite'
@@ -148,18 +140,8 @@ runs:
 
     # Serving salsa lovers
     - name: Serving salsa lovers
+      uses: shrink/actions-docker-extract@v1
       id: served-salsa
-      run: |
-        provenance=${{ steps.cosign-ttl.outputs.repo_name }}.provenance
-        raw=${{ steps.cosign-ttl.outputs.repo_name }}.raw.txt
-        att=${{ steps.cosign-ttl.outputs.repo_name }}.att
-        containerId=${{ steps.docker-salsa.outputs.digest }}
-        
-        docker cp "${containerId}":./"${provenance}" .
-        docker cp "${containerId}":./"${raw}" .
-        docker cp "${containerId}":./"${att}" .
-        
-        echo "::set-output name=provenance::${provenance}"
-        echo "::set-output name=raw::${raw}"
-        echo "::set-output name=att::${att}"
-      shell: bash
+      with:
+        image: ${{ steps.docker-envs.outputs.salsa_image_with_tag }}
+        path: /artifacts/.

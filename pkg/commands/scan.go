@@ -95,8 +95,16 @@ func GenerateProvenance(scanCfg *config.ScanConfiguration) error {
 
 	provenanceFileName := utils.ProvenanceFile(scanCfg.RepoName)
 
-	path := fmt.Sprintf("%s/%s", utils.ParseWorkdir(scanCfg.WorkDir), provenanceFileName)
-	err = os.WriteFile(path, statement, 0644)
+	artifactPath := fmt.Sprintf("%s/artifacts", utils.ParseWorkdir(scanCfg.WorkDir))
+	if _, err := os.Stat(artifactPath); os.IsNotExist(err) {
+		err := os.Mkdir(artifactPath, 0777)
+		if err != nil {
+			return fmt.Errorf("creating artifact path")
+		}
+	}
+
+	path := fmt.Sprintf("%s/%s", artifactPath, provenanceFileName)
+	err = os.WriteFile(path, statement, 0755)
 	if err != nil {
 		return fmt.Errorf("write to file: %v\n", err)
 	}

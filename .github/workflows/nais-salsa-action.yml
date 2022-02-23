@@ -13,12 +13,9 @@ jobs:
         uses: ./
         with:
           # for org or for each repo?
-          gcp_credentials:  ${{ secrets.GCP_CREDENTIALS }}
+          gcp_credentials: ${{ secrets.GCP_CREDENTIALS }}
 
       - name: Upload provenance
         uses: actions/upload-artifact@v2
         with:
-          path: |
-            ./salsa.provenance
-            ./salsa.raw.txt
-            ./salsa.att
+          path: ./artifacts/
