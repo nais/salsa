@@ -101,7 +101,6 @@ runs:
         push: false
         tags: ${{ steps.docker-envs.outputs.salsa_image_with_tag }}
         context: .
-        file: salsa/Dockerfile
         build-args: |
           dir=${{ github.workspace }}
           repo=${{ steps.cosign-ttl.outputs.repo_name }}
