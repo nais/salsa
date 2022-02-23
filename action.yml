@@ -144,4 +144,4 @@ runs:
       id: served-salsa
       with:
         image: ${{ steps.docker-envs.outputs.salsa_image_with_tag }}
-        path: artifacts/.
+        path: 'artifacts/.'
