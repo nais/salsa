@@ -41,3 +41,10 @@ func StartSpinner(message string) *spinner.Spinner {
 	s.Start()
 	return s
 }
+
+func ParseWorkdir(workdir string) string {
+	if len(workdir) <= 2 {
+		return ""
+	}
+	return workdir
+}

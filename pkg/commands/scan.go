@@ -94,13 +94,14 @@ func GenerateProvenance(scanCfg *config.ScanConfiguration) error {
 	}
 
 	provenanceFileName := utils.ProvenanceFile(scanCfg.RepoName)
-	path := fmt.Sprintf("%s/%s", scanCfg.WorkDir, provenanceFileName)
+
+	path := fmt.Sprintf("%s/%s", utils.ParseWorkdir(scanCfg.WorkDir), provenanceFileName)
 	err = os.WriteFile(path, statement, 0644)
 	if err != nil {
 		return fmt.Errorf("write to file: %v\n", err)
 	}
 
-	log.Infof("generated provenance in file: %s", path)
+	log.Infof("generated provenance: %s", path)
 	return nil
 }
 

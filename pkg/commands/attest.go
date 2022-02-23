@@ -47,8 +47,9 @@ var attestCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+
 		s := utils.StartSpinner(fmt.Sprintf("finished attestation for %s", PathFlags.Repo))
-		filePath := fmt.Sprintf("%s/%s.%s", workDir, PathFlags.Repo, "att")
+		filePath := fmt.Sprintf("%s/%s.%s", utils.ParseWorkdir(workDir), PathFlags.Repo, "att")
 		// TODO: could be a subcommand e.g bin/salsa attest verify
 		if verify {
 			raw, err := attest.Verify(args)
@@ -65,7 +66,7 @@ var attestCmd = &cobra.Command{
 				if err != nil {
 					return fmt.Errorf("could not write file %s %w", filePath, err)
 				}
-				err = os.WriteFile(fmt.Sprintf("%s/%s.%s", workDir, PathFlags.Repo, "raw.txt"), []byte(raw), os.FileMode(0755))
+				err = os.WriteFile(fmt.Sprintf("%s/%s.%s", utils.ParseWorkdir(workDir), PathFlags.Repo, "raw.txt"), []byte(raw), os.FileMode(0755))
 			} else {
 				log.Infof("no attestations found from cosign verify-attest command")
 			}
@@ -79,7 +80,9 @@ var attestCmd = &cobra.Command{
 				if err != nil {
 					return fmt.Errorf("could not write file %s %w", filePath, err)
 				}
+				log.Infof(fmt.Sprintf("attest created: %s", filePath))
 			}
+			log.Infof("attest uploaded sucecfully")
 		}
 		s.Stop()
 		return nil
