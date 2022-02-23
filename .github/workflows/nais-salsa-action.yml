@@ -10,6 +10,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Generate provenance
+        id: provenance
         uses: ./
         with:
           # for org or for each repo?
@@ -18,4 +19,4 @@ jobs:
       - name: Upload provenance
         uses: actions/upload-artifact@v2
         with:
-          path: ./artifacts/
+          path: ${{ steps.provenance.outputs.artifacts }}

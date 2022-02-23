@@ -38,7 +38,7 @@ var attestCmd = &cobra.Command{
 		}
 
 		if attest.PredicateFile == "" {
-			file := utils.ProvenanceFile(PathFlags.Repo)
+			file := fmt.Sprintf("%s/%s", "artifacts", utils.ProvenanceFile(PathFlags.Repo))
 			log.Infof("no predicate specified, using default pattern %s", file)
 			attest.PredicateFile = file
 		}

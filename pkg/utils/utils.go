@@ -32,7 +32,7 @@ func Exec(cmd *exec.Cmd) (string, error) {
 }
 
 func ProvenanceFile(repoName string) string {
-	return fmt.Sprintf("artifacts/%s.provenance", repoName)
+	return fmt.Sprintf("%s.provenance", repoName)
 }
 
 func StartSpinner(message string) *spinner.Spinner {
