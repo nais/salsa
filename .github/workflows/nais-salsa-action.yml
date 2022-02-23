@@ -17,6 +17,7 @@ jobs:
           gcp_credentials: ${{ secrets.GCP_CREDENTIALS }}
 
       - name: Upload provenance
+        if: ${{ steps.provenance.outputs.artifacts }} != ""
         uses: actions/upload-artifact@v2
         with:
           path: ${{ steps.provenance.outputs.artifacts }}

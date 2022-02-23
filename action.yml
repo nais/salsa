@@ -19,6 +19,12 @@ inputs:
     required: true
     default: ${{ github.repository }}
 
+  generate_artifacts:
+    description: |-
+      Can be set to true, for upload-artifact action or other use.
+    required: false
+    default: "false"
+
   gcp_credentials:
     description: |-
       Gcp serviceuser account key in json. This is required credentials and are used for 
@@ -140,11 +146,13 @@ runs:
 
     # Serving salsa lovers
     - name: Serving salsa lovers
+      if: $REQUIRED == "true"
       id: served-salsa
       run: |
         output=extracted-artifacts-$(date +'%Y-%m-%d')
-        docker cp $(docker create "$SALSA_IMAGE"):/salsa/artifacts/ ./${output}
+        docker cp "$(docker create $SALSA_IMAGE)":/salsa/artifacts/ ./${output}
         echo "::set-output name=artifacts::${output}"
       shell: bash
       env:
         SALSA_IMAGE: ${{ steps.docker-envs.outputs.salsa_image_with_tag }}
+        REQUIRED: ${{ inputs.generate_artifacts }}
