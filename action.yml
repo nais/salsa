@@ -15,7 +15,7 @@ inputs:
       Name of the file and path to provenance.
       Used as an relative path under $GITHUB_WORKSPACE 
       to place the genrated files.
-      Defaults to '${{ github.repository }}'.
+      Defaults to "${{ github.repository }}".
     required: true
     default: ${{ github.repository }}
 
@@ -30,14 +30,14 @@ inputs:
 
   github_context:
     description: |-
-      Internal value (do not set): the 'github' context object in json.
+      Internal value (do not set): the "github" context object in json.
       The context is used when generating provenance.
     required: true
     default: ${{ toJSON(github) }}
 
   runner_context:
     description: |-
-      Internal value (do not set): the 'runner' context object in json.
+      Internal value (do not set): the "runner" context object in json.
       The context is used when generating provenance.
     required: true
     default: ${{ toJSON(runner) }}
