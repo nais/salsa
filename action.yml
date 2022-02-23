@@ -60,10 +60,18 @@ runs:
         tags: ${{ steps.cosign-ttl.outputs.image }}
 
     # checkout salsa / could be done with binary
-    - uses: actions/checkout@v2
+    - name: Misanplace Salsa
+      uses: actions/checkout@v2
       with:
         repository: nais/salsa
-        path: salsa
+        submodules: true
+        path: './prepped-salsa'
+
+    - name: Check
+      run: |
+        ls -l
+        echo ${GITHUB_WORKSPACE}
+      shell: bash
 
     # env to file google credentials
     - name: Google auth and credentials
@@ -100,6 +108,7 @@ runs:
       with:
         push: false
         tags: ${{ steps.docker-envs.outputs.salsa_image_with_tag }}
+        file: './prepped-salsa/Dockerfile'
         context: .
         build-args: |
           dir=${{ github.workspace }}
