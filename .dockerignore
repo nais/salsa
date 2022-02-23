@@ -1,5 +1,6 @@
   **/*
   !*.json
+  !*.sh
 - !prisma
 - !src
 + !prisma/**
