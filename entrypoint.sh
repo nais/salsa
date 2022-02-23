@@ -5,6 +5,8 @@ echo "---------- Preparing pico-de-galo Slsa container with repository: $SALSA_S
 # Run salsa commands
 # --repoDir "$SALSA_SCAN_REPO_DIR" \
 
+pwd
+
 salsa scan \
   --repo "$SALSA_SCAN_REPO" \
   --github_context "$SALSA_SCAN_GITHUB_CONTEXT" \
