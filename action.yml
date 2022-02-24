@@ -23,7 +23,7 @@ inputs:
     description: |-
       Can be set to true, for upload-artifact action or other use.
     required: false
-    default: "false"
+    default: 'false'
 
   gcp_credentials:
     description: |-
@@ -146,7 +146,7 @@ runs:
 
     # Serving salsa lovers
     - name: Serving salsa lovers
-      if: inputs.generate_artifacts == "true"
+      if: ${{ inputs.generate_artifacts == 'true' }}
       id: served-salsa
       run: |
         output=extracted-artifacts-$(date +'%Y-%m-%d')
