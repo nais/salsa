@@ -49,10 +49,12 @@ inputs:
     default: ${{ toJSON(runner) }}
 
   env_context:
-     description: |-
-      Internal value (do not set): the "env" context object in json.
-     required: false
-     default: ${{ env }}
+    description: |-
+      This information about object "env" must be sent inn. It is not availible from the 
+      action.yml. To provide the current job environment varibales, the "env"
+      objecct need to be sendt inn.
+    required: false
+    default: ""
 
 outputs:
   artifacts:
@@ -143,7 +145,7 @@ runs:
       run: |
         docker run ${{ steps.docker-envs.outputs.salsa_image_with_tag }}
       shell: bash
-        #env:
+      #env:
       # SALSA_SCAN_REPO_DIR: ${{ github.workspace }}
       #SALSA_SCAN_REPO: ${{ steps.cosign-ttl.outputs.repo_name }}
       #SALSA_SCAN_GITHUB_CONTEXT: ${{ steps.docker-envs.outputs.github }}
