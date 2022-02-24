@@ -47,10 +47,13 @@ inputs:
       The context is used when generating provenance.
     required: true
     default: ${{ toJSON(runner) }}
-  # env_context:
-  #   description: 'internal (do not set): the "env" context object in json'
-  #   required: false
-  #   default: ${{ toJSON(env) }}
+
+  env_context:
+     description: |-
+      Internal value (do not set): the "env" context object in json.
+     required: false
+     default: ${{ env }}
+
 outputs:
   artifacts:
     description: |-
@@ -104,14 +107,17 @@ runs:
         salsa_docker_image=nais/salsa:latest
         encoded_github="$(echo ${GITHUB_CONTEXT} | base64 -w 0)"
         encoded_runner="$(echo ${RUNNER_CONTEXT} | base64 -w 0)"
+        encoded_env="$(echo ${ENV_CONTEXT} | base64 -w 0)"
         gcp_path="${GCP_CREDENTIAL_PATH##*/}"
         echo "::set-output name=github::${encoded_github}"
         echo "::set-output name=runner::${encoded_runner}"
+        echo "::set-output name=env_s::${encoded_env}"
         echo "::set-output name=gcp_creds::${gcp_path}"
         echo "::set-output name=salsa_image_with_tag::${salsa_docker_image}"
       env:
         GITHUB_CONTEXT: ${{ inputs.github_context }}
         RUNNER_CONTEXT: ${{ inputs.runner_context }}
+        ENV_CONTEXT: ${{ inputs.env_context }}
         GCP_CREDENTIAL_PATH: ${{ steps.google.outputs.credentials_file_path }}
 
     - name: Build Salsa
@@ -129,6 +135,7 @@ runs:
           image=${{ steps.cosign-ttl.outputs.image }}
           github=${{ steps.docker-envs.outputs.github  }}
           runner=${{ steps.docker-envs.outputs.runner }}
+          env_s=${{ steps.docker-envs.outputs.env_s }}
           gcp_cred_path=${{ steps.docker-envs.outputs.gcp_creds }}
 
     # Pico-de-gallo
@@ -137,7 +144,7 @@ runs:
         docker run ${{ steps.docker-envs.outputs.salsa_image_with_tag }}
       shell: bash
         #env:
-        # SALSA_SCAN_REPO_DIR: ${{ github.workspace }}
+      # SALSA_SCAN_REPO_DIR: ${{ github.workspace }}
       #SALSA_SCAN_REPO: ${{ steps.cosign-ttl.outputs.repo_name }}
       #SALSA_SCAN_GITHUB_CONTEXT: ${{ steps.docker-envs.outputs.github }}
       #SALSA_SCAN_RUNNER_CONTEXT: ${{ steps.docker-envs.outputs.runner }}
