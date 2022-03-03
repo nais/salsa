@@ -4,33 +4,47 @@ branding:
   icon: lock
   color: red
 inputs:
-  repo_dir:
-    description: 'path to directory of artifacts'
-    required: false
   repo_name:
-    description: 'path to write build provenance file'
+    description: |-
+      Name of the file and path to provenance.
+      Used as an relative path under $GITHUB_WORKSPACE.
+      Defaults to "github.repository".
     required: true
+    default: ${{ github.repository }}
+
   image:
-    description: 'docker image to pull and sign'
+    description: |-
+      docker image to sign
     required: true
+
   github_context:
-    description: 'internal (do not set): the "github" context object in json'
+    description: |-
+      Internal value (do not set): the "github" context object in json.
+      The context is used when generating provenance.
     required: true
     default: ${{ toJSON(github) }}
+
   runner_context:
-    description: 'internal (do not set): the "runner" context object in json'
+    description: |-
+      Internal value (do not set): the "runner" context object in json.
+      The context is used when generating provenance.
     required: true
     default: ${{ toJSON(runner) }}
- # env_context:
- #   description: 'internal (do not set): the "env" context object in json'
- #   required: false
- #   default: ${{ toJSON(env) }}
+
+  env_context:
+    description: |-
+      This information about object "env" must be sent inn. It is not availible from the 
+      action.yml. To provide the current job environment varibales, the "env"
+      objecct need to be sendt inn.
+    required: false
+    default: "{}"
+
 runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ inputs.repo_dir }}
     - ${{ inputs.repo_name }}
     - ${{ inputs.github_context }}
     - ${{ inputs.runner_context }}
-  #  - ${{ inputs.env_context }}
+    - ${{ inputs.image }}
+    - ${{ inputs.env_context }}

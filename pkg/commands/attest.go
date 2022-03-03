@@ -47,7 +47,7 @@ var attestCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		s := utils.StartSpinner(fmt.Sprintf("finished attestation for %s", PathFlags.Repo))
+		s := utils.StartSpinner(fmt.Sprintf("finished attestation for %s\n", PathFlags.Repo))
 		filePath := fmt.Sprintf("%s/%s.%s", workDir, PathFlags.Repo, "att")
 		// TODO: could be a subcommand e.g bin/salsa attest verify
 		if verify {

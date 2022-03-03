@@ -5,9 +5,6 @@ on:
     branches:
       - main
 
-env:
-  IMAGE: ghcr.io/navikt/gandalf/gandalf-security-token-service:90b27f4bb7d23e81b70442c7cfd76090843b68b3
-
 jobs:
   generate-provenance:
     runs-on: ubuntu-20.04
@@ -15,13 +12,29 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
+      - name: 'Authenticate to Google Cloud'
+        id: 'google'
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+     # For demonstration purpose
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: ttl.sh/nais/salsa-test:1h
+
       - name: Generate provenance
         uses: ./
         with:
-          image: ${{ env.IMAGE }}
-          repo_name: salsa
+          image: ttl.sh/nais/salsa-test:1h
 
+      # For test output
       - name: Upload provenance
         uses: actions/upload-artifact@v2
         with:
-          path: ./salsa.provenance
+          path: |
+            ./salsa.provenance
+            ./salsa.raw.txt
+            ./salsa.att
