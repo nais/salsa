@@ -43,10 +43,7 @@ var attestCmd = &cobra.Command{
 			attest.PredicateFile = file
 		}
 
-		workDir, err := PathFlags.WorkDir()
-		if err != nil {
-			return err
-		}
+		workDir := PathFlags.WorkDir()
 		s := utils.StartSpinner(fmt.Sprintf("finished attestation for %s\n", PathFlags.Repo))
 		filePath := fmt.Sprintf("%s/%s.%s", workDir, PathFlags.Repo, "att")
 		// TODO: could be a subcommand e.g bin/salsa attest verify
@@ -102,12 +99,7 @@ func (o AttestOptions) Verify(a []string) (string, error) {
 		args...,
 	)
 
-	cmd.Dir, err = PathFlags.WorkDir()
-
-	if err != nil {
-		return "", err
-	}
-
+	cmd.Dir = PathFlags.WorkDir()
 	return utils.Exec(cmd)
 }
 
@@ -133,11 +125,7 @@ func (o AttestOptions) Exec(a []string) (string, error) {
 		args...,
 	)
 
-	cmd.Dir, err = PathFlags.WorkDir()
-	if err != nil {
-		return "", err
-	}
-
+	cmd.Dir = PathFlags.WorkDir()
 	return utils.Exec(cmd)
 }
 

@@ -4,6 +4,14 @@ branding:
   icon: lock
   color: red
 inputs:
+
+  repo_dir:
+    description: |-
+      Root of directory to look for build files.
+      Defualts to $GITHUB_WORKSPACE.
+    required: true
+    default: ${{ github.workspace }}
+
   repo_name:
     description: |-
       Name of the file and path to provenance.
@@ -43,6 +51,7 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
+    - ${{ inputs.repo_dir }}
     - ${{ inputs.repo_name }}
     - ${{ inputs.github_context }}
     - ${{ inputs.runner_context }}

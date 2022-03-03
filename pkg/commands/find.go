@@ -27,11 +27,7 @@ var findCmd = &cobra.Command{
 			return errors.New("missing artifact")
 		}
 
-		path, err := PathFlags.WorkDir()
-		if err != nil {
-			return err
-		}
-
+		path := PathFlags.WorkDir()
 		files, err := ioutil.ReadDir(path)
 		if err != nil {
 			return fmt.Errorf("could not read dir %w", err)

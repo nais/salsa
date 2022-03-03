@@ -20,12 +20,9 @@ var cloneCmd = &cobra.Command{
 			return errors.New("repo and url must be specified")
 		}
 
-		path, err := PathFlags.WorkDir()
-		if err != nil {
-			return err
-		}
+		path := PathFlags.WorkDir()
 		log.Infof("prepare to checkout %s into path %s ...", url, path)
-		err = vcs.CloneRepo(url, path)
+		err := vcs.CloneRepo(url, path)
 		if err != nil {
 			return err
 		}
