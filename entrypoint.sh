@@ -1,16 +1,14 @@
 #!/bin/sh -l
 
-WORKING_DIRECTORY="$1"
-REPOSITORY="$2"
-REPO_NAME="${REPOSITORY##*/}"
-REPO_DIR=$(echo "$WORKING_DIRECTORY" | sed 's|\(.*\)/.*|\1|')
+WORKING_DIRECTORY="$1" && REPO_DIR="$(echo "$WORKING_DIRECTORY" | sed 's|\(.*\)/.*|\1|')"
+REPOSITORY="$2" && REPO_NAME="${REPOSITORY##*/}"
 #REPO_DIR="${WORKING_DIRECTORY%/*}"
 GITHUB=$(echo "${3}" | base64 -w 0)
 RUNNER=$(echo "${4}" | base64 -w 0)
 IMAGE="$5"
 ENVS=$(echo "${6}" | base64 -w 0)
 
-# Run salsa commands
+echo "---------- Preparing pico-de-galo Slsa for repository: $REPO_NAME ----------"
 salsa scan \
   --repoDir "$REPO_DIR" \
   --repo "$REPO_NAME" \
@@ -26,3 +24,4 @@ salsa scan \
     --repoDir "$REPO_DIR" \
     --repo "$REPO_NAME" \
     --config salsa-sample.yaml "$IMAGE"
+echo "---------- Slsa aguacate attest verified for: $REPO_NAME ----------"
