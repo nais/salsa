@@ -7,7 +7,7 @@ inputs:
 
   repo_dir:
     description: |-
-      Root of directory to look for build files.
+      Internal value (do not set): Root of directory to look for build files.
       Defualts to $GITHUB_WORKSPACE.
     required: false
     default: ${{ github.workspace }}

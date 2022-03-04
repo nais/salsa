@@ -1,11 +1,13 @@
 #!/bin/sh -l
 
 DIRECTORY="$1"
-echo "$DIRECTORY"
-REPO_DIR="${DIRECTORY%/*}"
-echo "$REPO_DIR"
 REPOSITORY="$2"
 REPO_NAME="${REPOSITORY##*/}"
+REPO_DIR="${DIRECTORY%/*}"
+# GITHUB_WORKSPACE: "/home/runner/work/salsa/salsa"
+if test "${REPO_DIR#*$REPO_NAME}" != "$REPO_DIR"; then
+  REPO_DIR="${REPO_DIR%/*}"
+fi
 GITHUB=$(echo "${3}" | base64 -w 0)
 RUNNER=$(echo "${4}" | base64 -w 0)
 IMAGE="$5"
