@@ -1,9 +1,10 @@
 #!/bin/sh -l
 
 WORKING_DIRECTORY="$1"
-REPO_DIR="${WORKING_DIRECTORY%/*}"
 REPOSITORY="$2"
 REPO_NAME="${REPOSITORY##*/}"
+REPO_DIR=$(echo "$WORKING_DIRECTORY" | sed 's|\(.*\)/.*|\1|')
+#REPO_DIR="${WORKING_DIRECTORY%/*}"
 GITHUB=$(echo "${3}" | base64 -w 0)
 RUNNER=$(echo "${4}" | base64 -w 0)
 IMAGE="$5"
