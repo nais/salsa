@@ -1,52 +1,31 @@
 package jvm
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/nais/salsa/pkg/build"
 )
 
 func TestMavenDeps(t *testing.T) {
-	//got, _ := MavenCompileAndRuntimeTimeDeps(mvnDependencyListOutput)
-	//want := []build.Dependency{
-	//	mvnDep("org.apache.logging.log4j:log4j-core", "2.14.1"),
-	//	mvnDep("org.apache.logging.log4j:log4j-api", "2.14.2"),
-	//}
-	//
-	//if !reflect.DeepEqual(got, want) {
-	//	t.Errorf("got %q, wanted %q", got, want)
-	//}
+	got, _ := MavenCompileAndRuntimeTimeDeps("testdata/target/dependency")
+	want := []build.Dependency{
+		mvnDep("org.springframework:spring-core", "5.3.16", "0903d17e58654a2c79f4e46df79dc73ccaa49b6edbc7c3278359db403b687f6e"),
+		mvnDep("org.yaml:snakeyaml", "1.26", "d87d607e500885356c03c1cae61e8c2e05d697df8787d5aba13484c2eb76a844"),
+	}
 
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("got %q, wanted %q", got, want)
+	}
 }
 
-func mvnDep(coordinates, version string) build.Dependency {
+func mvnDep(coordinates, version string, digest string) build.Dependency {
 	return build.Dependency{
 		Coordinates: coordinates,
 		Version:     version,
 		CheckSum: build.CheckSum{
-			Algorithm: "todo",
-			Digest:    "todo",
+			Algorithm: "sha256",
+			Digest:    digest,
 		},
 	}
 }
-
-const mvnDependencyListOutput = `[INFO] Scanning for projects...
-[INFO]
-[INFO] -----------------------------< jks:stuff >------------------------------
-[INFO] Building stuff 1.0-SNAPSHOT
-[INFO] --------------------------------[ jar ]---------------------------------
-[INFO]
-[INFO] --- maven-dependency-plugin:2.8:list (default-cli) @ stuff ---
-[WARNING] The artifact xml-apis:xml-apis:jar:2.0.2 has been relocated to xml-apis:xml-apis:jar:1.0.b2
-[INFO]
-[INFO] The following files have been resolved:
-[INFO]    junit:junit:jar:3.8.1:test
-[INFO]    org.apache.logging.log4j:log4j-core:jar:2.14.1:compile
-[INFO]    org.apache.logging.log4j:log4j-api:jar:2.14.2:compile
-[INFO]
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time:  0.864 s
-[INFO] Finished at: 2021-10-20T19:31:08+02:00
-[INFO] ------------------------------------------------------------------------`

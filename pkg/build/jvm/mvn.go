@@ -69,7 +69,7 @@ func MavenCompileAndRuntimeTimeDeps(rootPath string) ([]build.Dependency, error)
 		path := strings.Split(f, "/")
 		version := path[len(path)-2]
 		artifactId := path[len(path)-3]
-		groupId := strings.Join(path[0:(len(path)-3)], ".")
+		groupId := strings.Join(path[1:(len(path)-3)], ".")
 
 		fmt.Printf("yolo %s:%s:%s\n", groupId, artifactId, version)
 		digest, err := hashFile(file)
