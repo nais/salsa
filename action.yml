@@ -9,7 +9,7 @@ inputs:
     description: |-
       Root of directory to look for build files.
       Defualts to $GITHUB_WORKSPACE.
-    required: true
+    required: false
     default: ${{ github.workspace }}
 
   repo_name:
@@ -17,7 +17,7 @@ inputs:
       Name of the file and path to provenance.
       Used as an relative path under $GITHUB_WORKSPACE.
       Defaults to "github.repository".
-    required: true
+    required: false
     default: ${{ github.repository }}
 
   image:
@@ -29,14 +29,14 @@ inputs:
     description: |-
       Internal value (do not set): the "github" context object in json.
       The context is used when generating provenance.
-    required: true
+    required: false
     default: ${{ toJSON(github) }}
 
   runner_context:
     description: |-
       Internal value (do not set): the "runner" context object in json.
       The context is used when generating provenance.
-    required: true
+    required: false
     default: ${{ toJSON(runner) }}
 
   env_context:

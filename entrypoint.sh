@@ -15,15 +15,13 @@ salsa scan \
   --repo "$REPO_NAME" \
   --github_context "$GITHUB" \
   --runner_context "$RUNNER" \
-  --env_context "$ENVS"
-
-salsa attest \
-  --repoDir "$REPO_DIR" \
-  --repo "$REPO_NAME" \
-  --config salsa-sample.yaml "$IMAGE"
-
-salsa attest \
-  --verify \
-  --repoDir "$REPO_DIR" \
-  --repo "$REPO_NAME" \
-  --config salsa-sample.yaml "$IMAGE"
+  --env_context "$ENVS" &&
+  salsa attest \
+    --repoDir "$REPO_DIR" \
+    --repo "$REPO_NAME" \
+    --config salsa-sample.yaml "$IMAGE" &&
+  salsa attest \
+    --verify \
+    --repoDir "$REPO_DIR" \
+    --repo "$REPO_NAME" \
+    --config salsa-sample.yaml "$IMAGE"

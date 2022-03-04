@@ -46,13 +46,13 @@ func GoDeps(goSumContents string) []build.Dependency {
 		}
 		parts := strings.Split(line, " ")
 		version := parts[1][1:]
-		stringDecodedDigest := digest.Digest(strings.Split(parts[2], ":")[1])
+		base64EncodedDigest := strings.Split(parts[2], ":")[1]
 		deps = append(deps, build.Dependency{
 			Coordinates: parts[0],
 			Version:     version,
 			CheckSum: build.CheckSum{
 				Algorithm: digest.AlgorithmSHA256,
-				Digest:    string(stringDecodedDigest),
+				Digest:    base64EncodedDigest,
 			},
 		})
 	}
