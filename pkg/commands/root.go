@@ -21,7 +21,7 @@ const (
 type RootFlags struct {
 	Repo    string
 	RepoDir string
-	Root    bool
+	Remote  bool
 }
 
 var (
@@ -40,6 +40,10 @@ var rootCmd = &cobra.Command{
 }
 
 func (r RootFlags) WorkDir() string {
+	if r.Remote {
+		current, _ := os.Getwd()
+		return current
+	}
 	return r.RepoDir + "/" + r.Repo
 }
 
@@ -53,6 +57,7 @@ func init() {
 	PathFlags = &RootFlags{}
 	rootCmd.PersistentFlags().StringVar(&PathFlags.Repo, "repo", "", "name of git repo")
 	rootCmd.PersistentFlags().StringVar(&PathFlags.RepoDir, "repoDir", "tmp", "path to folder for cloned projects")
+	rootCmd.PersistentFlags().BoolVar(&PathFlags.Remote, "remote-run", false, "remote run use another current path (can be deleted with introduction of containers)")
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/."+cmdName+".yaml)")
 }
 

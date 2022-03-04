@@ -102,7 +102,7 @@ func GenerateProvenance(scanCfg *config.ScanConfiguration) error {
 
 func init() {
 	rootCmd.AddCommand(scanCmd)
-	scanCmd.Flags().StringVar(&githubContext, "github_context", "", "context of github environment")
-	scanCmd.Flags().StringVar(&runnerContext, "runner_context", "", "context of runner environment")
-	scanCmd.Flags().StringVar(&envContext, "env_context", "", "environmental variables of current context")
+	scanCmd.Flags().StringVar(&githubContext, "github-context", "", "context of github environment")
+	scanCmd.Flags().StringVar(&runnerContext, "runner-context", "", "context of runner environment")
+	scanCmd.Flags().StringVar(&envContext, "env-context", "", "environmental variables of current context")
 }
