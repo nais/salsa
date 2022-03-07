@@ -5,13 +5,21 @@ on:
     branches:
       - main
 
+env:
+  IMAGE: ttl.sh/nais/salsa-test:1h
+
 jobs:
   generate-provenance:
     runs-on: ubuntu-20.04
     steps:
+      # Required step?
       - name: Checkout Code
         uses: actions/checkout@v2
 
+    # For demonstration purpose
+    # Credentials needed to authenticate to google kms and
+    # sign image. Can be backed in to an action, so users
+    # do not have to specify more than a GCP_CREDENTIALS.
       - name: 'Authenticate to Google Cloud'
         id: 'google'
         uses: 'google-github-actions/auth@v0'
@@ -23,12 +31,12 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ttl.sh/nais/salsa-test:1h
+          tags: ${{ env.IMAGE }}
 
-      - name: Generate provenance
+    # Added to your workflow
+      - name: Generate provenance, upload and sign image
+      # wil be actions/salsa-action@v01
         uses: ./
-        with:
-          image: ttl.sh/nais/salsa-test:1h
 
       # For test output
       - name: Upload provenance

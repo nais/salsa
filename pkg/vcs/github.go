@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 const (
@@ -114,5 +115,21 @@ func ParseEnv(envs *string, env *Environment) error {
 		return fmt.Errorf("unmarshal environmental context json: %w", err)
 	}
 
+	env.CurrentEnvironment.filterEnvs()
+
 	return nil
+}
+
+func (in *CurrentEnvironment) filterEnvs() {
+	for key, val := range in.Envs {
+		if strings.HasPrefix(key, "GITHUB_") {
+			delete(in.Envs, key)
+		}
+		if key == "PATH" {
+			delete(in.Envs, key)
+		}
+		if val == "" {
+			delete(in.Envs, key)
+		}
+	}
 }

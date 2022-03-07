@@ -22,8 +22,10 @@ inputs:
 
   image:
     description: |-
-      docker image to sign
+      docker image to sign.
+      Defaults to $ENV_IMAGE.
     required: true
+    default: ${{ env.IMAGE }}
 
   github_context:
     description: |-
@@ -41,11 +43,10 @@ inputs:
 
   env_context:
     description: |-
-      This information about object "env" must be sent inn. It is not availible from the 
-      action.yml. To provide the current job environment varibales, the "env"
-      objecct need to be sendt inn.
+      Internal value (do not set): 
+      The the current running workflow environment varibales.
     required: false
-    default: "{}"
+    default: ${{ toJson(env) }}
 
 runs:
   using: 'docker'
