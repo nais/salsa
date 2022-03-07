@@ -16,13 +16,17 @@ type Golang struct {
 }
 
 func (g Golang) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
-	fileContent, err := os.ReadFile(fmt.Sprintf("%s/%s", workDir, golangBuildFileName))
+	path := fmt.Sprintf("%s/%s", workDir, golangBuildFileName)
+	fileContent, err := os.ReadFile(path)
 	deps := GoDeps(string(fileContent))
 	if err != nil {
 		return nil, fmt.Errorf("error parsing %s, %v", golangBuildFileName, err)
 	}
 	return &build.ArtifactDependencies{
-		Cmd:         golangBuildFileName,
+		Cmd: build.Cmd{
+			Path:     path,
+			CmdFlags: golangBuildFileName,
+		},
 		RuntimeDeps: deps,
 	}, nil
 }

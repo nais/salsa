@@ -16,7 +16,8 @@ type Npm struct {
 }
 
 func (n Npm) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
-	fileContent, err := os.ReadFile(fmt.Sprintf("%s/%s", workDir, npmBuildFileName))
+	path := fmt.Sprintf("%s/%s", workDir, npmBuildFileName)
+	fileContent, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("read file: %w\n", err)
 	}
@@ -25,7 +26,10 @@ func (n Npm) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
 		return nil, fmt.Errorf("error parsing deps: %v\n", err)
 	}
 	return &build.ArtifactDependencies{
-		Cmd:         npmBuildFileName,
+		Cmd: build.Cmd{
+			Path:     path,
+			CmdFlags: npmBuildFileName,
+		},
 		RuntimeDeps: deps,
 	}, nil
 }

@@ -22,14 +22,18 @@ func NewYarn() build.BuildTool {
 }
 
 func (y Yarn) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
-	fileContent, err := os.ReadFile(fmt.Sprintf("%s/%s", workDir, yarnBuildFileName))
+	path := fmt.Sprintf("%s/%s", workDir, yarnBuildFileName)
+	fileContent, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("read file: %w\n", err)
 	}
 	deps := YarnDeps(string(fileContent))
 
 	return &build.ArtifactDependencies{
-		Cmd:         yarnBuildFileName,
+		Cmd: build.Cmd{
+			Path:     path,
+			CmdFlags: yarnBuildFileName,
+		},
 		RuntimeDeps: deps,
 	}, nil
 }

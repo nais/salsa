@@ -16,7 +16,8 @@ type Composer struct {
 }
 
 func (c Composer) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
-	fileContent, err := os.ReadFile(fmt.Sprintf("%s/%s", workDir, composerLockFileName))
+	path := fmt.Sprintf("%s/%s", workDir, composerLockFileName)
+	fileContent, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("read file: %w\n", err)
 	}
@@ -25,7 +26,10 @@ func (c Composer) ResolveDeps(workDir string) (*build.ArtifactDependencies, erro
 		return nil, fmt.Errorf("scan: %v\n", err)
 	}
 	return &build.ArtifactDependencies{
-		Cmd:         composerLockFileName,
+		Cmd: build.Cmd{
+			Path:     path,
+			CmdFlags: composerLockFileName,
+		},
 		RuntimeDeps: deps,
 	}, nil
 }

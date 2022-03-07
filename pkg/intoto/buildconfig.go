@@ -2,6 +2,7 @@ package intoto
 
 import (
 	"fmt"
+	"github.com/nais/salsa/pkg/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -12,8 +13,23 @@ type BuildConfig struct {
 	Shell string `json:"shell"`
 }
 
-func GenerateBuildConfig(cmd *cobra.Command) *BuildConfig {
+func GenerateBuildConfig(scanConfig *config.ScanConfiguration) *BuildConfig {
+	return &BuildConfig{
+		Commands: []string{
+			fmt.Sprintf("%s %s",
+				scanConfig.Cmd.CommandPath(),
+				salsaCmdFlags(scanConfig.Cmd),
+			),
+			fmt.Sprintf("%s %s",
+				scanConfig.Dependencies.CmdPath(),
+				scanConfig.Dependencies.CmdFlags(),
+			),
+		},
+		Shell: "bash",
+	}
+}
 
+func salsaCmdFlags(cmd *cobra.Command) string {
 	flagsUsed := make([]*pflag.Flag, 0)
 	cmd.Flags().VisitAll(func(f *pflag.Flag) {
 		if f.Changed {
@@ -26,10 +42,5 @@ func GenerateBuildConfig(cmd *cobra.Command) *BuildConfig {
 		cmdFlags += fmt.Sprintf("--%s %s", c.Name, c.Value.String())
 	}
 
-	return &BuildConfig{
-		Commands: []string{
-			fmt.Sprintf("%s %s", cmd.CommandPath(), cmdFlags),
-		},
-		Shell: "bash",
-	}
+	return cmdFlags
 }

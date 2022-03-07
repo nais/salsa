@@ -37,18 +37,21 @@ func (g Gradle) ResolveDeps(workDir string) (*build.ArtifactDependencies, error)
 		return nil, fmt.Errorf("exec: %v\n", err)
 	}
 
-	xml, err := ioutil.ReadFile(workDir + "/gradle/verification-metadata.xml")
+	xmlData, err := ioutil.ReadFile(workDir + "/gradle/verification-metadata.xml")
 	if err != nil {
 		return nil, fmt.Errorf("readfile: %v\n", err)
 	}
 
-	deps, err := GradleDeps(depsOutput, xml)
+	deps, err := GradleDeps(depsOutput, xmlData)
 	if err != nil {
 		return nil, fmt.Errorf("could not get gradle deps: %w", err)
 	}
 
 	return &build.ArtifactDependencies{
-		Cmd:         fmt.Sprintf("%s %v", cmd.Path, cmd.Args),
+		Cmd: build.Cmd{
+			Path:     cmd.Path,
+			CmdFlags: strings.Join(cmd.Args, " "),
+		},
 		RuntimeDeps: deps,
 	}, nil
 }

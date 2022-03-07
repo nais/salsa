@@ -129,7 +129,10 @@ func ExpectedDeps() []build.Dependency {
 
 func ExpectedArtDeps(deps []build.Dependency) *build.ArtifactDependencies {
 	return &build.ArtifactDependencies{
-		Cmd:         "lang list:deps",
+		Cmd: build.Cmd{
+			Path:     "lang",
+			CmdFlags: "list:deps",
+		},
 		RuntimeDeps: deps,
 	}
 }
@@ -167,7 +170,10 @@ func ExpectedConfigSource() slsa.ConfigSource {
 
 func buildConfig() *BuildConfig {
 	return &BuildConfig{
-		Commands: []string{"salsa "},
-		Shell:    "bash",
+		Commands: []string{
+			"salsa ",
+			"lang list:deps",
+		},
+		Shell: "bash",
 	}
 }

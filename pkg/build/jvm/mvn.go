@@ -40,7 +40,10 @@ func (m Maven) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) 
 		return nil, fmt.Errorf("scan: %v\n", err)
 	}
 	return &build.ArtifactDependencies{
-		Cmd:         fmt.Sprintf("%s %v", cmd.Path, cmd.Args),
+		Cmd: build.Cmd{
+			Path:     cmd.Path,
+			CmdFlags: strings.Join(cmd.Args, " "),
+		},
 		RuntimeDeps: deps,
 	}, nil
 }

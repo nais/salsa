@@ -37,7 +37,7 @@ func CreateProvenanceOptions(scanCfg *config.ScanConfiguration) *ProvenanceOptio
 		return opts
 	}
 
-	opts.BuildConfig = GenerateBuildConfig(scanCfg.Cmd)
+	opts.BuildConfig = GenerateBuildConfig(scanCfg)
 	opts.BuilderId = vcs.DefaultBuildId
 	opts.BuildType = vcs.AdHocBuildType
 	opts.Invocation = nil

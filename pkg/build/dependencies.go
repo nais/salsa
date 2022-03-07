@@ -15,8 +15,13 @@ const (
 )
 
 type ArtifactDependencies struct {
-	Cmd         string
+	Cmd         Cmd
 	RuntimeDeps []Dependency
+}
+
+type Cmd struct {
+	Path     string
+	CmdFlags string
 }
 
 type Dependency struct {
@@ -58,6 +63,14 @@ func (t SupportedBuildTools) DetectDeps(workDir string) (*ArtifactDependencies, 
 		}
 	}
 	return nil, nil
+}
+
+func (in ArtifactDependencies) CmdPath() string {
+	return in.Cmd.Path
+}
+
+func (in ArtifactDependencies) CmdFlags() string {
+	return in.Cmd.CmdFlags
 }
 
 func (d Dependency) ToUri() string {
