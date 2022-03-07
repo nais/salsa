@@ -14,6 +14,8 @@ RUN chmod +x /usr/local/bin/salsa
 RUN apk add --no-cache ca-certificates git curl
 RUN curl -L -f https://github.com/sigstore/cosign/releases/download/v1.5.1/cosign-linux-amd64 > /usr/local/bin/cosign && chmod +x /usr/local/bin/cosign
 
+RUN apk add --no-cache jq httpie
+
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 

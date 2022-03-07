@@ -121,6 +121,9 @@ func ParseEnv(envs *string, env *Environment) error {
 }
 
 func (in *CurrentEnvironment) filterEnvs() {
+	if len(in.Envs) < 1 {
+		return
+	}
 	for key, val := range in.Envs {
 		if strings.HasPrefix(key, "GITHUB_") {
 			delete(in.Envs, key)

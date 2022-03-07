@@ -37,6 +37,8 @@ jobs:
       - name: Generate provenance, upload and sign image
       # wil be actions/salsa-action@v01
         uses: ./
+        with:
+          image: ${{ env.IMAGE }}
 
       # For test output
       - name: Upload provenance

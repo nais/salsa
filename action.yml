@@ -41,13 +41,6 @@ inputs:
     required: false
     default: ${{ toJSON(runner) }}
 
-  env_context:
-    description: |-
-      Internal value (do not set): 
-      The the current running workflow environment varibales.
-    required: false
-    default: ${{ toJson(env) }}
-
 runs:
   using: 'docker'
   image: 'Dockerfile'
