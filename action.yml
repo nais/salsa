@@ -22,8 +22,7 @@ inputs:
 
   image:
     description: |-
-      docker image to sign.
-      Defaults to $ENV_IMAGE.
+      docker image to sign. Defaults to $ENV_IMAGE.
     required: true
 
   github_context:
