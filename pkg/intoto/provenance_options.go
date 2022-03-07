@@ -116,7 +116,7 @@ func NonReproducibleMetadata(env *vcs.Environment) *Metadata {
 	//(Documentation would explain how to recompute the rest of the fields.)
 	return &Metadata{
 		Arch: env.RunnerContext.Arch,
-		Env:  map[string]string{}, //env.GetCurrentEnvironment(),
+		Env:  env.GetCurrentFilteredEnvironment(),
 		Context: Context{
 			Github: Github{
 				RunId: env.GitHubContext.RunId,

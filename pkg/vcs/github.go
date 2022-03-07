@@ -115,23 +115,45 @@ func ParseEnv(envs *string, env *Environment) error {
 		return fmt.Errorf("unmarshal environmental context json: %w", err)
 	}
 
-	env.CurrentEnvironment.filterEnvs()
-
 	return nil
 }
 
-func (in *CurrentEnvironment) filterEnvs() {
+func (in *CurrentEnvironment) filterEnvs() map[string]string {
 	if len(in.Envs) < 1 {
-		return
+		return map[string]string{}
 	}
 	for key, val := range in.Envs {
-		if strings.HasPrefix(key, "GITHUB_") {
+		in.filterEnvsWithPrefix(key, "INPUT_", "GITHUB_", "RUNNER_", "TOKEN_")
+		in.filterEnvsWithSuffix(key, "_TOKEN")
+		in.filterSingleLineEnv(key)
+		in.filterEmptyValue(key, val)
+	}
+	return in.Envs
+}
+
+func (in *CurrentEnvironment) filterEmptyValue(key, val string) {
+	if val == "" {
+		delete(in.Envs, key)
+	}
+}
+
+func (in *CurrentEnvironment) filterSingleLineEnv(key string) {
+	if !strings.Contains(key, "_") {
+		delete(in.Envs, key)
+	}
+}
+
+func (in *CurrentEnvironment) filterEnvsWithPrefix(key string, prefixes ...string) {
+	for _, prefix := range prefixes {
+		if strings.HasPrefix(key, prefix) {
 			delete(in.Envs, key)
 		}
-		if key == "PATH" {
-			delete(in.Envs, key)
-		}
-		if val == "" {
+	}
+}
+
+func (in *CurrentEnvironment) filterEnvsWithSuffix(key string, suffixes ...string) {
+	for _, suffix := range suffixes {
+		if strings.HasPrefix(key, suffix) {
 			delete(in.Envs, key)
 		}
 	}
