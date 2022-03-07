@@ -62,3 +62,15 @@ func (in *Environment) AddUserDefinedParameters() *Event {
 
 	return in.Event
 }
+
+func (in *Environment) GetCurrentEnvironment() map[string]string {
+	if in.CurrentEnvironment == nil {
+		return map[string]string{}
+	}
+
+	if len(in.CurrentEnvironment.Envs) < 1 {
+		return map[string]string{}
+	}
+
+	return in.CurrentEnvironment.Envs
+}
