@@ -14,7 +14,7 @@ jobs:
     steps:
       # Required step?
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
     # For demonstration purpose
     # Credentials needed to authenticate to google kms and
