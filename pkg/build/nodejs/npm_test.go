@@ -1,22 +1,21 @@
 package nodejs
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/nais/salsa/pkg/build"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestPackageLockJsonParsing(t *testing.T) {
 	got, _ := NpmDeps(packageLockContents)
-	want := []build.Dependency{
-		npmDep("js-tokens", "4.0.0", "sha512", "RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ=="),
-		npmDep("loose-envify", "1.4.0", "sha512", "lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q=="),
-		npmDep("object-assign", "4.1.1", "sha1", "IQmtx5ZYh8/AXLvUQsrIv7s2CGM="),
-		npmDep("react", "17.0.2", "sha512", "gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA=="),
-	}
+	want := map[string]build.Dependency{}
+	want["js-tokens"] = npmDep("js-tokens", "4.0.0", "sha512", "RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==")
+	want["loose-envify"] = npmDep("loose-envify", "1.4.0", "sha512", "lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==")
+	want["object-assign"] = npmDep("object-assign", "4.1.1", "sha1", "IQmtx5ZYh8/AXLvUQsrIv7s2CGM=")
+	want["react"] = npmDep("react", "17.0.2", "sha512", "gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==")
 
-	if !assert.ElementsMatch(t, got, want) {
+	if !reflect.DeepEqual(got, want) {
 		t.Errorf("got %q, wanted %q", got, want)
 	}
 }

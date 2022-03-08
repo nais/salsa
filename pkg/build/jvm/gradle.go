@@ -66,14 +66,14 @@ func (g Gradle) BuildFiles() []string {
 	return g.BuildFilePatterns
 }
 
-func GradleDeps(depsOutput string, checksumXml []byte) ([]build.Dependency, error) {
+func GradleDeps(depsOutput string, checksumXml []byte) (map[string]build.Dependency, error) {
 	pattern := regexp.MustCompile(`(?m)---\s[a-zA-Z0-9.]+:.*$`)
 	matches := pattern.FindAllString(depsOutput, -1)
 	if matches == nil {
 		return nil, errors.New("unable to find any dependencies")
 	}
 
-	deps := make([]build.Dependency, 0)
+	deps := make(map[string]build.Dependency, 0)
 
 	sum := GradleChecksum{}
 	err := xml.Unmarshal(checksumXml, &sum)
@@ -88,31 +88,23 @@ func GradleDeps(depsOutput string, checksumXml []byte) ([]build.Dependency, erro
 		version := filterVersion(elements[2])
 		coordinates := fmt.Sprintf("%s:%s", groupId, artifactId)
 		checksum := sum.checksum(groupId, artifactId, version)
-		// TODO build.Dependency can be map, for readability and performance, no need for 'contains'.
-		if notEmptyNotExisting(deps, coordinates, checksum) {
-			deps = append(deps, build.Dependency{
+		if noneEmpty(checksum) {
+			deps[coordinates] = build.Dependency{
 				Coordinates: coordinates,
 				Version:     version,
 				CheckSum: build.CheckSum{
 					Algorithm: digest.AlgorithmSHA256,
 					Digest:    checksum,
 				},
-			})
+			}
 		}
 	}
 
 	return deps, nil
 }
 
-func notEmptyNotExisting(deps []build.Dependency, coordinates, checksum string) bool {
-	return !contains(deps, coordinates) && checksum != ""
-}
-
-func contains(dependencies []build.Dependency, name string) bool {
-	for _, a := range dependencies {
-		return a.Equals(name)
-	}
-	return false
+func noneEmpty(checksum string) bool {
+	return checksum != ""
 }
 
 func filterVersion(rawVersion string) string {

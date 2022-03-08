@@ -10,10 +10,9 @@ import (
 
 func TestGoDeps(t *testing.T) {
 	got := GoDeps(goSumContents)
-	wantDeps := []build.Dependency{
-		dep("github.com/google/uuid", "1.0.0", "b4Gk+7WdP/d3HZH8EJsZpvV7EtDOgaZLtnaNGIu1adA="),
-		dep("github.com/pborman/uuid", "1.2.1", "+ZZIw58t/ozdjRaXh/3awHfmWRbzYxJoAdNJxe/3pvw="),
-	}
+	wantDeps := map[string]build.Dependency{}
+	wantDeps["github.com/google/uuid"] = dep("github.com/google/uuid", "1.0.0", "b4Gk+7WdP/d3HZH8EJsZpvV7EtDOgaZLtnaNGIu1adA=")
+	wantDeps["github.com/pborman/uuid"] = dep("github.com/pborman/uuid", "1.2.1", "+ZZIw58t/ozdjRaXh/3awHfmWRbzYxJoAdNJxe/3pvw=")
 
 	if !reflect.DeepEqual(got, wantDeps) {
 		t.Errorf("got %q, wanted %q", got, wantDeps)

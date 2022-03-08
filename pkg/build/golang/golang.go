@@ -41,8 +41,8 @@ func (g Golang) BuildFiles() []string {
 	return g.BuildFilePatterns
 }
 
-func GoDeps(goSumContents string) []build.Dependency {
-	deps := make([]build.Dependency, 0)
+func GoDeps(goSumContents string) map[string]build.Dependency {
+	deps := make(map[string]build.Dependency, 0)
 	lines := strings.Split(goSumContents, "\n")
 	for _, line := range lines {
 		if isNotInteresting(line) {
@@ -50,15 +50,16 @@ func GoDeps(goSumContents string) []build.Dependency {
 		}
 		parts := strings.Split(line, " ")
 		version := parts[1][1:]
+		coordinates := parts[0]
 		base64EncodedDigest := strings.Split(parts[2], ":")[1]
-		deps = append(deps, build.Dependency{
-			Coordinates: parts[0],
+		deps[coordinates] = build.Dependency{
+			Coordinates: coordinates,
 			Version:     version,
 			CheckSum: build.CheckSum{
 				Algorithm: digest.AlgorithmSHA256,
 				Digest:    base64EncodedDigest,
 			},
-		})
+		}
 	}
 	return deps
 }

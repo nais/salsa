@@ -42,8 +42,8 @@ func (y Yarn) BuildFiles() []string {
 	return y.BuildFilePatterns
 }
 
-func YarnDeps(yarnLockContents string) []build.Dependency {
-	deps := make([]build.Dependency, 0)
+func YarnDeps(yarnLockContents string) map[string]build.Dependency {
+	deps := make(map[string]build.Dependency, 0)
 	lines := strings.Split(yarnLockContents, "\n")
 	blockLines := blockLineNumbers(lines)
 	for _, startLine := range blockLines {
@@ -51,13 +51,13 @@ func YarnDeps(yarnLockContents string) []build.Dependency {
 		depVersion := parseVersion(lines[startLine+1])
 		integrityLine := lines[startLine+3]
 
-		deps = append(deps, build.Dependency{
+		deps[depName] = build.Dependency{
 			Coordinates: depName,
 			Version:     depVersion,
 			CheckSum:    yarnShaDigest(integrityLine),
-		})
+		}
 	}
-	return deduplicate(deps)
+	return deps
 }
 
 func blockLineNumbers(yarnLockLines []string) []int {
@@ -113,23 +113,4 @@ func yarnShaDigest(line string) build.CheckSum {
 		Algorithm: fields[0],
 		Digest:    fields[1],
 	}
-}
-
-func deduplicate(deps []build.Dependency) []build.Dependency {
-	type DependencyKey struct{ coordinate string }
-	var unique []build.Dependency
-	transients := make(map[DependencyKey]int)
-
-	for _, d := range deps {
-		k := DependencyKey{d.Coordinates}
-		// Overwrite with last
-		if i, ok := transients[k]; ok {
-			unique[i] = d
-		} else {
-			// recalculate size
-			transients[k] = len(unique)
-			unique = append(unique, d)
-		}
-	}
-	return unique
 }

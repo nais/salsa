@@ -16,7 +16,7 @@ const (
 
 type ArtifactDependencies struct {
 	Cmd         Cmd
-	RuntimeDeps []Dependency
+	RuntimeDeps map[string]Dependency
 }
 
 type Cmd struct {
@@ -79,10 +79,6 @@ func (d Dependency) ToUri() string {
 
 func (d Dependency) ToDigestSet() slsa.DigestSet {
 	return slsa.DigestSet{d.CheckSum.Algorithm: d.CheckSum.Digest}
-}
-
-func (d Dependency) Equals(name string) bool {
-	return d.Coordinates == name
 }
 
 func match(t BuildTool, workDir string) (bool, error) {

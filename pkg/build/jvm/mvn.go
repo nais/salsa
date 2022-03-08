@@ -58,13 +58,13 @@ func (m Maven) BuildFiles() []string {
 	return m.BuildFilePatterns
 }
 
-func MavenCompileAndRuntimeTimeDeps(rootPath string) ([]build.Dependency, error) {
+func MavenCompileAndRuntimeTimeDeps(rootPath string) (map[string]build.Dependency, error) {
 	files, err := findJarFiles(rootPath)
 	if err != nil {
 		return nil, err
 	}
 
-	deps := make([]build.Dependency, 0)
+	deps := make(map[string]build.Dependency, 0)
 
 	for _, file := range files {
 		f := strings.Split(file, rootPath)[1]
@@ -79,14 +79,15 @@ func MavenCompileAndRuntimeTimeDeps(rootPath string) ([]build.Dependency, error)
 		if err != nil {
 			return nil, err
 		}
-		deps = append(deps, build.Dependency{
-			Coordinates: fmt.Sprintf("%s:%s", groupId, artifactId),
+		coordinates := fmt.Sprintf("%s:%s", groupId, artifactId)
+		deps[coordinates] = build.Dependency{
+			Coordinates: coordinates,
 			Version:     version,
 			CheckSum: build.CheckSum{
 				Algorithm: "sha256",
 				Digest:    digest,
 			},
-		})
+		}
 	}
 	return deps, nil
 }
@@ -109,7 +110,6 @@ func findJarFiles(rootPath string) ([]string, error) {
 		}
 		if !info.IsDir() && filepath.Ext(info.Name()) == ".jar" {
 			files = append(files, path)
-			//	fmt.Printf("File Name: %s path:%s\n", info.Name(), path)
 		}
 		return nil
 	})

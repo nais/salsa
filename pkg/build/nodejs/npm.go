@@ -44,7 +44,7 @@ func (n Npm) BuildFiles() []string {
 	return n.BuildFilePatterns
 }
 
-func NpmDeps(packageLockJsonContents string) ([]build.Dependency, error) {
+func NpmDeps(packageLockJsonContents string) (map[string]build.Dependency, error) {
 	var f interface{}
 	err := json.Unmarshal([]byte(packageLockJsonContents), &f)
 	if err != nil {
@@ -54,20 +54,20 @@ func NpmDeps(packageLockJsonContents string) ([]build.Dependency, error) {
 	return transform(raw["dependencies"].(map[string]interface{})), nil
 }
 
-func transform(input map[string]interface{}) []build.Dependency {
-	deps := make([]build.Dependency, 0)
+func transform(input map[string]interface{}) map[string]build.Dependency {
+	deps := make(map[string]build.Dependency, 0)
 	for key, value := range input {
 		dependency := value.(map[string]interface{})
 		integrity := fmt.Sprintf("%s", dependency["integrity"])
 		shaDig := strings.Split(integrity, "-")
-		deps = append(deps, build.Dependency{
+		deps[key] = build.Dependency{
 			Coordinates: key,
 			Version:     fmt.Sprintf("%s", dependency["version"]),
 			CheckSum: build.CheckSum{
 				Algorithm: fmt.Sprintf("%s", shaDig[0]),
 				Digest:    fmt.Sprintf("%s", shaDig[1]),
 			},
-		})
+		}
 	}
 	return deps
 }
