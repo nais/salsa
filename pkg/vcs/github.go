@@ -123,18 +123,12 @@ func (in *CurrentEnvironment) filterEnvs() map[string]string {
 		return map[string]string{}
 	}
 	for key, val := range in.Envs {
-		in.filterEnvsWithPrefix(key, "INPUT_", "GITHUB_", "RUNNER_", "TOKEN_")
-		in.filterEnvsWithSuffix(key, "_TOKEN")
+		in.filterEnvsWithPrefix(key, "INPUT_", "GITHUB_", "RUNNER_", "ACTIONS_")
+		in.filterEnv(key, "TOKEN")
 		in.filterSingleLineEnv(key)
 		in.filterEmptyValue(key, val)
 	}
 	return in.Envs
-}
-
-func (in *CurrentEnvironment) filterEmptyValue(key, val string) {
-	if val == "" {
-		delete(in.Envs, key)
-	}
 }
 
 func (in *CurrentEnvironment) filterSingleLineEnv(key string) {
@@ -143,17 +137,23 @@ func (in *CurrentEnvironment) filterSingleLineEnv(key string) {
 	}
 }
 
-func (in *CurrentEnvironment) filterEnvsWithPrefix(key string, prefixes ...string) {
-	for _, prefix := range prefixes {
-		if strings.HasPrefix(key, prefix) {
+func (in *CurrentEnvironment) filterEmptyValue(key, val string) {
+	if val == "" {
+		delete(in.Envs, key)
+	}
+}
+
+func (in *CurrentEnvironment) filterEnv(key string, contains ...string) {
+	for _, contain := range contains {
+		if strings.Contains(key, contain) {
 			delete(in.Envs, key)
 		}
 	}
 }
 
-func (in *CurrentEnvironment) filterEnvsWithSuffix(key string, suffixes ...string) {
-	for _, suffix := range suffixes {
-		if strings.HasPrefix(key, suffix) {
+func (in *CurrentEnvironment) filterEnvsWithPrefix(key string, prefixes ...string) {
+	for _, prefix := range prefixes {
+		if strings.HasPrefix(key, prefix) {
 			delete(in.Envs, key)
 		}
 	}
