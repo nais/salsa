@@ -88,28 +88,23 @@ func GradleDeps(depsOutput string, checksumXml []byte) (map[string]build.Depende
 		version := filterVersion(elements[2])
 		coordinates := fmt.Sprintf("%s:%s", groupId, artifactId)
 		checksum := sum.checksum(groupId, artifactId, version)
-		if noneEmpty(checksum) {
-			deps[coordinates] = build.Dependency{
-				Coordinates: coordinates,
-				Version:     version,
-				CheckSum: build.CheckSum{
-					Algorithm: digest.AlgorithmSHA256,
-					Digest:    checksum,
-				},
-			}
+		deps[coordinates] = build.Dependency{
+			Coordinates: coordinates,
+			Version:     version,
+			CheckSum: build.CheckSum{
+				Algorithm: digest.AlgorithmSHA256,
+				Digest:    checksum,
+			},
 		}
 	}
 
 	return deps, nil
 }
 
-func noneEmpty(checksum string) bool {
-	return checksum != ""
-}
-
 func filterVersion(rawVersion string) string {
 	// 1.6.0 -> 1.6.10 (*)
 	// 1.6.0 (*)
+	// 1.6.0 (c)
 	// 1.6.10
 	// 1.5.2-native-mt (*)
 	filteredSuffix := filterSuffixes(rawVersion, " (*)", " (c)")
@@ -128,6 +123,7 @@ func filterSuffixes(orgString string, suffixes ...string) string {
 	return result
 }
 
+// TODO check for empty checksums matching first if
 func (g GradleChecksum) checksum(groupId, artifactId, version string) string {
 	for _, c := range g.Components.Components {
 		if c.Group == groupId && c.Name == artifactId && c.Version == version {
