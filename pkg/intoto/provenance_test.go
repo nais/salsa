@@ -94,7 +94,7 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 				assert.Equal(t, test.buildInvocationId, slsaPredicate.Metadata.BuildInvocationID)
 				assert.Equal(t, test.buildTimerIsSet, time.Now().UTC().After(*slsaPredicate.Metadata.BuildStartedOn))
 				assert.Equal(t, test.buildTimerFinishedIsSet, time.Now().UTC().After(*slsaPredicate.Metadata.BuildFinishedOn))
-				assert.Equal(t, false, slsaPredicate.Metadata.Reproducible)
+				assert.Equal(t, true, slsaPredicate.Metadata.Reproducible)
 
 				// completeness
 				assert.Equal(t, true, slsaPredicate.Metadata.Completeness.Environment)

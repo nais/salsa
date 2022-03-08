@@ -13,7 +13,7 @@ func GenerateSlsaPredicate(opts *ProvenanceOptions) *slsa.ProvenancePredicate {
 		},
 		BuildType:   opts.BuildType,
 		BuildConfig: opts.BuildConfig,
-		Metadata:    withMetadata(opts, false, time.Now().UTC()),
+		Metadata:    withMetadata(opts, time.Now().UTC()),
 		Materials:   withMaterials(opts),
 	}
 
@@ -25,20 +25,20 @@ func GenerateSlsaPredicate(opts *ProvenanceOptions) *slsa.ProvenancePredicate {
 	return predicate
 }
 
-func withMetadata(opts *ProvenanceOptions, rp bool, buildFinished time.Time) *slsa.ProvenanceMetadata {
+func withMetadata(opts *ProvenanceOptions, buildFinished time.Time) *slsa.ProvenanceMetadata {
 	return &slsa.ProvenanceMetadata{
 		BuildInvocationID: opts.BuildInvocationId,
 		BuildStartedOn:    &opts.BuildStartedOn,
 		BuildFinishedOn:   &buildFinished,
 		Completeness:      withCompleteness(opts),
-		Reproducible:      rp,
+		Reproducible:      reproducible(opts),
 	}
 }
 
 func withCompleteness(opts *ProvenanceOptions) slsa.ProvenanceComplete {
 	return slsa.ProvenanceComplete{
 		Environment: opts.HasEnvironment(),
-		Materials:   opts.HasDependencies() && opts.HasBuilderRepoDigest(),
+		Materials:   hasMaterials(opts),
 		Parameters:  opts.HasParameters(),
 	}
 }
@@ -64,4 +64,12 @@ func AppendBuildContext(opts *ProvenanceOptions, materials *[]slsa.ProvenanceMat
 	if opts.BuilderRepoDigest != nil {
 		*materials = append(*materials, *opts.BuilderRepoDigest)
 	}
+}
+
+func hasMaterials(opts *ProvenanceOptions) bool {
+	return opts.HasDependencies() && opts.HasBuilderRepoDigest()
+}
+
+func reproducible(opts *ProvenanceOptions) bool {
+	return opts.HasEnvironment() && hasMaterials(opts) && opts.HasParameters()
 }
