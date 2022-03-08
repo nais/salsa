@@ -81,6 +81,10 @@ func (d Dependency) ToDigestSet() slsa.DigestSet {
 	return slsa.DigestSet{d.CheckSum.Algorithm: d.CheckSum.Digest}
 }
 
+func (d Dependency) Equals(name string) bool {
+	return d.Coordinates == name
+}
+
 func match(t BuildTool, workDir string) (bool, error) {
 	for _, file := range t.BuildFiles() {
 		buildFile, err := findBuildFile(workDir, file)

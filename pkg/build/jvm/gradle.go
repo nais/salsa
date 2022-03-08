@@ -82,22 +82,58 @@ func GradleDeps(depsOutput string, checksumXml []byte) ([]build.Dependency, erro
 	}
 
 	for _, match := range matches {
-		replacedDownGrades := strings.Replace(match, " -> ", ":", -1)
-		elements := strings.Split(strings.Replace(replacedDownGrades, "--- ", "", -1), ":")
+		elements := strings.Split(strings.Replace(match, "--- ", "", -1), ":")
 		groupId := elements[0]
 		artifactId := elements[1]
-		version := strings.Split(elements[2], " ")[0]
-		deps = append(deps, build.Dependency{
-			Coordinates: fmt.Sprintf("%s:%s", groupId, artifactId),
-			Version:     version,
-			CheckSum: build.CheckSum{
-				Algorithm: digest.AlgorithmSHA256,
-				Digest:    sum.checksum(groupId, artifactId, version),
-			},
-		})
+		version := filterVersion(elements[2])
+		coordinates := fmt.Sprintf("%s:%s", groupId, artifactId)
+		checksum := sum.checksum(groupId, artifactId, version)
+		// TODO build.Dependency can be map, for readability and performance, no need for 'contains'.
+		if notEmptyNotExisting(deps, coordinates, checksum) {
+			deps = append(deps, build.Dependency{
+				Coordinates: coordinates,
+				Version:     version,
+				CheckSum: build.CheckSum{
+					Algorithm: digest.AlgorithmSHA256,
+					Digest:    checksum,
+				},
+			})
+		}
 	}
 
 	return deps, nil
+}
+
+func notEmptyNotExisting(deps []build.Dependency, coordinates, checksum string) bool {
+	return !contains(deps, coordinates) && checksum != ""
+}
+
+func contains(dependencies []build.Dependency, name string) bool {
+	for _, a := range dependencies {
+		return a.Equals(name)
+	}
+	return false
+}
+
+func filterVersion(rawVersion string) string {
+	// 1.6.0 -> 1.6.10 (*)
+	// 1.6.0 (*)
+	// 1.6.10
+	// 1.5.2-native-mt (*)
+	filteredSuffix := filterSuffixes(rawVersion, " (*)", " (c)")
+	useLatest := strings.Split(filteredSuffix, " -> ")
+	if len(useLatest) > 1 {
+		return useLatest[1]
+	}
+	return useLatest[0]
+}
+
+func filterSuffixes(orgString string, suffixes ...string) string {
+	result := orgString
+	for _, suffix := range suffixes {
+		result = strings.TrimSuffix(result, suffix)
+	}
+	return result
 }
 
 func (g GradleChecksum) checksum(groupId, artifactId, version string) string {
