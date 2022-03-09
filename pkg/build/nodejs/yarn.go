@@ -15,7 +15,7 @@ type Yarn struct {
 	BuildFilePatterns []string
 }
 
-func NewYarn() build.BuildTool {
+func NewYarn() build.Tool {
 	return &Yarn{
 		BuildFilePatterns: []string{yarnBuildFileName},
 	}
@@ -50,12 +50,8 @@ func YarnDeps(yarnLockContents string) map[string]build.Dependency {
 		depName := parseDependency(lines[startLine])
 		depVersion := parseVersion(lines[startLine+1])
 		integrityLine := lines[startLine+3]
-
-		deps[depName] = build.Dependency{
-			Coordinates: depName,
-			Version:     depVersion,
-			CheckSum:    yarnShaDigest(integrityLine),
-		}
+		checksum := yarnChecksum(integrityLine)
+		deps[depName] = build.CreateDependency(depName, depVersion, checksum)
 	}
 	return deps
 }
@@ -106,11 +102,8 @@ func parseVersion(line string) string {
 	return matches[pkgversionIndex]
 }
 
-func yarnShaDigest(line string) build.CheckSum {
+func yarnChecksum(line string) build.CheckSum {
 	trimPrefixIntegrity := strings.TrimPrefix(line, "  integrity ")
 	fields := strings.Split(trimPrefixIntegrity, "-")
-	return build.CheckSum{
-		Algorithm: fields[0],
-		Digest:    fields[1],
-	}
+	return build.CreateChecksum(fields[0], fields[1])
 }

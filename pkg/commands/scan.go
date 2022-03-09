@@ -41,7 +41,7 @@ var scanCmd = &cobra.Command{
 		log.Infof("prepare to scan path %s ...", workDir)
 
 		tools := build.SupportedBuildTools{
-			Tools: []build.BuildTool{
+			Tools: []build.Tool{
 				jvm.NewGradle(),
 				jvm.NewMaven(),
 				golang.NewGolang(),

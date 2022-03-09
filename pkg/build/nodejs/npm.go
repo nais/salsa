@@ -34,7 +34,7 @@ func (n Npm) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
 	}, nil
 }
 
-func NewNpm() build.BuildTool {
+func NewNpm() build.Tool {
 	return &Npm{
 		BuildFilePatterns: []string{npmBuildFileName},
 	}
@@ -60,14 +60,8 @@ func transform(input map[string]interface{}) map[string]build.Dependency {
 		dependency := value.(map[string]interface{})
 		integrity := fmt.Sprintf("%s", dependency["integrity"])
 		shaDig := strings.Split(integrity, "-")
-		deps[key] = build.Dependency{
-			Coordinates: key,
-			Version:     fmt.Sprintf("%s", dependency["version"]),
-			CheckSum: build.CheckSum{
-				Algorithm: fmt.Sprintf("%s", shaDig[0]),
-				Digest:    fmt.Sprintf("%s", shaDig[1]),
-			},
-		}
+		checksum := build.CreateChecksum(fmt.Sprintf("%s", shaDig[0]), fmt.Sprintf("%s", shaDig[1]))
+		deps[key] = build.CreateDependency(key, fmt.Sprintf("%s", dependency["version"]), checksum)
 	}
 	return deps
 }

@@ -34,7 +34,7 @@ func (c Composer) ResolveDeps(workDir string) (*build.ArtifactDependencies, erro
 	}, nil
 }
 
-func NewComposer() build.BuildTool {
+func NewComposer() build.Tool {
 	return &Composer{
 		BuildFilePatterns: []string{composerLockFileName},
 	}
@@ -71,14 +71,8 @@ func ComposerDeps(composerLockJsonContents string) (map[string]build.Dependency,
 func transform(dependencies []dep) map[string]build.Dependency {
 	deps := make(map[string]build.Dependency, 0)
 	for _, d := range dependencies {
-		deps[d.Name] = build.Dependency{
-			Coordinates: d.Name,
-			Version:     d.Version,
-			CheckSum: build.CheckSum{
-				Algorithm: digest.AlgorithmSHA1,
-				Digest:    d.Dist.Shasum,
-			},
-		}
+		checksum := build.CreateChecksum(digest.AlgorithmSHA1, d.Dist.Shasum)
+		deps[d.Name] = build.CreateDependency(d.Name, d.Version, checksum)
 	}
 	return deps
 }

@@ -56,7 +56,7 @@ func (g Gradle) ResolveDeps(workDir string) (*build.ArtifactDependencies, error)
 	}, nil
 }
 
-func NewGradle() build.BuildTool {
+func NewGradle() build.Tool {
 	return &Gradle{
 		BuildFilePatterns: []string{gradleBuildFileName},
 	}
@@ -88,16 +88,8 @@ func GradleDeps(depsOutput string, checksumXml []byte) (map[string]build.Depende
 		version := filterVersion(elements[2])
 		coordinates := fmt.Sprintf("%s:%s", groupId, artifactId)
 		checksum := sum.checksum(groupId, artifactId, version)
-		deps[coordinates] = build.Dependency{
-			Coordinates: coordinates,
-			Version:     version,
-			CheckSum: build.CheckSum{
-				Algorithm: digest.AlgorithmSHA256,
-				Digest:    checksum,
-			},
-		}
+		deps[coordinates] = build.CreateDependency(coordinates, version, checksum)
 	}
-
 	return deps, nil
 }
 
@@ -107,7 +99,7 @@ func filterVersion(rawVersion string) string {
 	// 1.6.0 (c)
 	// 1.6.10
 	// 1.5.2-native-mt (*)
-	filteredSuffix := filterSuffixes(rawVersion, " (*)", " (c)")
+	filteredSuffix := filterSuffix(rawVersion, " (*)", " (c)")
 	useLatest := strings.Split(filteredSuffix, " -> ")
 	if len(useLatest) > 1 {
 		return useLatest[1]
@@ -115,7 +107,7 @@ func filterVersion(rawVersion string) string {
 	return useLatest[0]
 }
 
-func filterSuffixes(orgString string, suffixes ...string) string {
+func filterSuffix(orgString string, suffixes ...string) string {
 	result := orgString
 	for _, suffix := range suffixes {
 		result = strings.TrimSuffix(result, suffix)
@@ -123,19 +115,26 @@ func filterSuffixes(orgString string, suffixes ...string) string {
 	return result
 }
 
-// TODO check for empty checksums matching first if
-func (g GradleChecksum) checksum(groupId, artifactId, version string) string {
+func (g GradleChecksum) checksum(groupId, artifactId, version string) build.CheckSum {
 	for _, c := range g.Components.Components {
 		if c.Group == groupId && c.Name == artifactId && c.Version == version {
 			for _, a := range c.Artifacts {
-				if strings.HasSuffix(a.Name, ".jar") {
-					return a.Sha256.Value
+				if hasSuffix(a, ".jar", ".pom") {
+					return build.CreateChecksum(digest.AlgorithmSHA256, a.Sha256.Value)
 				}
 			}
 		}
 	}
+	return build.CheckSum{}
+}
 
-	return ""
+func hasSuffix(a Artifact, suffixes ...string) bool {
+	for _, suffix := range suffixes {
+		if strings.HasSuffix(a.Name, suffix) {
+			return true
+		}
+	}
+	return false
 }
 
 type GradleChecksum struct {

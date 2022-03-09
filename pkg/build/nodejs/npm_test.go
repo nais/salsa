@@ -1,7 +1,7 @@
 package nodejs
 
 import (
-	"reflect"
+	"github.com/nais/salsa/pkg/build/test"
 	"testing"
 
 	"github.com/nais/salsa/pkg/build"
@@ -10,25 +10,12 @@ import (
 func TestPackageLockJsonParsing(t *testing.T) {
 	got, _ := NpmDeps(packageLockContents)
 	want := map[string]build.Dependency{}
-	want["js-tokens"] = npmDep("js-tokens", "4.0.0", "sha512", "RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==")
-	want["loose-envify"] = npmDep("loose-envify", "1.4.0", "sha512", "lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==")
-	want["object-assign"] = npmDep("object-assign", "4.1.1", "sha1", "IQmtx5ZYh8/AXLvUQsrIv7s2CGM=")
-	want["react"] = npmDep("react", "17.0.2", "sha512", "gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==")
+	want["js-tokens"] = test.Dependency("js-tokens", "4.0.0", "sha512", "RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==")
+	want["loose-envify"] = test.Dependency("loose-envify", "1.4.0", "sha512", "lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==")
+	want["object-assign"] = test.Dependency("object-assign", "4.1.1", "sha1", "IQmtx5ZYh8/AXLvUQsrIv7s2CGM=")
+	want["react"] = test.Dependency("react", "17.0.2", "sha512", "gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==")
 
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("got %q, wanted %q", got, want)
-	}
-}
-
-func npmDep(coordinates, version, alg, digest string) build.Dependency {
-	return build.Dependency{
-		Coordinates: coordinates,
-		Version:     version,
-		CheckSum: build.CheckSum{
-			Algorithm: alg,
-			Digest:    digest,
-		},
-	}
+	test.AssertEqual(t, got, want)
 }
 
 const packageLockContents = `

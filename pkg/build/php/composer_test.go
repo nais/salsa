@@ -1,9 +1,8 @@
 package php
 
 import (
-	"github.com/nais/salsa/pkg/digest"
+	"github.com/nais/salsa/pkg/build/test"
 	"github.com/stretchr/testify/assert"
-	"reflect"
 	"testing"
 
 	"github.com/nais/salsa/pkg/build"
@@ -13,35 +12,22 @@ func TestComposerLockJsonParsing(t *testing.T) {
 	got, err := ComposerDeps(composerLockContents)
 	assert.NoError(t, err)
 	want := map[string]build.Dependency{}
-	want["guzzlehttp/guzzle"] = dependency("guzzlehttp/guzzle", "7.4.1")
-	want["guzzlehttp/promises"] = dependency("guzzlehttp/promises", "1.5.1")
-	want["guzzlehttp/psr7"] = dependency("guzzlehttp/psr7", "2.1.0")
-	want["nikic/fast-route"] = dependency("nikic/fast-route", "v1.3.0")
-	want["psr/container"] = dependency("psr/container", "2.0.2")
-	want["psr/http-client"] = dependency("psr/http-client", "1.0.1")
-	want["psr/http-factory"] = dependency("psr/http-factory", "1.0.1")
-	want["psr/http-message"] = dependency("psr/http-message", "1.0.1")
-	want["psr/http-server-handler"] = dependency("psr/http-server-handler", "1.0.1")
-	want["psr/http-server-middleware"] = dependency("psr/http-server-middleware", "1.0.1")
-	want["psr/log"] = dependency("psr/log", "1.1.4")
-	want["ralouphie/getallheaders"] = dependency("ralouphie/getallheaders", "3.0.3")
-	want["slim/slim"] = dependency("slim/slim", "4.9.0")
-	want["symfony/deprecation-contracts"] = dependency("symfony/deprecation-contracts", "v2.5.0")
+	want["guzzlehttp/guzzle"] = test.Dependency("guzzlehttp/guzzle", "7.4.1", "sha1", "")
+	want["guzzlehttp/promises"] = test.Dependency("guzzlehttp/promises", "1.5.1", "sha1", "")
+	want["guzzlehttp/psr7"] = test.Dependency("guzzlehttp/psr7", "2.1.0", "sha1", "")
+	want["nikic/fast-route"] = test.Dependency("nikic/fast-route", "v1.3.0", "sha1", "")
+	want["psr/container"] = test.Dependency("psr/container", "2.0.2", "sha1", "")
+	want["psr/http-client"] = test.Dependency("psr/http-client", "1.0.1", "sha1", "")
+	want["psr/http-factory"] = test.Dependency("psr/http-factory", "1.0.1", "sha1", "")
+	want["psr/http-message"] = test.Dependency("psr/http-message", "1.0.1", "sha1", "")
+	want["psr/http-server-handler"] = test.Dependency("psr/http-server-handler", "1.0.1", "sha1", "")
+	want["psr/http-server-middleware"] = test.Dependency("psr/http-server-middleware", "1.0.1", "sha1", "")
+	want["psr/log"] = test.Dependency("psr/log", "1.1.4", "sha1", "")
+	want["ralouphie/getallheaders"] = test.Dependency("ralouphie/getallheaders", "3.0.3", "sha1", "")
+	want["slim/slim"] = test.Dependency("slim/slim", "4.9.0", "sha1", "")
+	want["symfony/deprecation-contracts"] = test.Dependency("symfony/deprecation-contracts", "v2.5.0", "sha1", "")
 
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("got %q, wanted %q", got, want)
-	}
-}
-
-func dependency(coordinates, version string) build.Dependency {
-	return build.Dependency{
-		Coordinates: coordinates,
-		Version:     version,
-		CheckSum: build.CheckSum{
-			Algorithm: digest.AlgorithmSHA1,
-			Digest:    "",
-		},
-	}
+	test.AssertEqual(t, got, want)
 }
 
 const composerLockContents = `{

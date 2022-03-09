@@ -3,6 +3,7 @@ package jvm
 import (
 	"crypto/sha256"
 	"fmt"
+	"github.com/nais/salsa/pkg/digest"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
@@ -48,7 +49,7 @@ func (m Maven) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) 
 	}, nil
 }
 
-func NewMaven() build.BuildTool {
+func NewMaven() build.Tool {
 	return &Maven{
 		BuildFilePatterns: []string{mavenBuildFileName},
 	}
@@ -74,32 +75,23 @@ func MavenCompileAndRuntimeTimeDeps(rootPath string) (map[string]build.Dependenc
 		artifactId := path[len(path)-3]
 		groupId := strings.Join(path[1:(len(path)-3)], ".")
 
-		fmt.Printf("yolo %s:%s:%s\n", groupId, artifactId, version)
-		digest, err := hashFile(file)
+		checksum, err := hashFile(file)
 		if err != nil {
 			return nil, err
 		}
 		coordinates := fmt.Sprintf("%s:%s", groupId, artifactId)
-		deps[coordinates] = build.Dependency{
-			Coordinates: coordinates,
-			Version:     version,
-			CheckSum: build.CheckSum{
-				Algorithm: "sha256",
-				Digest:    digest,
-			},
-		}
+		deps[coordinates] = build.CreateDependency(coordinates, version, checksum)
 	}
 	return deps, nil
 }
 
-func hashFile(file string) (string, error) {
+func hashFile(file string) (build.CheckSum, error) {
 	content, err := ioutil.ReadFile(file)
 	if err != nil {
-		return "", err
+		return build.CheckSum{}, err
 	}
 	hash := fmt.Sprintf("%x", sha256.Sum256(content))
-
-	return hash, nil
+	return build.CreateChecksum(digest.AlgorithmSHA256, hash), nil
 }
 
 func findJarFiles(rootPath string) ([]string, error) {
@@ -116,6 +108,5 @@ func findJarFiles(rootPath string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("%v", files)
 	return files, nil
 }

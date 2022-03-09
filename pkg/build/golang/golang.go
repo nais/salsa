@@ -31,7 +31,7 @@ func (g Golang) ResolveDeps(workDir string) (*build.ArtifactDependencies, error)
 	}, nil
 }
 
-func NewGolang() build.BuildTool {
+func NewGolang() build.Tool {
 	return &Golang{
 		BuildFilePatterns: []string{golangBuildFileName},
 	}
@@ -52,14 +52,8 @@ func GoDeps(goSumContents string) map[string]build.Dependency {
 		version := parts[1][1:]
 		coordinates := parts[0]
 		base64EncodedDigest := strings.Split(parts[2], ":")[1]
-		deps[coordinates] = build.Dependency{
-			Coordinates: coordinates,
-			Version:     version,
-			CheckSum: build.CheckSum{
-				Algorithm: digest.AlgorithmSHA256,
-				Digest:    base64EncodedDigest,
-			},
-		}
+		checksum := build.CreateChecksum(digest.AlgorithmSHA256, base64EncodedDigest)
+		deps[coordinates] = build.CreateDependency(coordinates, version, checksum)
 	}
 	return deps
 }
