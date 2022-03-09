@@ -56,7 +56,7 @@ func (g Gradle) ResolveDeps(workDir string) (*build.ArtifactDependencies, error)
 	}, nil
 }
 
-func NewGradle() build.BuildTool {
+func NewGradle() build.Tool {
 	return &Gradle{
 		BuildFilePatterns: []string{gradleBuildFileName},
 	}
@@ -66,14 +66,14 @@ func (g Gradle) BuildFiles() []string {
 	return g.BuildFilePatterns
 }
 
-func GradleDeps(depsOutput string, checksumXml []byte) ([]build.Dependency, error) {
+func GradleDeps(depsOutput string, checksumXml []byte) (map[string]build.Dependency, error) {
 	pattern := regexp.MustCompile(`(?m)---\s[a-zA-Z0-9.]+:.*$`)
 	matches := pattern.FindAllString(depsOutput, -1)
 	if matches == nil {
 		return nil, errors.New("unable to find any dependencies")
 	}
 
-	deps := make([]build.Dependency, 0)
+	deps := make(map[string]build.Dependency, 0)
 
 	sum := GradleChecksum{}
 	err := xml.Unmarshal(checksumXml, &sum)
@@ -88,39 +88,18 @@ func GradleDeps(depsOutput string, checksumXml []byte) ([]build.Dependency, erro
 		version := filterVersion(elements[2])
 		coordinates := fmt.Sprintf("%s:%s", groupId, artifactId)
 		checksum := sum.checksum(groupId, artifactId, version)
-		// TODO build.Dependency can be map, for readability and performance, no need for 'contains'.
-		if notEmptyNotExisting(deps, coordinates, checksum) {
-			deps = append(deps, build.Dependency{
-				Coordinates: coordinates,
-				Version:     version,
-				CheckSum: build.CheckSum{
-					Algorithm: digest.AlgorithmSHA256,
-					Digest:    checksum,
-				},
-			})
-		}
+		deps[coordinates] = build.CreateDependency(coordinates, version, checksum)
 	}
-
 	return deps, nil
-}
-
-func notEmptyNotExisting(deps []build.Dependency, coordinates, checksum string) bool {
-	return !contains(deps, coordinates) && checksum != ""
-}
-
-func contains(dependencies []build.Dependency, name string) bool {
-	for _, a := range dependencies {
-		return a.Equals(name)
-	}
-	return false
 }
 
 func filterVersion(rawVersion string) string {
 	// 1.6.0 -> 1.6.10 (*)
 	// 1.6.0 (*)
+	// 1.6.0 (c)
 	// 1.6.10
 	// 1.5.2-native-mt (*)
-	filteredSuffix := filterSuffixes(rawVersion, " (*)", " (c)")
+	filteredSuffix := filterSuffix(rawVersion, " (*)", " (c)")
 	useLatest := strings.Split(filteredSuffix, " -> ")
 	if len(useLatest) > 1 {
 		return useLatest[1]
@@ -128,7 +107,7 @@ func filterVersion(rawVersion string) string {
 	return useLatest[0]
 }
 
-func filterSuffixes(orgString string, suffixes ...string) string {
+func filterSuffix(orgString string, suffixes ...string) string {
 	result := orgString
 	for _, suffix := range suffixes {
 		result = strings.TrimSuffix(result, suffix)
@@ -136,18 +115,26 @@ func filterSuffixes(orgString string, suffixes ...string) string {
 	return result
 }
 
-func (g GradleChecksum) checksum(groupId, artifactId, version string) string {
+func (g GradleChecksum) checksum(groupId, artifactId, version string) build.CheckSum {
 	for _, c := range g.Components.Components {
 		if c.Group == groupId && c.Name == artifactId && c.Version == version {
 			for _, a := range c.Artifacts {
-				if strings.HasSuffix(a.Name, ".jar") {
-					return a.Sha256.Value
+				if hasSuffix(a, ".jar", ".pom") {
+					return build.CreateChecksum(digest.AlgorithmSHA256, a.Sha256.Value)
 				}
 			}
 		}
 	}
+	return build.CheckSum{}
+}
 
-	return ""
+func hasSuffix(a Artifact, suffixes ...string) bool {
+	for _, suffix := range suffixes {
+		if strings.HasSuffix(a.Name, suffix) {
+			return true
+		}
+	}
+	return false
 }
 
 type GradleChecksum struct {

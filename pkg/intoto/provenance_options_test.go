@@ -114,20 +114,18 @@ func ExpectedBuilderRepoDigestMaterial() *slsa.ProvenanceMaterial {
 	}
 }
 
-func ExpectedDeps() []build.Dependency {
-	return []build.Dependency{
-		{
-			Coordinates: fmt.Sprintf("%s:%s", "groupId", "artifactId"),
-			Version:     "v01",
-			CheckSum: build.CheckSum{
-				Algorithm: "todo",
-				Digest:    "todo",
-			},
-		},
-	}
+func ExpectedDeps() map[string]build.Dependency {
+	deps := map[string]build.Dependency{}
+	checksum := build.CreateChecksum("todo", "todo")
+	deps[fmt.Sprintf("%s:%s", "groupId", "artifactId")] = build.CreateDependency(
+		fmt.Sprintf("%s:%s", "groupId", "artifactId"),
+		"v01",
+		checksum,
+	)
+	return deps
 }
 
-func ExpectedArtDeps(deps []build.Dependency) *build.ArtifactDependencies {
+func ExpectedArtDeps(deps map[string]build.Dependency) *build.ArtifactDependencies {
 	return &build.ArtifactDependencies{
 		Cmd: build.Cmd{
 			Path:     "lang",

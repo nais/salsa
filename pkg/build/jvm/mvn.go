@@ -3,6 +3,7 @@ package jvm
 import (
 	"crypto/sha256"
 	"fmt"
+	"github.com/nais/salsa/pkg/digest"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
@@ -48,7 +49,7 @@ func (m Maven) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) 
 	}, nil
 }
 
-func NewMaven() build.BuildTool {
+func NewMaven() build.Tool {
 	return &Maven{
 		BuildFilePatterns: []string{mavenBuildFileName},
 	}
@@ -58,13 +59,13 @@ func (m Maven) BuildFiles() []string {
 	return m.BuildFilePatterns
 }
 
-func MavenCompileAndRuntimeTimeDeps(rootPath string) ([]build.Dependency, error) {
+func MavenCompileAndRuntimeTimeDeps(rootPath string) (map[string]build.Dependency, error) {
 	files, err := findJarFiles(rootPath)
 	if err != nil {
 		return nil, err
 	}
 
-	deps := make([]build.Dependency, 0)
+	deps := make(map[string]build.Dependency, 0)
 
 	for _, file := range files {
 		f := strings.Split(file, rootPath)[1]
@@ -74,31 +75,23 @@ func MavenCompileAndRuntimeTimeDeps(rootPath string) ([]build.Dependency, error)
 		artifactId := path[len(path)-3]
 		groupId := strings.Join(path[1:(len(path)-3)], ".")
 
-		fmt.Printf("yolo %s:%s:%s\n", groupId, artifactId, version)
-		digest, err := hashFile(file)
+		checksum, err := hashFile(file)
 		if err != nil {
 			return nil, err
 		}
-		deps = append(deps, build.Dependency{
-			Coordinates: fmt.Sprintf("%s:%s", groupId, artifactId),
-			Version:     version,
-			CheckSum: build.CheckSum{
-				Algorithm: "sha256",
-				Digest:    digest,
-			},
-		})
+		coordinates := fmt.Sprintf("%s:%s", groupId, artifactId)
+		deps[coordinates] = build.CreateDependency(coordinates, version, checksum)
 	}
 	return deps, nil
 }
 
-func hashFile(file string) (string, error) {
+func hashFile(file string) (build.CheckSum, error) {
 	content, err := ioutil.ReadFile(file)
 	if err != nil {
-		return "", err
+		return build.CheckSum{}, err
 	}
 	hash := fmt.Sprintf("%x", sha256.Sum256(content))
-
-	return hash, nil
+	return build.CreateChecksum(digest.AlgorithmSHA256, hash), nil
 }
 
 func findJarFiles(rootPath string) ([]string, error) {
@@ -109,13 +102,11 @@ func findJarFiles(rootPath string) ([]string, error) {
 		}
 		if !info.IsDir() && filepath.Ext(info.Name()) == ".jar" {
 			files = append(files, path)
-			//	fmt.Printf("File Name: %s path:%s\n", info.Name(), path)
 		}
 		return nil
 	})
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("%v", files)
 	return files, nil
 }

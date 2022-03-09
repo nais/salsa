@@ -1,8 +1,7 @@
 package golang
 
 import (
-	"github.com/nais/salsa/pkg/digest"
-	"reflect"
+	"github.com/nais/salsa/pkg/build/test"
 	"testing"
 
 	"github.com/nais/salsa/pkg/build"
@@ -10,25 +9,11 @@ import (
 
 func TestGoDeps(t *testing.T) {
 	got := GoDeps(goSumContents)
-	wantDeps := []build.Dependency{
-		dep("github.com/google/uuid", "1.0.0", "b4Gk+7WdP/d3HZH8EJsZpvV7EtDOgaZLtnaNGIu1adA="),
-		dep("github.com/pborman/uuid", "1.2.1", "+ZZIw58t/ozdjRaXh/3awHfmWRbzYxJoAdNJxe/3pvw="),
-	}
+	want := map[string]build.Dependency{}
+	want["github.com/google/uuid"] = test.Dependency("github.com/google/uuid", "1.0.0", "sha256", "b4Gk+7WdP/d3HZH8EJsZpvV7EtDOgaZLtnaNGIu1adA=")
+	want["github.com/pborman/uuid"] = test.Dependency("github.com/pborman/uuid", "1.2.1", "sha256", "+ZZIw58t/ozdjRaXh/3awHfmWRbzYxJoAdNJxe/3pvw=")
 
-	if !reflect.DeepEqual(got, wantDeps) {
-		t.Errorf("got %q, wanted %q", got, wantDeps)
-	}
-}
-
-func dep(coordinates, version, checksum string) build.Dependency {
-	return build.Dependency{
-		Coordinates: coordinates,
-		Version:     version,
-		CheckSum: build.CheckSum{
-			Algorithm: digest.AlgorithmSHA256,
-			Digest:    checksum,
-		},
-	}
+	test.AssertEqual(t, got, want)
 }
 
 const goSumContents = `
