@@ -15,22 +15,6 @@ type Golang struct {
 	BuildFilePatterns []string
 }
 
-func (g Golang) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
-	path := fmt.Sprintf("%s/%s", workDir, golangBuildFileName)
-	fileContent, err := os.ReadFile(path)
-	deps := GoDeps(string(fileContent))
-	if err != nil {
-		return nil, fmt.Errorf("error parsing %s, %v", golangBuildFileName, err)
-	}
-	return &build.ArtifactDependencies{
-		Cmd: build.Cmd{
-			Path:     path,
-			CmdFlags: golangBuildFileName,
-		},
-		RuntimeDeps: deps,
-	}, nil
-}
-
 func NewGolang() build.Tool {
 	return &Golang{
 		BuildFilePatterns: []string{golangBuildFileName},
@@ -39,6 +23,16 @@ func NewGolang() build.Tool {
 
 func (g Golang) BuildFiles() []string {
 	return g.BuildFilePatterns
+}
+
+func (g Golang) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
+	path := fmt.Sprintf("%s/%s", workDir, golangBuildFileName)
+	fileContent, err := os.ReadFile(path)
+	deps := GoDeps(string(fileContent))
+	if err != nil {
+		return nil, fmt.Errorf("error parsing %s, %v", golangBuildFileName, err)
+	}
+	return build.ArtifactDependency(deps, path, golangBuildFileName), nil
 }
 
 func GoDeps(goSumContents string) map[string]build.Dependency {
@@ -52,8 +46,8 @@ func GoDeps(goSumContents string) map[string]build.Dependency {
 		version := parts[1][1:]
 		coordinates := parts[0]
 		base64EncodedDigest := strings.Split(parts[2], ":")[1]
-		checksum := build.CreateChecksum(digest.AlgorithmSHA256, base64EncodedDigest)
-		deps[coordinates] = build.CreateDependency(coordinates, version, checksum)
+		checksum := build.Verification(digest.AlgorithmSHA256, base64EncodedDigest)
+		deps[coordinates] = build.Dependence(coordinates, version, checksum)
 	}
 	return deps
 }

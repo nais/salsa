@@ -21,6 +21,16 @@ type Maven struct {
 	BuildFilePatterns []string
 }
 
+func NewMaven() build.Tool {
+	return &Maven{
+		BuildFilePatterns: []string{mavenBuildFileName},
+	}
+}
+
+func (m Maven) BuildFiles() []string {
+	return m.BuildFilePatterns
+}
+
 func (m Maven) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
 	cmd := exec.Command(
 		"mvn",
@@ -40,23 +50,7 @@ func (m Maven) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) 
 	if err != nil {
 		return nil, fmt.Errorf("scan: %v\n", err)
 	}
-	return &build.ArtifactDependencies{
-		Cmd: build.Cmd{
-			Path:     cmd.Path,
-			CmdFlags: strings.Join(cmd.Args, " "),
-		},
-		RuntimeDeps: deps,
-	}, nil
-}
-
-func NewMaven() build.Tool {
-	return &Maven{
-		BuildFilePatterns: []string{mavenBuildFileName},
-	}
-}
-
-func (m Maven) BuildFiles() []string {
-	return m.BuildFilePatterns
+	return build.ArtifactDependency(deps, cmd.Path, strings.Join(cmd.Args, " ")), nil
 }
 
 func MavenCompileAndRuntimeTimeDeps(rootPath string) (map[string]build.Dependency, error) {
@@ -75,23 +69,23 @@ func MavenCompileAndRuntimeTimeDeps(rootPath string) (map[string]build.Dependenc
 		artifactId := path[len(path)-3]
 		groupId := strings.Join(path[1:(len(path)-3)], ".")
 
-		checksum, err := hashFile(file)
+		checksum, err := buildChecksum(file)
 		if err != nil {
 			return nil, err
 		}
 		coordinates := fmt.Sprintf("%s:%s", groupId, artifactId)
-		deps[coordinates] = build.CreateDependency(coordinates, version, checksum)
+		deps[coordinates] = build.Dependence(coordinates, version, checksum)
 	}
 	return deps, nil
 }
 
-func hashFile(file string) (build.CheckSum, error) {
+func buildChecksum(file string) (build.CheckSum, error) {
 	content, err := ioutil.ReadFile(file)
 	if err != nil {
 		return build.CheckSum{}, err
 	}
-	hash := fmt.Sprintf("%x", sha256.Sum256(content))
-	return build.CreateChecksum(digest.AlgorithmSHA256, hash), nil
+	checksum := fmt.Sprintf("%x", sha256.Sum256(content))
+	return build.Verification(digest.AlgorithmSHA256, checksum), nil
 }
 
 func findJarFiles(rootPath string) ([]string, error) {

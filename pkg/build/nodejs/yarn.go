@@ -21,6 +21,10 @@ func NewYarn() build.Tool {
 	}
 }
 
+func (y Yarn) BuildFiles() []string {
+	return y.BuildFilePatterns
+}
+
 func (y Yarn) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
 	path := fmt.Sprintf("%s/%s", workDir, yarnBuildFileName)
 	fileContent, err := os.ReadFile(path)
@@ -28,18 +32,7 @@ func (y Yarn) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
 		return nil, fmt.Errorf("read file: %w\n", err)
 	}
 	deps := YarnDeps(string(fileContent))
-
-	return &build.ArtifactDependencies{
-		Cmd: build.Cmd{
-			Path:     path,
-			CmdFlags: yarnBuildFileName,
-		},
-		RuntimeDeps: deps,
-	}, nil
-}
-
-func (y Yarn) BuildFiles() []string {
-	return y.BuildFilePatterns
+	return build.ArtifactDependency(deps, path, yarnBuildFileName), nil
 }
 
 func YarnDeps(yarnLockContents string) map[string]build.Dependency {
@@ -50,8 +43,8 @@ func YarnDeps(yarnLockContents string) map[string]build.Dependency {
 		depName := parseDependency(lines[startLine])
 		depVersion := parseVersion(lines[startLine+1])
 		integrityLine := lines[startLine+3]
-		checksum := yarnChecksum(integrityLine)
-		deps[depName] = build.CreateDependency(depName, depVersion, checksum)
+		checksum := buildChecksum(integrityLine)
+		deps[depName] = build.Dependence(depName, depVersion, checksum)
 	}
 	return deps
 }
@@ -102,8 +95,8 @@ func parseVersion(line string) string {
 	return matches[pkgversionIndex]
 }
 
-func yarnChecksum(line string) build.CheckSum {
+func buildChecksum(line string) build.CheckSum {
 	trimPrefixIntegrity := strings.TrimPrefix(line, "  integrity ")
 	fields := strings.Split(trimPrefixIntegrity, "-")
-	return build.CreateChecksum(fields[0], fields[1])
+	return build.Verification(fields[0], fields[1])
 }

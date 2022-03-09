@@ -7,8 +7,8 @@ import (
 )
 
 func Dependency(coordinates, version, algo, checksum string) build.Dependency {
-	return build.CreateDependency(coordinates, version,
-		build.CreateChecksum(algo, checksum),
+	return build.Dependence(coordinates, version,
+		build.Verification(algo, checksum),
 	)
 }
 

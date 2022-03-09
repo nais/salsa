@@ -20,6 +20,16 @@ type Gradle struct {
 	BuildFilePatterns []string
 }
 
+func NewGradle() build.Tool {
+	return &Gradle{
+		BuildFilePatterns: []string{gradleBuildFileName},
+	}
+}
+
+func (g Gradle) BuildFiles() []string {
+	return g.BuildFilePatterns
+}
+
 func (g Gradle) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
 	cmd := exec.Command(
 		"gradle",
@@ -46,24 +56,7 @@ func (g Gradle) ResolveDeps(workDir string) (*build.ArtifactDependencies, error)
 	if err != nil {
 		return nil, fmt.Errorf("could not get gradle deps: %w", err)
 	}
-
-	return &build.ArtifactDependencies{
-		Cmd: build.Cmd{
-			Path:     cmd.Path,
-			CmdFlags: strings.Join(cmd.Args, " "),
-		},
-		RuntimeDeps: deps,
-	}, nil
-}
-
-func NewGradle() build.Tool {
-	return &Gradle{
-		BuildFilePatterns: []string{gradleBuildFileName},
-	}
-}
-
-func (g Gradle) BuildFiles() []string {
-	return g.BuildFilePatterns
+	return build.ArtifactDependency(deps, cmd.Path, strings.Join(cmd.Args, " ")), nil
 }
 
 func GradleDeps(depsOutput string, checksumXml []byte) (map[string]build.Dependency, error) {
@@ -87,8 +80,8 @@ func GradleDeps(depsOutput string, checksumXml []byte) (map[string]build.Depende
 		artifactId := elements[1]
 		version := filterVersion(elements[2])
 		coordinates := fmt.Sprintf("%s:%s", groupId, artifactId)
-		checksum := sum.checksum(groupId, artifactId, version)
-		deps[coordinates] = build.CreateDependency(coordinates, version, checksum)
+		checksum := sum.buildChecksum(groupId, artifactId, version)
+		deps[coordinates] = build.Dependence(coordinates, version, checksum)
 	}
 	return deps, nil
 }
@@ -115,12 +108,12 @@ func filterSuffix(orgString string, suffixes ...string) string {
 	return result
 }
 
-func (g GradleChecksum) checksum(groupId, artifactId, version string) build.CheckSum {
+func (g GradleChecksum) buildChecksum(groupId, artifactId, version string) build.CheckSum {
 	for _, c := range g.Components.Components {
 		if c.Group == groupId && c.Name == artifactId && c.Version == version {
 			for _, a := range c.Artifacts {
 				if hasSuffix(a, ".jar", ".pom") {
-					return build.CreateChecksum(digest.AlgorithmSHA256, a.Sha256.Value)
+					return build.Verification(digest.AlgorithmSHA256, a.Sha256.Value)
 				}
 			}
 		}

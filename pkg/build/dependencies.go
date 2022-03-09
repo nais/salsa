@@ -16,6 +16,16 @@ type ArtifactDependencies struct {
 	RuntimeDeps map[string]Dependency
 }
 
+func ArtifactDependency(deps map[string]Dependency, path, cmdFlags string) *ArtifactDependencies {
+	return &ArtifactDependencies{
+		Cmd: Cmd{
+			Path:     path,
+			CmdFlags: cmdFlags,
+		},
+		RuntimeDeps: deps,
+	}
+}
+
 func (in ArtifactDependencies) CmdPath() string {
 	return in.Cmd.Path
 }
@@ -44,7 +54,7 @@ func (d Dependency) ToDigestSet() slsa.DigestSet {
 	return slsa.DigestSet{d.CheckSum.Algorithm: d.CheckSum.Digest}
 }
 
-func CreateDependency(coordinates, version string, checksum CheckSum) Dependency {
+func Dependence(coordinates, version string, checksum CheckSum) Dependency {
 	return Dependency{
 		Coordinates: coordinates,
 		Version:     version,
@@ -58,7 +68,7 @@ type CheckSum struct {
 	Digest    string
 }
 
-func CreateChecksum(algo, digest string) CheckSum {
+func Verification(algo, digest string) CheckSum {
 	return CheckSum{
 		Algorithm: algo,
 		Digest:    digest,

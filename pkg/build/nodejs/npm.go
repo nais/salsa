@@ -15,6 +15,16 @@ type Npm struct {
 	BuildFilePatterns []string
 }
 
+func NewNpm() build.Tool {
+	return &Npm{
+		BuildFilePatterns: []string{npmBuildFileName},
+	}
+}
+
+func (n Npm) BuildFiles() []string {
+	return n.BuildFilePatterns
+}
+
 func (n Npm) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
 	path := fmt.Sprintf("%s/%s", workDir, npmBuildFileName)
 	fileContent, err := os.ReadFile(path)
@@ -25,23 +35,7 @@ func (n Npm) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error parsing deps: %v\n", err)
 	}
-	return &build.ArtifactDependencies{
-		Cmd: build.Cmd{
-			Path:     path,
-			CmdFlags: npmBuildFileName,
-		},
-		RuntimeDeps: deps,
-	}, nil
-}
-
-func NewNpm() build.Tool {
-	return &Npm{
-		BuildFilePatterns: []string{npmBuildFileName},
-	}
-}
-
-func (n Npm) BuildFiles() []string {
-	return n.BuildFilePatterns
+	return build.ArtifactDependency(deps, path, npmBuildFileName), nil
 }
 
 func NpmDeps(packageLockJsonContents string) (map[string]build.Dependency, error) {
@@ -60,8 +54,8 @@ func transform(input map[string]interface{}) map[string]build.Dependency {
 		dependency := value.(map[string]interface{})
 		integrity := fmt.Sprintf("%s", dependency["integrity"])
 		shaDig := strings.Split(integrity, "-")
-		checksum := build.CreateChecksum(fmt.Sprintf("%s", shaDig[0]), fmt.Sprintf("%s", shaDig[1]))
-		deps[key] = build.CreateDependency(key, fmt.Sprintf("%s", dependency["version"]), checksum)
+		checksum := build.Verification(fmt.Sprintf("%s", shaDig[0]), fmt.Sprintf("%s", shaDig[1]))
+		deps[key] = build.Dependence(key, fmt.Sprintf("%s", dependency["version"]), checksum)
 	}
 	return deps
 }

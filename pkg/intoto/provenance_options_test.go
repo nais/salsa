@@ -116,8 +116,8 @@ func ExpectedBuilderRepoDigestMaterial() *slsa.ProvenanceMaterial {
 
 func ExpectedDeps() map[string]build.Dependency {
 	deps := map[string]build.Dependency{}
-	checksum := build.CreateChecksum("todo", "todo")
-	deps[fmt.Sprintf("%s:%s", "groupId", "artifactId")] = build.CreateDependency(
+	checksum := build.Verification("todo", "todo")
+	deps[fmt.Sprintf("%s:%s", "groupId", "artifactId")] = build.Dependence(
 		fmt.Sprintf("%s:%s", "groupId", "artifactId"),
 		"v01",
 		checksum,
