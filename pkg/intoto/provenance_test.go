@@ -83,7 +83,7 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 				i, err := slsaPredicate.Invocation.Parameters.(*vcs.Event).Inputs.MarshalJSON()
 				assert.NoError(t, err)
 				assert.Equal(t, "some user inputs", fmt.Sprintf("%s", i))
-				e := slsaPredicate.Invocation.Environment.(*Metadata)
+				e := slsaPredicate.Invocation.Environment.(*vcs.Metadata)
 				assert.NoError(t, err)
 				assert.Equal(t, expectedMetadata(), e)
 				assert.NotEmpty(t, slsaPredicate.Invocation.Environment)
@@ -146,15 +146,15 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 	}
 }
 
-func expectedMetadata() *Metadata {
-	return &Metadata{
+func expectedMetadata() *vcs.Metadata {
+	return &vcs.Metadata{
 		Arch: "",
 		Env:  map[string]string{},
-		Context: Context{
-			Github: Github{
+		Context: vcs.Context{
+			Github: vcs.Github{
 				RunId: "1234",
 			},
-			Runner: Runner{
+			Runner: vcs.Runner{
 				Os:   "Linux",
 				Temp: "/home/runner/work/_temp"},
 		},

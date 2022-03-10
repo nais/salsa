@@ -64,7 +64,7 @@ func (in *ProvenanceOptions) withBuilderInvocation(env *vcs.Environment) *Proven
 			EntryPoint: env.GitHubContext.Workflow,
 		},
 		Parameters:  env.AddUserDefinedParameters(),
-		Environment: NonReproducibleMetadata(env),
+		Environment: env.NonReproducibleMetadata(),
 	}
 	return in
 }
@@ -108,23 +108,4 @@ func (in *ProvenanceOptions) HasEnvironment() bool {
 	}
 
 	return in.Invocation.Environment != nil
-}
-
-func NonReproducibleMetadata(env *vcs.Environment) *Metadata {
-	// Other variables that are required to reproduce the build and that cannot be
-	// recomputed using existing information.
-	//(Documentation would explain how to recompute the rest of the fields.)
-	return &Metadata{
-		Arch: env.RunnerContext.Arch,
-		Env:  env.GetCurrentFilteredEnvironment(),
-		Context: Context{
-			Github: Github{
-				RunId: env.GitHubContext.RunId,
-			},
-			Runner: Runner{
-				Os:   env.RunnerContext.OS,
-				Temp: env.RunnerContext.Temp,
-			},
-		},
-	}
 }
