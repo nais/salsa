@@ -2,8 +2,8 @@ package intoto
 
 import (
 	"fmt"
+	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/config"
-	"github.com/nais/salsa/pkg/digest"
 	"github.com/spf13/cobra"
 	"os"
 	"testing"
@@ -183,7 +183,7 @@ func ToExpectedMaterials() []slsa.ProvenanceMaterial {
 		{
 			URI: "git+https://github.com/nais/salsa",
 			Digest: slsa.DigestSet{
-				digest.AlgorithmSHA1: "4321",
+				build.AlgorithmSHA1: "4321",
 			},
 		},
 	}

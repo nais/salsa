@@ -3,7 +3,6 @@ package php
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/nais/salsa/pkg/digest"
 	"os"
 
 	"github.com/nais/salsa/pkg/build"
@@ -65,7 +64,7 @@ func ComposerDeps(composerLockJsonContents string) (map[string]build.Dependency,
 func transform(dependencies []dep) map[string]build.Dependency {
 	deps := make(map[string]build.Dependency, 0)
 	for _, d := range dependencies {
-		checksum := build.Verification(digest.AlgorithmSHA1, d.Dist.Shasum)
+		checksum := build.Verification(build.AlgorithmSHA1, d.Dist.Shasum)
 		deps[d.Name] = build.Dependence(d.Name, d.Version, checksum)
 	}
 	return deps

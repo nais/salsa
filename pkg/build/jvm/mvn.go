@@ -3,7 +3,6 @@ package jvm
 import (
 	"crypto/sha256"
 	"fmt"
-	"github.com/nais/salsa/pkg/digest"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
@@ -85,7 +84,7 @@ func buildChecksum(file string) (build.CheckSum, error) {
 		return build.CheckSum{}, err
 	}
 	checksum := fmt.Sprintf("%x", sha256.Sum256(content))
-	return build.Verification(digest.AlgorithmSHA256, checksum), nil
+	return build.Verification(build.AlgorithmSHA256, checksum), nil
 }
 
 func findJarFiles(rootPath string) ([]string, error) {

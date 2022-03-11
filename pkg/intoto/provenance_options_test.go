@@ -3,7 +3,6 @@ package intoto
 import (
 	"fmt"
 	"github.com/nais/salsa/pkg/config"
-	"github.com/nais/salsa/pkg/digest"
 	"github.com/spf13/cobra"
 	"testing"
 	"time"
@@ -109,7 +108,7 @@ func ExpectedBuilderRepoDigestMaterial() *slsa.ProvenanceMaterial {
 	return &slsa.ProvenanceMaterial{
 		URI: "git+https://github.com/nais/salsa",
 		Digest: slsa.DigestSet{
-			digest.AlgorithmSHA1: "4321",
+			build.AlgorithmSHA1: "4321",
 		},
 	}
 }
@@ -160,7 +159,7 @@ func ExpectedConfigSource() slsa.ConfigSource {
 	return slsa.ConfigSource{
 		URI: "git+https://github.com/nais/salsa",
 		Digest: slsa.DigestSet{
-			digest.AlgorithmSHA1: "4321",
+			build.AlgorithmSHA1: "4321",
 		},
 		EntryPoint: "Create a provenance",
 	}

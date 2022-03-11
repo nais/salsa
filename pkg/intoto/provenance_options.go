@@ -2,7 +2,6 @@ package intoto
 
 import (
 	"github.com/nais/salsa/pkg/config"
-	"github.com/nais/salsa/pkg/digest"
 	"time"
 
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
@@ -48,7 +47,7 @@ func (in *ProvenanceOptions) withBuilderRepoDigest(env *vcs.Environment) *Proven
 	in.BuilderRepoDigest = &slsa.ProvenanceMaterial{
 		URI: "git+" + env.RepoUri(),
 		Digest: slsa.DigestSet{
-			digest.AlgorithmSHA1: env.GithubSha(),
+			build.AlgorithmSHA1: env.GithubSha(),
 		},
 	}
 	return in
@@ -59,7 +58,7 @@ func (in *ProvenanceOptions) withBuilderInvocation(env *vcs.Environment) *Proven
 		ConfigSource: slsa.ConfigSource{
 			URI: "git+" + env.RepoUri(),
 			Digest: slsa.DigestSet{
-				digest.AlgorithmSHA1: env.GithubSha(),
+				build.AlgorithmSHA1: env.GithubSha(),
 			},
 			EntryPoint: env.GitHubContext.Workflow,
 		},

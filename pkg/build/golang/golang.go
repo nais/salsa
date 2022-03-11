@@ -1,12 +1,12 @@
 package golang
 
 import (
+	"encoding/base64"
 	"fmt"
 	"os"
 	"strings"
 
 	"github.com/nais/salsa/pkg/build"
-	"github.com/nais/salsa/pkg/digest"
 )
 
 const golangBuildFileName = "go.sum"
@@ -28,14 +28,14 @@ func (g Golang) BuildFiles() []string {
 func (g Golang) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
 	path := fmt.Sprintf("%s/%s", workDir, golangBuildFileName)
 	fileContent, err := os.ReadFile(path)
-	deps := GoDeps(string(fileContent))
+	deps, err := GoDeps(string(fileContent))
 	if err != nil {
 		return nil, fmt.Errorf("error parsing %s, %v", golangBuildFileName, err)
 	}
 	return build.ArtifactDependency(deps, path, golangBuildFileName), nil
 }
 
-func GoDeps(goSumContents string) map[string]build.Dependency {
+func GoDeps(goSumContents string) (map[string]build.Dependency, error) {
 	deps := make(map[string]build.Dependency, 0)
 	lines := strings.Split(goSumContents, "\n")
 	for _, line := range lines {
@@ -46,10 +46,14 @@ func GoDeps(goSumContents string) map[string]build.Dependency {
 		version := parts[1][1:]
 		coordinates := parts[0]
 		base64EncodedDigest := strings.Split(parts[2], ":")[1]
-		checksum := build.Verification(digest.AlgorithmSHA256, base64EncodedDigest)
+		digest, err := decodeDigest(base64EncodedDigest)
+		if err != nil {
+			return nil, err
+		}
+		checksum := build.Verification(build.AlgorithmSHA256, digest)
 		deps[coordinates] = build.Dependence(coordinates, version, checksum)
 	}
-	return deps
+	return deps, nil
 }
 
 func isNotInteresting(line string) bool {
@@ -63,4 +67,12 @@ func isEmpty(line string) bool {
 func isMod(line string) bool {
 	idx := strings.Index(line, "go.mod")
 	return idx > -1
+}
+
+func decodeDigest(base64Encoded string) (string, error) {
+	decoded, err := base64.StdEncoding.DecodeString(base64Encoded)
+	if err != nil {
+		return "", fmt.Errorf("decoding base64 encoded checksum")
+	}
+	return fmt.Sprintf("%x", decoded), nil
 }

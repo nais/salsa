@@ -4,7 +4,6 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/nais/salsa/pkg/digest"
 	"io/ioutil"
 	"os/exec"
 	"regexp"
@@ -113,7 +112,7 @@ func (g GradleChecksum) buildChecksum(groupId, artifactId, version string) build
 		if c.Group == groupId && c.Name == artifactId && c.Version == version {
 			for _, a := range c.Artifacts {
 				if hasSuffix(a, ".jar", ".pom") {
-					return build.Verification(digest.AlgorithmSHA256, a.Sha256.Value)
+					return build.Verification(build.AlgorithmSHA256, a.Sha256.Value)
 				}
 			}
 		}

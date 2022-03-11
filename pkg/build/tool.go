@@ -6,6 +6,11 @@ import (
 	"io/ioutil"
 )
 
+const (
+	AlgorithmSHA256 = "sha256"
+	AlgorithmSHA1   = "sha1"
+)
+
 type Tool interface {
 	BuildFiles() []string
 	ResolveDeps(workDir string) (*ArtifactDependencies, error)
