@@ -2,15 +2,32 @@ package vcs
 
 import (
 	"fmt"
+	"github.com/go-git/go-git/v5/plumbing/transport"
+	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	log "github.com/sirupsen/logrus"
+	"os"
 
 	"github.com/go-git/go-git/v5"
 )
 
-func CloneRepo(repoUrl string, path string) error {
+const (
+	GithubUrl = "https://github.com"
+)
+
+func CloneRepo(owner, repo, path, username, password string) error {
+	auth := transport.AuthMethod(nil)
+	if username != "" || password != "" {
+		auth = &http.BasicAuth{
+			Username: username,
+			Password: password,
+		}
+	}
+	repoUrl := fmt.Sprintf("%s/%s/%s", GithubUrl, owner, repo)
 	log.Printf("cloning repo %s", repoUrl)
 	_, err := git.PlainClone(path, false, &git.CloneOptions{
-		URL: repoUrl,
+		Auth:     auth,
+		URL:      repoUrl,
+		Progress: os.Stdout,
 	})
 
 	if err != nil {
