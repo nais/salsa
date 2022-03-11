@@ -74,10 +74,10 @@ func GradleDeps(depsOutput string, checksumXml []byte) (map[string]build.Depende
 	}
 
 	for _, match := range matches {
-		elements := strings.Split(strings.Replace(match, "--- ", "", -1), ":")
+		elements := filter(match)
 		groupId := elements[0]
 		artifactId := elements[1]
-		version := filterVersion(elements[2])
+		version := Version(elements)
 		coordinates := fmt.Sprintf("%s:%s", groupId, artifactId)
 		checksum := sum.buildChecksum(groupId, artifactId, version)
 		deps[coordinates] = build.Dependence(coordinates, version, checksum)
@@ -85,26 +85,18 @@ func GradleDeps(depsOutput string, checksumXml []byte) (map[string]build.Depende
 	return deps, nil
 }
 
-func filterVersion(rawVersion string) string {
-	// 1.6.0 -> 1.6.10 (*)
-	// 1.6.0 (*)
-	// 1.6.0 (c)
-	// 1.6.10
-	// 1.5.2-native-mt (*)
-	filteredSuffix := filterSuffix(rawVersion, " (*)", " (c)")
-	useLatest := strings.Split(filteredSuffix, " -> ")
-	if len(useLatest) > 1 {
-		return useLatest[1]
+func Version(elements []string) string {
+	if len(elements) == 3 {
+		return elements[2]
 	}
-	return useLatest[0]
+	return elements[3]
 }
 
-func filterSuffix(orgString string, suffixes ...string) string {
-	result := orgString
-	for _, suffix := range suffixes {
-		result = strings.TrimSuffix(result, suffix)
-	}
-	return result
+func filter(match string) []string {
+	replaceUpgrade := strings.Replace(match, " -> ", ":", -1)
+	replaceAndTrimStar := strings.TrimSpace(strings.Replace(replaceUpgrade, "(*)", "", -1))
+	replaceAndTrimC := strings.TrimSpace(strings.Replace(replaceAndTrimStar, "(c)", "", -1))
+	return strings.Split(strings.Replace(replaceAndTrimC, "--- ", "", -1), ":")
 }
 
 func (g GradleChecksum) buildChecksum(groupId, artifactId, version string) build.CheckSum {
