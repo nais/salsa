@@ -1,12 +1,13 @@
 package nodejs
 
 import (
+	"errors"
 	"fmt"
+	"github.com/nais/salsa/pkg/build"
+	"github.com/nais/salsa/pkg/utils"
 	"os"
 	"regexp"
 	"strings"
-
-	"github.com/nais/salsa/pkg/build"
 )
 
 const yarnBuildFileName = "yarn.lock"
@@ -15,7 +16,7 @@ type Yarn struct {
 	BuildFilePatterns []string
 }
 
-func NewYarn() build.Tool {
+func BuildYarn() build.Tool {
 	return &Yarn{
 		BuildFilePatterns: []string{yarnBuildFileName},
 	}
@@ -28,25 +29,37 @@ func (y Yarn) BuildFiles() []string {
 func (y Yarn) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
 	path := fmt.Sprintf("%s/%s", workDir, yarnBuildFileName)
 	fileContent, err := os.ReadFile(path)
+
 	if err != nil {
-		return nil, fmt.Errorf("read file: %w\n", err)
+		return nil, fmt.Errorf("read file: %w", err)
 	}
-	deps := YarnDeps(string(fileContent))
+
+	deps, err := YarnDeps(string(fileContent))
+	if err != nil {
+		return nil, fmt.Errorf("try to derive depencies from: %s %w", path, err)
+	}
+
 	return build.ArtifactDependency(deps, path, yarnBuildFileName), nil
 }
 
-func YarnDeps(yarnLockContents string) map[string]build.Dependency {
+func YarnDeps(yarnLockContents string) (map[string]build.Dependency, error) {
 	deps := make(map[string]build.Dependency, 0)
 	lines := strings.Split(yarnLockContents, "\n")
 	blockLines := blockLineNumbers(lines)
 	for _, startLine := range blockLines {
 		depName := parseDependency(lines[startLine])
 		depVersion := parseVersion(lines[startLine+1])
+		if !strings.Contains(lines[startLine+3], "integrity") {
+			return nil, errors.New("integrity is missing")
+		}
 		integrityLine := lines[startLine+3]
-		checksum := buildChecksum(integrityLine)
+		checksum, err := buildChecksum(integrityLine)
+		if err != nil {
+			return nil, fmt.Errorf("building checksum %w", err)
+		}
 		deps[depName] = build.Dependence(depName, depVersion, checksum)
 	}
-	return deps
+	return deps, nil
 }
 
 func blockLineNumbers(yarnLockLines []string) []int {
@@ -95,8 +108,12 @@ func parseVersion(line string) string {
 	return matches[pkgversionIndex]
 }
 
-func buildChecksum(line string) build.CheckSum {
+func buildChecksum(line string) (build.CheckSum, error) {
 	trimPrefixIntegrity := strings.TrimPrefix(line, "  integrity ")
 	fields := strings.Split(trimPrefixIntegrity, "-")
-	return build.Verification(fields[0], fields[1])
+	decodedDigest, err := utils.DecodeDigest(fields[1])
+	if err != nil {
+		return build.CheckSum{}, err
+	}
+	return build.Verification(fields[0], decodedDigest), nil
 }

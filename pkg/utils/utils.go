@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bytes"
+	"encoding/base64"
 	"fmt"
 	"io"
 	"os"
@@ -40,4 +41,12 @@ func StartSpinner(message string) *spinner.Spinner {
 	s.FinalMSG = message
 	s.Start()
 	return s
+}
+
+func DecodeDigest(base64Encoded string) (string, error) {
+	decoded, err := base64.StdEncoding.DecodeString(base64Encoded)
+	if err != nil {
+		return "", fmt.Errorf("decoding base64 encoded checksum")
+	}
+	return fmt.Sprintf("%x", decoded), nil
 }

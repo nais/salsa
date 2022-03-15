@@ -1,29 +1,29 @@
 package nodejs
 
 import (
-	"github.com/nais/salsa/pkg/build/test"
-	"testing"
-
 	"github.com/nais/salsa/pkg/build"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestYarnLockParsing(t *testing.T) {
 
-	got := YarnDeps(yarnlLockContents)
+	got, err := YarnDeps(yarnlLockContents)
+	assert.NoError(t, err)
 	want := map[string]build.Dependency{}
-	want["js-tokens"] = test.Dependency("js-tokens", "4.0.0", "sha512", "RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==")
-	want["loose-envify"] = test.Dependency("loose-envify", "1.4.0", "sha512", "lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==")
-	want["object-assign"] = test.Dependency("object-assign", "4.1.1", "sha1", "IQmtx5ZYh8/AXLvUQsrIv7s2CGM=")
-	want["react"] = test.Dependency("react", "17.0.2", "sha512", "gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==")
-	want["@babel/helper-annotate-as-pure"] = test.Dependency("@babel/helper-annotate-as-pure", "7.16.7", "sha512", "s6t2w/IPQVTAET1HitoowRGXooX8mCgtuP5195wD/QJPV6wYjpujCGF7JuMODVX2ZAJOf1GT6DT9MHEZvLOFSw==")
-	want["@babel/helper-builder-binary-assignment-operator-visitor"] = test.Dependency("@babel/helper-builder-binary-assignment-operator-visitor", "7.16.7", "sha512", "C6FdbRaxYjwVu/geKW4ZeQ0Q31AftgRcdSnZ5/jsH6BzCJbtvXvhpfkbkThYSuutZA7nCXpPR6AD9zd1dprMkA==")
-	want["range-parser"] = test.Dependency("range-parser", "1.2.1", "sha512", "Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==")
-	want["webpack-sources"] = test.Dependency("webpack-sources", "1.4.3", "sha512", "lgTS3Xhv1lCOKo7SA5TjKXMjpSM4sBjNV5+q2bqesbSPs5FjGmU6jjtBSkX9b4qW87vDIsCIlUPOEhbZrMdjeQ==")
-	want["util-deprecate"] = test.Dependency("util-deprecate", "1.0.2", "sha1", "RQ1Nyfpw3nMnYvvS1KKJgUGaDM8=")
-	want["unist-util-visit"] = test.Dependency("unist-util-visit", "2.0.3", "sha512", "iJ4/RczbJMkD0712mGktuGpm/U4By4FfDonL7N/9tATGIF4imikjOuagyMY53tnZq3NP6BcmlrHhEKAfGWjh7Q==")
-	want["source-map"] = test.Dependency("source-map", "0.6.1", "sha512", "UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==")
+	want["js-tokens"] = build.TestDependency("js-tokens", "4.0.0", "sha512", "45d2547e5704ddc5332a232a420b02bb4e853eef5474824ed1b7986cf84737893a6a9809b627dca02b53f5b7313a9601b690f690233a49bce0e026aeb16fcf29")
+	want["loose-envify"] = build.TestDependency("loose-envify", "1.4.0", "sha512", "972bb13c6aff59f86b95e9b608bfd472751cd7372a280226043cee918ed8e45ff242235d928ebe7d12debe5c351e03324b0edfeb5d54218e34f04b71452a0add")
+	want["object-assign"] = build.TestDependency("object-assign", "4.1.1", "sha1", "2109adc7965887cfc05cbbd442cac8bfbb360863")
+	want["react"] = build.TestDependency("react", "17.0.2", "sha512", "82784fb7be62fddabfcf7ffaabfd1ab0fefc0f4bb9f760f92f5a5deccf0ff9d724e85bbf8c978bea25552b6ddfa6d494663f158dffbeef05c0f1435c94641c6c")
+	want["@babel/helper-annotate-as-pure"] = build.TestDependency("@babel/helper-annotate-as-pure", "7.16.7", "sha512", "b3ab76c3f20f4154c0113d478ada28c11197a285fc98282db8fe75f79c03fd024f57ac188e9ba308617b26e30e0d55f664024e7f5193e834fd307119bcb3854b")
+	want["@babel/helper-builder-binary-assignment-operator-visitor"] = build.TestDependency("@babel/helper-builder-binary-assignment-operator-visitor", "7.16.7", "sha512", "0ba15d6d16b1623c15bbf81e296e19790d10df501fb6045c7529d9e7f8ec1fa0730896edbd7be1a5f91b9138584aebad640ee7097a4f47a003f73775769acc90")
+	want["range-parser"] = build.TestDependency("range-parser", "1.2.1", "sha512", "1eb82cc7ea2baa8ca09e68456ca68713a736f7a27e1d30105e8c4417a80dba944e9a6189468cb37c6ddc700bdea8206bc2bff6cb143905577f1939796a03b04a")
+	want["webpack-sources"] = build.TestDependency("webpack-sources", "1.4.3", "sha512", "9604d2dd786fd6508e2a8ed20394e3297323a52338b018cd579faad9ba9eb1b48fb391631a653a8e3b414a45fd6f8a96f3bbc322c0889543ce1216d9acc76379")
+	want["util-deprecate"] = build.TestDependency("util-deprecate", "1.0.2", "sha1", "450d4dc9fa70de732762fbd2d4a28981419a0ccf")
+	want["unist-util-visit"] = build.TestDependency("unist-util-visit", "2.0.3", "sha512", "889e3f45ccdb24c903d3bd7698692db86a66fd4e01cb815f0e89cbecdffdb404c6205e229a29233ae6a0c8c639ded9d9ab734fe8172696b1e110a01f1968e1ed")
+	want["source-map"] = build.TestDependency("source-map", "0.6.1", "sha512", "52381aa6e99695b3219018334fb624739617513e3a17488abbc4865ead1b7303f9773fe1d0f963e9e9c9aa3cf565bab697959aa989eb55bc16396332177178ee")
 
-	test.AssertEqual(t, got, want)
+	build.AssertEqual(t, got, want)
 }
 
 const yarnlLockContents = `
@@ -117,3 +117,30 @@ source-map@^0.6.0, source-map@^0.6.1, source-map@~0.6.0, source-map@~0.6.1:
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.6.1.tgz#74722af32e9614e9c287a8d0bbde48b5e2f1a263"
   integrity sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==
 `
+
+func TestBuildYarn(t *testing.T) {
+	tests := []build.IntegrationTest{
+		{
+			Name:      "find build file and parse output",
+			BuildType: BuildYarn(),
+			WorkDir:   "testdata/nodejs/yarn",
+			BuildPath: "testdata/nodejs/yarn/yarn.lock",
+			Cmd:       "yarn.lock",
+			Want: build.Want{
+				Key:     "js-tokens",
+				Version: "4.0.0",
+				Algo:    "sha512",
+				Digest:  "45d2547e5704ddc5332a232a420b02bb4e853eef5474824ed1b7986cf84737893a6a9809b627dca02b53f5b7313a9601b690f690233a49bce0e026aeb16fcf29",
+			},
+		},
+		{
+			Name:         "cant find build file",
+			BuildType:    BuildYarn(),
+			WorkDir:      "testdata/whatever",
+			Error:        true,
+			ErrorMessage: "could not find match, reading dir open testdata/whatever: no such file or directory",
+		},
+	}
+
+	build.RunTests(t, tests)
+}

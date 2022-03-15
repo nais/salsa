@@ -3,6 +3,7 @@ package jvm
 import (
 	"crypto/sha256"
 	"fmt"
+	"github.com/nais/salsa/pkg/build"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
@@ -10,7 +11,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/utils"
 )
 
@@ -20,7 +20,7 @@ type Maven struct {
 	BuildFilePatterns []string
 }
 
-func NewMaven() build.Tool {
+func BuildMaven() build.Tool {
 	return &Maven{
 		BuildFilePatterns: []string{mavenBuildFileName},
 	}

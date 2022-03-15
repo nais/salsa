@@ -3,9 +3,8 @@ package php
 import (
 	"encoding/json"
 	"fmt"
-	"os"
-
 	"github.com/nais/salsa/pkg/build"
+	"os"
 )
 
 const composerLockFileName = "composer.lock"
@@ -18,7 +17,7 @@ func (c Composer) BuildFiles() []string {
 	return c.BuildFilePatterns
 }
 
-func NewComposer() build.Tool {
+func BuildComposer() build.Tool {
 	return &Composer{
 		BuildFilePatterns: []string{composerLockFileName},
 	}

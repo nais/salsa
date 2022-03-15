@@ -2,13 +2,13 @@ package intoto
 
 import (
 	"fmt"
+	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/config"
 	"github.com/spf13/cobra"
 	"testing"
 	"time"
 
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
-	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/vcs"
 	"github.com/stretchr/testify/assert"
 )

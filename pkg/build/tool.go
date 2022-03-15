@@ -1,6 +1,7 @@
 package build
 
 import (
+	"errors"
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
@@ -16,11 +17,11 @@ type Tool interface {
 	ResolveDeps(workDir string) (*ArtifactDependencies, error)
 }
 
-type SupportedBuildTools struct {
+type Tools struct {
 	Tools []Tool
 }
 
-func (t SupportedBuildTools) DetectDeps(workDir string) (*ArtifactDependencies, error) {
+func (t Tools) DetectDeps(workDir string) (*ArtifactDependencies, error) {
 	log.Info("search for build files\n")
 	for _, tool := range t.Tools {
 		foundMatch, err := match(tool, workDir)
@@ -32,13 +33,13 @@ func (t SupportedBuildTools) DetectDeps(workDir string) (*ArtifactDependencies, 
 			log.Infof("found build type '%s'\n", tool.BuildFiles())
 			deps, err := tool.ResolveDeps(workDir)
 			if err != nil {
-				return nil, fmt.Errorf("could not resolve deps, %v", err)
+				return nil, fmt.Errorf("could not resolve deps: %v", err)
 			}
 
 			return deps, nil
 		}
 	}
-	return nil, nil
+	return nil, errors.New(fmt.Sprintf("no supported build files found: %s", workDir))
 }
 
 func match(t Tool, workDir string) (bool, error) {
@@ -49,7 +50,7 @@ func match(t Tool, workDir string) (bool, error) {
 			return false, err
 		}
 
-		if buildFile != "" {
+		if file == buildFile && len(buildFile) != 0 {
 			return true, nil
 		}
 	}

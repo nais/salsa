@@ -40,24 +40,9 @@ var scanCmd = &cobra.Command{
 		workDir := PathFlags.WorkDir()
 		log.Infof("prepare to scan path %s ...", workDir)
 
-		tools := build.SupportedBuildTools{
-			Tools: []build.Tool{
-				jvm.NewGradle(),
-				jvm.NewMaven(),
-				golang.NewGolang(),
-				nodejs.NewNpm(),
-				nodejs.NewYarn(),
-				php.NewComposer(),
-			},
-		}
-
-		deps, err := tools.DetectDeps(workDir)
+		deps, err := InitBuildTools().DetectDeps(workDir)
 		if err != nil {
 			return fmt.Errorf("detecting dependecies: %v", err)
-		}
-
-		if deps == nil {
-			return errors.New("could not find any supported build tools in " + workDir)
 		}
 
 		ciEnv, err := vcs.CreateCIEnvironment(&githubContext, &runnerContext, &envContext)
@@ -98,6 +83,19 @@ func GenerateProvenance(scanCfg *config.ScanConfiguration) error {
 
 	log.Infof("generated provenance in file: %s", path)
 	return nil
+}
+
+func InitBuildTools() build.Tools {
+	return build.Tools{
+		Tools: []build.Tool{
+			jvm.BuildGradle(),
+			jvm.BuildMaven(),
+			golang.BuildGo(),
+			nodejs.BuildNpm(),
+			nodejs.BuildYarn(),
+			php.BuildComposer(),
+		},
+	}
 }
 
 func init() {

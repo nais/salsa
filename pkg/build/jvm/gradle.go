@@ -4,12 +4,12 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"github.com/nais/salsa/pkg/build"
 	"io/ioutil"
 	"os/exec"
 	"regexp"
 	"strings"
 
-	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/utils"
 )
 
@@ -19,7 +19,7 @@ type Gradle struct {
 	BuildFilePatterns []string
 }
 
-func NewGradle() build.Tool {
+func BuildGradle() build.Tool {
 	return &Gradle{
 		BuildFilePatterns: []string{gradleBuildFileName},
 	}
@@ -38,7 +38,7 @@ func (g Gradle) ResolveDeps(workDir string) (*build.ArtifactDependencies, error)
 
 	err := utils.RequireCommand("gradle")
 	if err != nil {
-		return nil, fmt.Errorf("exec: %v\n", err)
+		return nil, fmt.Errorf("required: %v\n", err)
 	}
 
 	depsOutput, err := utils.Exec(cmd)
