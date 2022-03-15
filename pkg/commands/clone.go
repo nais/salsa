@@ -10,12 +10,6 @@ import (
 
 var owner string
 
-type Principal struct {
-	Username, Password string
-}
-
-var auth Principal
-
 var cloneCmd = &cobra.Command{
 	Use:   "clone",
 	Short: "clones the given project into user defined path",
@@ -27,7 +21,7 @@ var cloneCmd = &cobra.Command{
 
 		path := PathFlags.WorkDir()
 		log.Infof("prepare to checkout %s into path %s ...", PathFlags.Repo, path)
-		err := vcs.CloneRepo(owner, PathFlags.Repo, path, auth.Username, auth.Password)
+		err := vcs.CloneRepo(owner, PathFlags.Repo, path, Auth.GithubToken)
 		if err != nil {
 			return err
 		}
@@ -38,7 +32,5 @@ var cloneCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(cloneCmd)
 	cloneCmd.Flags().StringVar(&owner, "owner", "", "owner of the repo")
-	cloneCmd.Flags().StringVar(&auth.Username, "username", "", "username for private/internal repos")
-	cloneCmd.Flags().StringVar(&auth.Password, "password", "", "Github PAT token")
 	viper.BindPFlags(cloneCmd.Flags())
 }

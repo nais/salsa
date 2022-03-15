@@ -14,12 +14,12 @@ const (
 	GithubUrl = "https://github.com"
 )
 
-func CloneRepo(owner, repo, path, username, password string) error {
+func CloneRepo(owner, repo, path, token string) error {
 	auth := transport.AuthMethod(nil)
-	if username != "" || password != "" {
+	if token != "" {
 		auth = &http.BasicAuth{
-			Username: username,
-			Password: password,
+			Username: "github",
+			Password: token,
 		}
 	}
 	repoUrl := fmt.Sprintf("%s/%s/%s", GithubUrl, owner, repo)
