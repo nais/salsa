@@ -25,6 +25,12 @@ inputs:
       docker image to sign. Defaults to $ENV_IMAGE.
     required: true
 
+  token:
+    description: |-
+      PAT or GITHUB_TOKEN to use with private or internal repository depencies.
+      Exports by default secret to environment key: 'GITHUB_TOKEN'
+    required: false
+
   github_context:
     description: |-
       Internal value (do not set): the "github" context object in json.
@@ -49,3 +55,4 @@ runs:
     - ${{ inputs.runner_context }}
     - ${{ inputs.image }}
     - ${{ inputs.env_context }}
+    - ${{ inputs.github_token }}

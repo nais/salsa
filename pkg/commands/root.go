@@ -24,9 +24,14 @@ type RootFlags struct {
 	Remote  bool
 }
 
+type Principal struct {
+	GithubToken string
+}
+
 var (
 	cfgFile   string
 	PathFlags *RootFlags
+	Auth      *Principal
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -55,10 +60,12 @@ func Execute() {
 
 func init() {
 	PathFlags = &RootFlags{}
+	Auth = &Principal{}
 	rootCmd.PersistentFlags().StringVar(&PathFlags.Repo, "repo", "", "name of git repo")
 	rootCmd.PersistentFlags().StringVar(&PathFlags.RepoDir, "repoDir", "tmp", "path to folder for cloned projects")
 	rootCmd.PersistentFlags().BoolVar(&PathFlags.Remote, "remote-run", false, "remote run use another current path (can be deleted with introduction of containers)")
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/."+cmdName+".yaml)")
+	rootCmd.PersistentFlags().StringVar(&Auth.GithubToken, "token", "", "Github token or PAT. When cloning a private repo or repo use private dependencies")
 }
 
 // initConfig reads in config file and ENV variables if set.

@@ -3,6 +3,7 @@ package jvm
 import (
 	"crypto/sha256"
 	"fmt"
+	"github.com/nais/salsa/pkg/token"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
@@ -14,15 +15,31 @@ import (
 	"github.com/nais/salsa/pkg/utils"
 )
 
-const mavenBuildFileName = "pom.xml"
+const (
+	mavenBuildFileName = "pom.xml"
+)
 
 type Maven struct {
 	BuildFilePatterns []string
+	Settings          Settings
 }
 
-func NewMaven() build.Tool {
+type Settings struct {
+	Auth Auth
+}
+
+type Auth struct {
+	GithubToken string
+}
+
+func NewMaven(token string) build.Tool {
 	return &Maven{
 		BuildFilePatterns: []string{mavenBuildFileName},
+		Settings: Settings{
+			Auth: Auth{
+				GithubToken: token,
+			},
+		},
 	}
 }
 
@@ -31,16 +48,14 @@ func (m Maven) BuildFiles() []string {
 }
 
 func (m Maven) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
-	cmd := exec.Command(
-		"mvn",
-		"dependency:copy-dependencies",
-		"-DincludeScope=runtime",
-		"-Dmdep.useRepositoryLayout=true",
-	)
+	cmd, err := m.mvnCmd()
+	if err != nil {
+		return nil, fmt.Errorf("mvn cmd: %v\n", err)
+	}
 	cmd.Dir = workDir
 	rootPath := workDir + "/target/dependency"
 
-	_, err := utils.Exec(cmd)
+	_, err = utils.Exec(cmd)
 	if err != nil {
 		return nil, fmt.Errorf("exec: %v\n", err)
 	}
@@ -50,6 +65,20 @@ func (m Maven) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) 
 		return nil, fmt.Errorf("scan: %v\n", err)
 	}
 	return build.ArtifactDependency(deps, cmd.Path, strings.Join(cmd.Args, " ")), nil
+}
+
+func (m Maven) mvnCmd() (*exec.Cmd, error) {
+	err := token.Export(m.Settings.Auth.GithubToken)
+	if err != nil {
+		return nil, err
+	}
+
+	return exec.Command(
+		"mvn",
+		"dependency:copy-dependencies",
+		"-DincludeScope=runtime",
+		"-Dmdep.useRepositoryLayout=true",
+	), nil
 }
 
 func MavenCompileAndRuntimeTimeDeps(rootPath string) (map[string]build.Dependency, error) {

@@ -15,6 +15,7 @@ import (
 	"github.com/nais/salsa/pkg/vcs"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"os"
 )
 
@@ -43,7 +44,9 @@ var scanCmd = &cobra.Command{
 		tools := build.SupportedBuildTools{
 			Tools: []build.Tool{
 				jvm.NewGradle(),
-				jvm.NewMaven(),
+				jvm.NewMaven(
+					Auth.GithubToken,
+				),
 				golang.NewGolang(),
 				nodejs.NewNpm(),
 				nodejs.NewYarn(),
@@ -105,4 +108,5 @@ func init() {
 	scanCmd.Flags().StringVar(&githubContext, "github-context", "", "context of github environment")
 	scanCmd.Flags().StringVar(&runnerContext, "runner-context", "", "context of runner environment")
 	scanCmd.Flags().StringVar(&envContext, "env-context", "", "environmental variables of current context")
+	viper.BindPFlags(scanCmd.Flags())
 }

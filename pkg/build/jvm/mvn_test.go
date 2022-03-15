@@ -1,11 +1,13 @@
 package jvm
 
 import (
-	"github.com/nais/salsa/pkg/build/test"
-	"github.com/stretchr/testify/assert"
-	"testing"
-
+	"fmt"
 	"github.com/nais/salsa/pkg/build"
+	"github.com/nais/salsa/pkg/build/test"
+	"github.com/nais/salsa/pkg/token"
+	"github.com/stretchr/testify/assert"
+	"os"
+	"testing"
 )
 
 func TestMavenDeps(t *testing.T) {
@@ -25,4 +27,45 @@ func TestMavenDeps(t *testing.T) {
 	)
 
 	test.AssertEqual(t, got, want)
+}
+
+func TestMavenMvnCmd(t *testing.T) {
+	for _, mvnTest := range []struct {
+		name  string
+		token string
+		key   string
+		cmd   string
+	}{
+		{
+			name:  "generate a maven cmd from input with empty '--token' flag",
+			token: "",
+			key:   token.DefaultGithubTokenEnvKey,
+			cmd:   "/usr/local/bin/mvn dependency:copy-dependencies -DincludeScope=runtime -Dmdep.useRepositoryLayout=true",
+		},
+		{
+			name:  "generate a maven cmd from input token",
+			token: "token",
+			key:   token.DefaultGithubTokenEnvKey,
+			cmd:   "/usr/local/bin/mvn dependency:copy-dependencies -DincludeScope=runtime -Dmdep.useRepositoryLayout=true",
+		},
+	} {
+		t.Run(mvnTest.name, func(t *testing.T) {
+			mvn := Maven{
+				BuildFilePatterns: nil,
+				Settings: Settings{
+					Auth: Auth{
+						GithubToken: mvnTest.token,
+					},
+				},
+			}
+
+			cmd, err := mvn.mvnCmd()
+
+			assert.Equal(t, mvnTest.cmd, fmt.Sprintf("%s", cmd))
+			assert.Equal(t, mvnTest.token, os.Getenv(mvnTest.key))
+			// unset for next test
+			err = os.Unsetenv(mvnTest.key)
+			assert.NoError(t, err)
+		})
+	}
 }

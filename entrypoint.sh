@@ -13,6 +13,7 @@ salsa scan \
   --github-context "$GITHUB" \
   --runner-context "$RUNNER" \
   --env-context "$ENVS" \
+  --token "$INPUT_TOKEN" \
   --remote-run &&
   salsa attest \
     --repo "$REPO_NAME" \
