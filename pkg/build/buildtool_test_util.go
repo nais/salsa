@@ -47,7 +47,6 @@ func (in IntegrationTest) integrationTest(t *testing.T) {
 		} else {
 			assert.NoError(t, err)
 			assert.NotNil(t, deps)
-			assert.Equal(t, in.BuildPath, deps.Cmd.Path)
 			assert.Equal(t, in.Cmd, deps.Cmd.CmdFlags)
 			assert.NotEmpty(t, deps)
 			assert.Equal(t, expected[in.Want.Key], deps.RuntimeDeps[in.Want.Key])
