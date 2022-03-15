@@ -57,7 +57,7 @@ func TestBuildGradle(t *testing.T) {
 			Name:      "find build file and parse output",
 			BuildType: BuildGradle(),
 			WorkDir:   "testdata/jvm/gradle",
-			BuildPath: "/usr/local/bin/gradle",
+			BuildPath: "/usr/bin/gradle",
 			Cmd:       "gradle -q dependencies --configuration runtimeClasspath -M sha256",
 			Want: build.Want{
 				Key:     "org.jetbrains.kotlin:kotlin-reflect",
