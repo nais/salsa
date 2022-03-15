@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/config"
+	"github.com/nais/salsa/pkg/github"
 	"github.com/spf13/cobra"
 	"os"
 	"testing"
 	"time"
 
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
-	"github.com/nais/salsa/pkg/vcs"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -33,9 +33,9 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 	}{
 		{
 			name:              "create slsa provenance artifact with default values",
-			buildType:         vcs.AdHocBuildType,
+			buildType:         github.AdHocBuildType,
 			buildInvocationId: "",
-			builderId:         vcs.DefaultBuildId,
+			builderId:         github.DefaultBuildId,
 			buildConfig:       buildConfig(),
 			materials:         ExpectedDependenciesMaterial(),
 			configSource: slsa.ConfigSource{
@@ -49,7 +49,7 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 		},
 		{
 			name:                    "create slsa provenance with runner context",
-			buildType:               vcs.BuildType,
+			buildType:               github.BuildType,
 			buildInvocationId:       "https://github.com/nais/salsa/actions/runs/1234",
 			builderId:               "https://github.com/nais/salsa/Attestations/GitHubHostedActions@v1",
 			buildConfig:             nil,
@@ -80,10 +80,10 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 				// VCS Context
 				assert.Equal(t, test.buildType, slsaPredicate.BuildType)
 				assert.NotEmpty(t, slsaPredicate.Invocation)
-				i, err := slsaPredicate.Invocation.Parameters.(*vcs.Event).Inputs.MarshalJSON()
+				i, err := slsaPredicate.Invocation.Parameters.(*github.Event).Inputs.MarshalJSON()
 				assert.NoError(t, err)
 				assert.Equal(t, "some user inputs", fmt.Sprintf("%s", i))
-				e := slsaPredicate.Invocation.Environment.(*vcs.Metadata)
+				e := slsaPredicate.Invocation.Environment.(*github.Metadata)
 				assert.NoError(t, err)
 				assert.Equal(t, expectedMetadata(), e)
 				assert.NotEmpty(t, slsaPredicate.Invocation.Environment)
@@ -146,15 +146,15 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 	}
 }
 
-func expectedMetadata() *vcs.Metadata {
-	return &vcs.Metadata{
+func expectedMetadata() *github.Metadata {
+	return &github.Metadata{
 		Arch: "",
 		Env:  map[string]string{},
-		Context: vcs.Context{
-			Github: vcs.Github{
+		Context: github.Context{
+			Github: github.Github{
 				RunId: "1234",
 			},
-			Runner: vcs.Runner{
+			Runner: github.Runner{
 				Os:   "Linux",
 				Temp: "/home/runner/work/_temp"},
 		},

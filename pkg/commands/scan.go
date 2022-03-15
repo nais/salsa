@@ -10,9 +10,9 @@ import (
 	"github.com/nais/salsa/pkg/build/nodejs"
 	"github.com/nais/salsa/pkg/build/php"
 	"github.com/nais/salsa/pkg/config"
+	"github.com/nais/salsa/pkg/github"
 	"github.com/nais/salsa/pkg/intoto"
 	"github.com/nais/salsa/pkg/utils"
-	"github.com/nais/salsa/pkg/vcs"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
@@ -45,7 +45,7 @@ var scanCmd = &cobra.Command{
 			return fmt.Errorf("detecting dependecies: %v", err)
 		}
 
-		ciEnv, err := vcs.CreateCIEnvironment(&githubContext, &runnerContext, &envContext)
+		ciEnv, err := github.CreateCIEnvironment(&githubContext, &runnerContext, &envContext)
 		if err != nil {
 			return err
 		}

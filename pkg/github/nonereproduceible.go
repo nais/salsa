@@ -1,4 +1,4 @@
-package vcs
+package github
 
 type Metadata struct {
 	Arch    string            `json:"arch"`

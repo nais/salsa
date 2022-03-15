@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/config"
+	"github.com/nais/salsa/pkg/github"
 	"github.com/spf13/cobra"
 	"testing"
 	"time"
 
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
-	"github.com/nais/salsa/pkg/vcs"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -30,9 +30,9 @@ func TestCreateProvenanceOptions(t *testing.T) {
 	}{
 		{
 			name:              "create provenance artifact with default values",
-			buildType:         vcs.AdHocBuildType,
+			buildType:         github.AdHocBuildType,
 			buildInvocationId: "",
-			builderId:         vcs.DefaultBuildId,
+			builderId:         github.DefaultBuildId,
 			buildConfig:       buildConfig(),
 			builderRepoDigest: (*slsa.ProvenanceMaterial)(nil),
 			configSource: slsa.ConfigSource{
@@ -45,7 +45,7 @@ func TestCreateProvenanceOptions(t *testing.T) {
 		},
 		{
 			name:              "create provenance artifact with runner context",
-			buildType:         vcs.BuildType,
+			buildType:         github.BuildType,
 			buildInvocationId: "https://github.com/nais/salsa/actions/runs/1234",
 			builderId:         "https://github.com/nais/salsa/Attestations/GitHubHostedActions@v1",
 			buildConfig:       nil,
@@ -134,9 +134,9 @@ func ExpectedArtDeps(deps map[string]build.Dependency) *build.ArtifactDependenci
 	}
 }
 
-func Environment() *vcs.Environment {
-	return &vcs.Environment{
-		GitHubContext: vcs.GitHubContext{
+func Environment() *github.Environment {
+	return &github.Environment{
+		GitHubContext: github.GitHubContext{
 			Repository: "nais/salsa",
 			RunId:      "1234",
 			SHA:        "4321",
@@ -144,10 +144,10 @@ func Environment() *vcs.Environment {
 			ServerUrl:  "https://github.com",
 			EventName:  "workflow_dispatch",
 		},
-		Event: &vcs.Event{
+		Event: &github.Event{
 			Inputs: []byte("some user inputs"),
 		},
-		RunnerContext: vcs.RunnerContext{
+		RunnerContext: github.RunnerContext{
 			OS:        "Linux",
 			Temp:      "/home/runner/work/_temp",
 			ToolCache: "/opt/hostedtoolcache",
