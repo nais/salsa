@@ -2,6 +2,7 @@ package golang
 
 import (
 	"github.com/nais/salsa/pkg/build"
+	"github.com/nais/salsa/pkg/build/test"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -10,10 +11,10 @@ func TestGoDeps(t *testing.T) {
 	got, err := GoDeps(goSumContents)
 	assert.NoError(t, err)
 	want := map[string]build.Dependency{}
-	want["github.com/google/uuid"] = build.TestDependency("github.com/google/uuid", "1.0.0", "sha256", "6f81a4fbb59d3ff7771d91fc109b19a6f57b12d0ce81a64bb6768d188bb569d0")
-	want["github.com/pborman/uuid"] = build.TestDependency("github.com/pborman/uuid", "1.2.1", "sha256", "f99648c39f2dfe8cdd8d169787fddac077e65916f363126801d349c5eff7a6fc")
+	want["github.com/google/uuid"] = test.Dependency("github.com/google/uuid", "1.0.0", "sha256", "6f81a4fbb59d3ff7771d91fc109b19a6f57b12d0ce81a64bb6768d188bb569d0")
+	want["github.com/pborman/uuid"] = test.Dependency("github.com/pborman/uuid", "1.2.1", "sha256", "f99648c39f2dfe8cdd8d169787fddac077e65916f363126801d349c5eff7a6fc")
 
-	build.AssertEqual(t, got, want)
+	test.AssertEqual(t, got, want)
 }
 
 const goSumContents = `
@@ -24,14 +25,14 @@ github.com/pborman/uuid v1.2.1/go.mod h1:X/NO0urCmaxf9VXbdlT7C2Yzkj2IKimNn4k+gtP
 `
 
 func TestBuildGo(t *testing.T) {
-	tests := []build.IntegrationTest{
+	tests := []test.IntegrationTest{
 		{
 			Name:      "find GOLANG build file and parse output",
 			BuildType: BuildGo(),
 			WorkDir:   "testdata/golang",
 			BuildPath: "testdata/golang/go.sum",
 			Cmd:       "go.sum",
-			Want: build.Want{
+			Want: test.Want{
 				Key:     "github.com/Microsoft/go-winio",
 				Version: "0.5.1",
 				Algo:    "sha256",
@@ -47,5 +48,5 @@ func TestBuildGo(t *testing.T) {
 		},
 	}
 
-	build.RunTests(t, tests)
+	test.Run(t, tests)
 }
