@@ -2,6 +2,7 @@ package jvm
 
 import (
 	"github.com/nais/salsa/pkg/build"
+	"github.com/nais/salsa/pkg/build/test"
 	"io/ioutil"
 	"testing"
 
@@ -14,25 +15,25 @@ func TestGradleDeps(t *testing.T) {
 	got, err := GradleDeps(string(gradleOutput), checksumXml)
 	assert.NoError(t, err)
 	want := map[string]build.Dependency{}
-	want["ch.qos.logback:logback-classic:"] = build.TestDependency(
+	want["ch.qos.logback:logback-classic:"] = test.Dependency(
 		"ch.qos.logback:logback-classic",
 		"1.2.10",
 		"sha256",
 		"3160ae988af82c8bf3024ddbe034a82da98bb186fd09e76c50543c5b9da5cc5e",
 	)
-	want["org.jetbrains.kotlinx:kotlinx-coroutines-core"] = build.TestDependency(
+	want["org.jetbrains.kotlinx:kotlinx-coroutines-core"] = test.Dependency(
 		"org.jetbrains.kotlinx:kotlinx-coroutines-core",
 		"1.5.2-native-mt",
 		"sha256",
 		"78492527a0d09e0c53c81aacc2e073a83ee0fc3105e701496819ec67c98df16f",
 	)
-	want["com.fasterxml.jackson.core:jackson-annotations"] = build.TestDependency(
+	want["com.fasterxml.jackson.core:jackson-annotations"] = test.Dependency(
 		"com.fasterxml.jackson.core:jackson-annotations",
 		"2.13.0",
 		"sha256",
 		"81f9724d8843e8b08f8f6c0609e7a2b030d00c34861c4ac7e2099a7235047d6f",
 	)
-	want["com.fasterxml.jackson.core:jackson-databind"] = build.TestDependency(
+	want["com.fasterxml.jackson.core:jackson-databind"] = test.Dependency(
 		"com.fasterxml.jackson.core:jackson-databind",
 		"2.13.0",
 		"sha256",
@@ -52,14 +53,14 @@ func TestGradleDeps(t *testing.T) {
 }
 
 func TestBuildGradle(t *testing.T) {
-	tests := []build.IntegrationTest{
+	tests := []test.IntegrationTest{
 		{
 			Name:      "find build file and parse output",
 			BuildType: BuildGradle(),
 			WorkDir:   "testdata/jvm/gradle",
 			BuildPath: "/usr/local/bin/gradle",
 			Cmd:       "gradle -q dependencies --configuration runtimeClasspath -M sha256",
-			Want: build.Want{
+			Want: test.Want{
 				Key:     "org.jetbrains.kotlin:kotlin-reflect",
 				Version: "1.6.10",
 				Algo:    "sha256",
@@ -82,5 +83,5 @@ func TestBuildGradle(t *testing.T) {
 		},
 	}
 
-	build.RunTests(t, tests)
+	test.Run(t, tests)
 }

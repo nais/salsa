@@ -1,6 +1,7 @@
-package build
+package test
 
 import (
+	"github.com/nais/salsa/pkg/build"
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
@@ -15,7 +16,7 @@ type Want struct {
 
 type IntegrationTest struct {
 	Name         string
-	BuildType    Tool
+	BuildType    build.Tool
 	WorkDir      string
 	BuildPath    string
 	Cmd          string
@@ -24,7 +25,7 @@ type IntegrationTest struct {
 	ErrorMessage string
 }
 
-func RunTests(t *testing.T, tests []IntegrationTest) {
+func Run(t *testing.T, tests []IntegrationTest) {
 	for _, test := range tests {
 		test.integrationTest(t)
 	}
@@ -32,13 +33,13 @@ func RunTests(t *testing.T, tests []IntegrationTest) {
 
 func (in IntegrationTest) integrationTest(t *testing.T) {
 	t.Run(in.Name, func(t *testing.T) {
-		tools := Tools{
-			Tools: []Tool{in.BuildType},
+		tools := build.Tools{
+			Tools: []build.Tool{in.BuildType},
 		}
 
 		// Check 1 random dependency is parsed dependencies.
-		expected := map[string]Dependency{
-			in.Want.Key: TestDependency(in.Want.Key, in.Want.Version, in.Want.Algo, in.Want.Digest),
+		expected := map[string]build.Dependency{
+			in.Want.Key: Dependency(in.Want.Key, in.Want.Version, in.Want.Algo, in.Want.Digest),
 		}
 
 		deps, err := tools.DetectDeps(in.WorkDir)
@@ -47,7 +48,6 @@ func (in IntegrationTest) integrationTest(t *testing.T) {
 		} else {
 			assert.NoError(t, err)
 			assert.NotNil(t, deps)
-			assert.Equal(t, in.BuildPath, deps.Cmd.Path)
 			assert.Equal(t, in.Cmd, deps.Cmd.CmdFlags)
 			assert.NotEmpty(t, deps)
 			assert.Equal(t, expected[in.Want.Key], deps.RuntimeDeps[in.Want.Key])
@@ -55,13 +55,13 @@ func (in IntegrationTest) integrationTest(t *testing.T) {
 	})
 }
 
-func TestDependency(coordinates, version, algo, checksum string) Dependency {
-	return Dependence(coordinates, version,
-		Verification(algo, checksum),
+func Dependency(coordinates, version, algo, checksum string) build.Dependency {
+	return build.Dependence(coordinates, version,
+		build.Verification(algo, checksum),
 	)
 }
 
-func AssertEqual(t *testing.T, got, want map[string]Dependency) {
+func AssertEqual(t *testing.T, got, want map[string]build.Dependency) {
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("got %q, wanted %q", got, want)
 	}

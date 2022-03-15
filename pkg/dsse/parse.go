@@ -1,4 +1,4 @@
-package intoto
+package dsse
 
 import (
 	"encoding/base64"

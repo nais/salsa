@@ -2,18 +2,19 @@ package nodejs
 
 import (
 	"github.com/nais/salsa/pkg/build"
+	"github.com/nais/salsa/pkg/build/test"
 	"testing"
 )
 
 func TestPackageLockJsonParsing(t *testing.T) {
 	got, _ := NpmDeps(packageLockContents)
 	want := map[string]build.Dependency{}
-	want["js-tokens"] = build.TestDependency("js-tokens", "4.0.0", "sha512", "45d2547e5704ddc5332a232a420b02bb4e853eef5474824ed1b7986cf84737893a6a9809b627dca02b53f5b7313a9601b690f690233a49bce0e026aeb16fcf29")
-	want["loose-envify"] = build.TestDependency("loose-envify", "1.4.0", "sha512", "972bb13c6aff59f86b95e9b608bfd472751cd7372a280226043cee918ed8e45ff242235d928ebe7d12debe5c351e03324b0edfeb5d54218e34f04b71452a0add")
-	want["object-assign"] = build.TestDependency("object-assign", "4.1.1", "sha1", "2109adc7965887cfc05cbbd442cac8bfbb360863")
-	want["react"] = build.TestDependency("react", "17.0.2", "sha512", "82784fb7be62fddabfcf7ffaabfd1ab0fefc0f4bb9f760f92f5a5deccf0ff9d724e85bbf8c978bea25552b6ddfa6d494663f158dffbeef05c0f1435c94641c6c")
+	want["js-tokens"] = test.Dependency("js-tokens", "4.0.0", "sha512", "45d2547e5704ddc5332a232a420b02bb4e853eef5474824ed1b7986cf84737893a6a9809b627dca02b53f5b7313a9601b690f690233a49bce0e026aeb16fcf29")
+	want["loose-envify"] = test.Dependency("loose-envify", "1.4.0", "sha512", "972bb13c6aff59f86b95e9b608bfd472751cd7372a280226043cee918ed8e45ff242235d928ebe7d12debe5c351e03324b0edfeb5d54218e34f04b71452a0add")
+	want["object-assign"] = test.Dependency("object-assign", "4.1.1", "sha1", "2109adc7965887cfc05cbbd442cac8bfbb360863")
+	want["react"] = test.Dependency("react", "17.0.2", "sha512", "82784fb7be62fddabfcf7ffaabfd1ab0fefc0f4bb9f760f92f5a5deccf0ff9d724e85bbf8c978bea25552b6ddfa6d494663f158dffbeef05c0f1435c94641c6c")
 
-	build.AssertEqual(t, got, want)
+	test.AssertEqual(t, got, want)
 }
 
 const packageLockContents = `
@@ -100,14 +101,14 @@ const packageLockContents = `
 }`
 
 func TestBuildNpm(t *testing.T) {
-	tests := []build.IntegrationTest{
+	tests := []test.IntegrationTest{
 		{
 			Name:      "find build file and parse output",
 			BuildType: BuildNpm(),
 			WorkDir:   "testdata/nodejs/npm",
 			BuildPath: "testdata/nodejs/npm/package-lock.json",
 			Cmd:       "package-lock.json",
-			Want: build.Want{
+			Want: test.Want{
 				Key:     "@ampproject/remapping",
 				Version: "2.1.0",
 				Algo:    "sha512",
@@ -123,5 +124,5 @@ func TestBuildNpm(t *testing.T) {
 		},
 	}
 
-	build.RunTests(t, tests)
+	test.Run(t, tests)
 }

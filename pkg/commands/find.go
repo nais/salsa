@@ -3,12 +3,12 @@ package commands
 import (
 	"errors"
 	"fmt"
+	"github.com/nais/salsa/pkg/dsse"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/nais/salsa/pkg/intoto"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -45,11 +45,11 @@ var findCmd = &cobra.Command{
 				return fmt.Errorf("read .att file content %s, %w", attFilePath, err)
 			}
 
-			provenance, err := intoto.ParseEnvelope(fileContents)
+			provenance, err := dsse.ParseEnvelope(fileContents)
 			if err != nil {
 				return fmt.Errorf("could not read file %s, %w", attFilePath, err)
 			}
-			result := intoto.FindMaterials(provenance.Predicate.Materials, artifact)
+			result := dsse.FindMaterials(provenance.Predicate.Materials, artifact)
 			app := strings.Split(file.Name(), ".")[0]
 
 			if len(result) == 0 {

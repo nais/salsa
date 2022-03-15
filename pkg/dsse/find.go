@@ -1,4 +1,4 @@
-package intoto
+package dsse
 
 import (
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
