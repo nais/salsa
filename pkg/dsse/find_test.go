@@ -1,4 +1,4 @@
-package intoto
+package dsse
 
 import (
 	"github.com/stretchr/testify/assert"
