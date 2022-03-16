@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/config"
+	"github.com/nais/salsa/pkg/vcs"
 	"github.com/spf13/cobra"
 	"testing"
 	"time"
 
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
-	"github.com/nais/salsa/pkg/vcs"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -59,11 +59,11 @@ func TestCreateProvenanceOptions(t *testing.T) {
 			if test.runnerContext {
 				env := Environment()
 				scanCfg := &config.ScanConfiguration{
-					WorkDir:       "",
-					RepoName:      "artifact",
-					Dependencies:  artDeps,
-					CiEnvironment: env,
-					Cmd:           nil,
+					WorkDir:            "",
+					RepoName:           "artifact",
+					Dependencies:       artDeps,
+					ContextEnvironment: env,
+					Cmd:                nil,
 				}
 				provenanceArtifact := CreateProvenanceOptions(scanCfg)
 				assert.Equal(t, "artifact", provenanceArtifact.Name)
@@ -82,11 +82,11 @@ func TestCreateProvenanceOptions(t *testing.T) {
 			} else {
 
 				scanCfg := &config.ScanConfiguration{
-					WorkDir:       "",
-					RepoName:      "artifact",
-					Dependencies:  artDeps,
-					CiEnvironment: nil,
-					Cmd:           &cobra.Command{Use: "salsa"},
+					WorkDir:            "",
+					RepoName:           "artifact",
+					Dependencies:       artDeps,
+					ContextEnvironment: nil,
+					Cmd:                &cobra.Command{Use: "salsa"},
 				}
 
 				provenanceArtifact := CreateProvenanceOptions(scanCfg)
@@ -134,9 +134,9 @@ func ExpectedArtDeps(deps map[string]build.Dependency) *build.ArtifactDependenci
 	}
 }
 
-func Environment() *vcs.Environment {
-	return &vcs.Environment{
-		GitHubContext: vcs.GitHubContext{
+func Environment() *vcs.GithubCIEnvironment {
+	return &vcs.GithubCIEnvironment{
+		GitHubContext: &vcs.GitHubContext{
 			Repository: "nais/salsa",
 			RunId:      "1234",
 			SHA:        "4321",
@@ -147,7 +147,7 @@ func Environment() *vcs.Environment {
 		Event: &vcs.Event{
 			Inputs: []byte("some user inputs"),
 		},
-		RunnerContext: vcs.RunnerContext{
+		RunnerContext: &vcs.RunnerContext{
 			OS:        "Linux",
 			Temp:      "/home/runner/work/_temp",
 			ToolCache: "/opt/hostedtoolcache",

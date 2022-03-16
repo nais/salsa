@@ -1,4 +1,4 @@
-package vcs
+package clone
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ const (
 	GithubUrl = "https://github.com"
 )
 
-func CloneRepo(owner, repo, path, token string) error {
+func Repo(owner, repo, path, token string) error {
 	auth := transport.AuthMethod(nil)
 	if token != "" {
 		auth = &http.BasicAuth{

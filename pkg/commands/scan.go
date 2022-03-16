@@ -18,7 +18,7 @@ import (
 	"os"
 )
 
-var githubContext string
+var buildContext string
 var runnerContext string
 var envContext string
 
@@ -45,17 +45,17 @@ var scanCmd = &cobra.Command{
 			return fmt.Errorf("detecting dependecies: %v", err)
 		}
 
-		ciEnv, err := vcs.CreateCIEnvironment(&githubContext, &runnerContext, &envContext)
+		contextEnvironment, err := vcs.CreateGithubCIEnvironment(&buildContext, &runnerContext, &envContext)
 		if err != nil {
 			return err
 		}
 
 		scanConfiguration := &config.ScanConfiguration{
-			WorkDir:       workDir,
-			RepoName:      PathFlags.Repo,
-			Dependencies:  deps,
-			CiEnvironment: ciEnv,
-			Cmd:           cmd,
+			WorkDir:            workDir,
+			RepoName:           PathFlags.Repo,
+			Dependencies:       deps,
+			ContextEnvironment: contextEnvironment,
+			Cmd:                cmd,
 		}
 
 		err = GenerateProvenance(scanConfiguration)
@@ -100,7 +100,7 @@ func InitBuildTools() build.Tools {
 
 func init() {
 	rootCmd.AddCommand(scanCmd)
-	scanCmd.Flags().StringVar(&githubContext, "github-context", "", "context of github environment")
-	scanCmd.Flags().StringVar(&runnerContext, "runner-context", "", "context of runner environment")
+	scanCmd.Flags().StringVar(&buildContext, "build-context", "", "context of build tool")
+	scanCmd.Flags().StringVar(&runnerContext, "runner-context", "", "context of runner")
 	scanCmd.Flags().StringVar(&envContext, "env-context", "", "environmental variables of current context")
 }

@@ -3,10 +3,10 @@ package intoto
 import (
 	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/config"
+	"github.com/nais/salsa/pkg/vcs"
 	"time"
 
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
-	"github.com/nais/salsa/pkg/vcs"
 )
 
 type ProvenanceOptions struct {
@@ -28,11 +28,11 @@ func CreateProvenanceOptions(scanCfg *config.ScanConfiguration) *ProvenanceOptio
 		Name:           scanCfg.RepoName,
 	}
 
-	if scanCfg.CiEnvironment != nil {
+	if scanCfg.ContextEnvironment != nil {
 		opts.BuildType = vcs.BuildType
-		opts.BuildInvocationId = scanCfg.CiEnvironment.BuildInvocationId()
-		opts.BuilderId = scanCfg.CiEnvironment.BuilderId()
-		opts.withBuilderRepoDigest(scanCfg.CiEnvironment).withBuilderInvocation(scanCfg.CiEnvironment)
+		opts.BuildInvocationId = scanCfg.ContextEnvironment.BuildInvocationId()
+		opts.BuilderId = scanCfg.ContextEnvironment.BuilderId()
+		opts.withBuilderRepoDigest(scanCfg.ContextEnvironment).withBuilderInvocation(scanCfg.ContextEnvironment)
 		return opts
 	}
 
@@ -43,26 +43,26 @@ func CreateProvenanceOptions(scanCfg *config.ScanConfiguration) *ProvenanceOptio
 	return opts
 }
 
-func (in *ProvenanceOptions) withBuilderRepoDigest(env *vcs.Environment) *ProvenanceOptions {
+func (in *ProvenanceOptions) withBuilderRepoDigest(env vcs.ContextEnvironment) *ProvenanceOptions {
 	in.BuilderRepoDigest = &slsa.ProvenanceMaterial{
 		URI: "git+" + env.RepoUri(),
 		Digest: slsa.DigestSet{
-			build.AlgorithmSHA1: env.GithubSha(),
+			build.AlgorithmSHA1: env.Sha(),
 		},
 	}
 	return in
 }
 
-func (in *ProvenanceOptions) withBuilderInvocation(env *vcs.Environment) *ProvenanceOptions {
+func (in *ProvenanceOptions) withBuilderInvocation(env vcs.ContextEnvironment) *ProvenanceOptions {
 	in.Invocation = &slsa.ProvenanceInvocation{
 		ConfigSource: slsa.ConfigSource{
 			URI: "git+" + env.RepoUri(),
 			Digest: slsa.DigestSet{
-				build.AlgorithmSHA1: env.GithubSha(),
+				build.AlgorithmSHA1: env.Sha(),
 			},
-			EntryPoint: env.GitHubContext.Workflow,
+			EntryPoint: env.Context(),
 		},
-		Parameters:  env.AddUserDefinedParameters(),
+		Parameters:  env.UserDefinedParameters(),
 		Environment: env.NonReproducibleMetadata(),
 	}
 	return in

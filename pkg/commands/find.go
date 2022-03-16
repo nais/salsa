@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/nais/salsa/pkg/dsse"
+	"github.com/nais/salsa/pkg/intoto"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -27,39 +28,46 @@ var findCmd = &cobra.Command{
 			return errors.New("missing artifact")
 		}
 
-		path := PathFlags.WorkDir()
-		files, err := ioutil.ReadDir(path)
+		path := PathFlags.RepoDir
+		dirs, err := ioutil.ReadDir(path)
 		if err != nil {
 			return fmt.Errorf("could not read dir %w", err)
 		}
 
-		for _, file := range files {
-			var attFilePath = fmt.Sprintf("%s/%s", path, file.Name())
-
-			if ext := filepath.Ext(file.Name()); ext != ".att" {
-				continue
-			}
-
-			fileContents, err := os.ReadFile(attFilePath)
+		for _, dir := range dirs {
+			files, err := ioutil.ReadDir(fmt.Sprintf("./%s/%s", path, dir.Name()))
 			if err != nil {
-				return fmt.Errorf("read .att file content %s, %w", attFilePath, err)
+				return fmt.Errorf("could not read dir %w", err)
 			}
 
-			provenance, err := dsse.ParseEnvelope(fileContents)
-			if err != nil {
-				return fmt.Errorf("could not read file %s, %w", attFilePath, err)
-			}
-			result := dsse.FindMaterials(provenance.Predicate.Materials, artifact)
-			app := strings.Split(file.Name(), ".")[0]
+			for _, file := range files {
+				var attFilePath = fmt.Sprintf("./%s/%s/%s", path, dir.Name(), file.Name())
 
-			if len(result) == 0 {
-				log.Infof("no dependcies where found in app %s", app)
-			} else {
-				log.Infof("found dependency(ies) in app %s:", app)
-				for _, f := range result {
-					log.Infof("-uri: %s", f.URI)
-					for k, d := range f.Digest {
-						log.Infof("--digest: %s:%s", k, d)
+				if ext := filepath.Ext(file.Name()); ext != ".att" {
+					continue
+				}
+
+				fileContents, err := os.ReadFile(attFilePath)
+				if err != nil {
+					return fmt.Errorf("read .att file content %s, %w", attFilePath, err)
+				}
+
+				provenance, err := dsse.ParseEnvelope(fileContents)
+				if err != nil {
+					return fmt.Errorf("could not read file %s, %w", attFilePath, err)
+				}
+				result := intoto.FindMaterials(provenance.Predicate.Materials, artifact)
+				app := strings.Split(file.Name(), ".")[0]
+
+				if len(result) == 0 {
+					log.Infof("no dependcies where found in app %s", app)
+				} else {
+					log.Infof("found dependency(ies) in app %s:", app)
+					for _, f := range result {
+						log.Infof("-uri: %s", f.URI)
+						for k, d := range f.Digest {
+							log.Infof("--digest: %s:%s", k, d)
+						}
 					}
 				}
 			}

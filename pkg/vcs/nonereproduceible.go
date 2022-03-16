@@ -19,22 +19,3 @@ type Runner struct {
 type Github struct {
 	RunId string
 }
-
-func (in *Environment) NonReproducibleMetadata() *Metadata {
-	// Other variables that are required to reproduce the build and that cannot be
-	// recomputed using existing information.
-	//(Documentation would explain how to recompute the rest of the fields.)
-	return &Metadata{
-		Arch: in.RunnerContext.Arch,
-		Env:  in.GetCurrentFilteredEnvironment(),
-		Context: Context{
-			Github: Github{
-				RunId: in.GitHubContext.RunId,
-			},
-			Runner: Runner{
-				Os:   in.RunnerContext.OS,
-				Temp: in.RunnerContext.Temp,
-			},
-		},
-	}
-}

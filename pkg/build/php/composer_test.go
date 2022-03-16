@@ -1023,7 +1023,7 @@ const composerLockContents = `{
     "plugin-api-version": "2.2.0"
 }`
 
-func TestBuildYarn(t *testing.T) {
+func TestBuildPhp(t *testing.T) {
 	tests := []test.IntegrationTest{
 		{
 			Name:      "find build file and parse output",

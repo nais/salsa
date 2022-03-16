@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/config"
+	"github.com/nais/salsa/pkg/vcs"
 	"github.com/spf13/cobra"
 	"os"
 	"testing"
 	"time"
 
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
-	"github.com/nais/salsa/pkg/vcs"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -65,11 +65,11 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 				env := Environment()
 
 				scanCfg := &config.ScanConfiguration{
-					WorkDir:       "",
-					RepoName:      "artifact",
-					Dependencies:  artDeps,
-					CiEnvironment: env,
-					Cmd:           nil,
+					WorkDir:            "",
+					RepoName:           "artifact",
+					Dependencies:       artDeps,
+					ContextEnvironment: env,
+					Cmd:                nil,
 				}
 
 				opts := CreateProvenanceOptions(scanCfg)
@@ -108,11 +108,11 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 			} else {
 
 				scanCfg := &config.ScanConfiguration{
-					WorkDir:       "",
-					RepoName:      "artifact",
-					Dependencies:  artDeps,
-					CiEnvironment: nil,
-					Cmd:           &cobra.Command{Use: "salsa"},
+					WorkDir:            "",
+					RepoName:           "artifact",
+					Dependencies:       artDeps,
+					ContextEnvironment: nil,
+					Cmd:                &cobra.Command{Use: "salsa"},
 				}
 
 				opts := CreateProvenanceOptions(scanCfg)
