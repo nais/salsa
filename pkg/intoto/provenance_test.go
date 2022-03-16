@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/config"
-	"github.com/nais/salsa/pkg/github"
+	"github.com/nais/salsa/pkg/vcs"
 	"github.com/spf13/cobra"
 	"os"
 	"testing"
@@ -33,9 +33,9 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 	}{
 		{
 			name:              "create slsa provenance artifact with default values",
-			buildType:         github.AdHocBuildType,
+			buildType:         vcs.AdHocBuildType,
 			buildInvocationId: "",
-			builderId:         github.DefaultBuildId,
+			builderId:         vcs.DefaultBuildId,
 			buildConfig:       buildConfig(),
 			materials:         ExpectedDependenciesMaterial(),
 			configSource: slsa.ConfigSource{
@@ -49,7 +49,7 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 		},
 		{
 			name:                    "create slsa provenance with runner context",
-			buildType:               github.BuildType,
+			buildType:               vcs.BuildType,
 			buildInvocationId:       "https://github.com/nais/salsa/actions/runs/1234",
 			builderId:               "https://github.com/nais/salsa/Attestations/GitHubHostedActions@v1",
 			buildConfig:             nil,
@@ -65,11 +65,11 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 				env := Environment()
 
 				scanCfg := &config.ScanConfiguration{
-					WorkDir:       "",
-					RepoName:      "artifact",
-					Dependencies:  artDeps,
-					CiEnvironment: env,
-					Cmd:           nil,
+					WorkDir:            "",
+					RepoName:           "artifact",
+					Dependencies:       artDeps,
+					ContextEnvironment: env,
+					Cmd:                nil,
 				}
 
 				opts := CreateProvenanceOptions(scanCfg)
@@ -80,10 +80,10 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 				// VCS Context
 				assert.Equal(t, test.buildType, slsaPredicate.BuildType)
 				assert.NotEmpty(t, slsaPredicate.Invocation)
-				i, err := slsaPredicate.Invocation.Parameters.(*github.Event).Inputs.MarshalJSON()
+				i, err := slsaPredicate.Invocation.Parameters.(*vcs.Event).Inputs.MarshalJSON()
 				assert.NoError(t, err)
 				assert.Equal(t, "some user inputs", fmt.Sprintf("%s", i))
-				e := slsaPredicate.Invocation.Environment.(*github.Metadata)
+				e := slsaPredicate.Invocation.Environment.(*vcs.Metadata)
 				assert.NoError(t, err)
 				assert.Equal(t, expectedMetadata(), e)
 				assert.NotEmpty(t, slsaPredicate.Invocation.Environment)
@@ -108,11 +108,11 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 			} else {
 
 				scanCfg := &config.ScanConfiguration{
-					WorkDir:       "",
-					RepoName:      "artifact",
-					Dependencies:  artDeps,
-					CiEnvironment: nil,
-					Cmd:           &cobra.Command{Use: "salsa"},
+					WorkDir:            "",
+					RepoName:           "artifact",
+					Dependencies:       artDeps,
+					ContextEnvironment: nil,
+					Cmd:                &cobra.Command{Use: "salsa"},
 				}
 
 				opts := CreateProvenanceOptions(scanCfg)
@@ -146,15 +146,15 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 	}
 }
 
-func expectedMetadata() *github.Metadata {
-	return &github.Metadata{
+func expectedMetadata() *vcs.Metadata {
+	return &vcs.Metadata{
 		Arch: "",
 		Env:  map[string]string{},
-		Context: github.Context{
-			Github: github.Github{
+		Context: vcs.Context{
+			Github: vcs.Github{
 				RunId: "1234",
 			},
-			Runner: github.Runner{
+			Runner: vcs.Runner{
 				Os:   "Linux",
 				Temp: "/home/runner/work/_temp"},
 		},

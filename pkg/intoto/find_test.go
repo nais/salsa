@@ -1,6 +1,7 @@
-package dsse
+package intoto
 
 import (
+	"github.com/nais/salsa/pkg/dsse"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -13,7 +14,7 @@ func TestFindMaterial(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.NoError(t, err)
-	statement, err := ParseEnvelope(fileContents)
+	statement, err := dsse.ParseEnvelope(fileContents)
 
 	assert.NoError(t, err)
 	assert.NotEmpty(t, statement.Predicate.Materials)

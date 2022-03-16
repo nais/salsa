@@ -1,54 +1,13 @@
-package github
+package vcs
 
 import (
 	"encoding/base64"
-	"fmt"
 	"github.com/stretchr/testify/assert"
-	"os"
 	"reflect"
 	"testing"
 )
 
-func TestCreateGithubContext(t *testing.T) {
-	githubContext, err := os.ReadFile("testdata/github-context.json")
-	assert.NoError(t, err)
-	encodedContext := base64.StdEncoding.EncodeToString(githubContext)
-	env := Environment{}
-	err = ParseGithub(&encodedContext, &env)
-	assert.NoError(t, err)
-
-	assert.Equal(t, "90dc9f2bc4007d1099a941ba3d408d2c896fe8dd", env.GitHubContext.SHA)
-	assert.Equal(t, "build", env.GitHubContext.Job)
-	assert.Equal(t, "refs/heads/main", env.GitHubContext.Ref)
-	assert.Equal(t, "nais/salsa", env.GitHubContext.Repository)
-	assert.Equal(t, "nais", env.GitHubContext.RepositoryOwner)
-	assert.Equal(t, "1839977840", env.GitHubContext.RunId)
-	assert.Equal(t, "57", env.GitHubContext.RunNumber)
-	assert.Equal(t, "jdoe", env.GitHubContext.Actor)
-
-	assert.Equal(t, "https://github.com/nais/salsa", env.RepoUri())
-	assert.Equal(t, "https://github.com/nais/salsa/Attestations/GitHubHostedActions@v1", env.BuilderId())
-	assert.Equal(t, "https://github.com/nais/salsa/actions/runs/1839977840", env.BuildInvocationId())
-	marshalJSON, err := env.AddUserDefinedParameters().Inputs.MarshalJSON()
-	assert.NoError(t, err)
-	assert.NotEmpty(t, fmt.Sprintf("%s", marshalJSON))
-	assert.Equal(t, "90dc9f2bc4007d1099a941ba3d408d2c896fe8dd", env.GithubSha())
-
-}
-
-func TestCreateRunnerContext(t *testing.T) {
-	env := Environment{}
-	encodedContext := base64.StdEncoding.EncodeToString([]byte(runnerContext))
-	err := ParseRunner(&encodedContext, &env)
-	assert.NoError(t, err)
-	assert.Equal(t, "Hosted Agent", env.RunnerContext.Name)
-	assert.Equal(t, "Linux", env.RunnerContext.OS)
-	assert.Equal(t, "X64", env.RunnerContext.Arch)
-	assert.Equal(t, "/opt/hostedtoolcache", env.RunnerContext.ToolCache)
-	assert.Equal(t, "/home/runner/work/_temp", env.RunnerContext.Temp)
-}
-
-func TestEnvironment_GetCurrentFilteredEnvironment(t *testing.T) {
+func TestEnvironmentGetCurrentFilteredEnvironment(t *testing.T) {
 	filteredResult := toEnvData(t, envs)
 	expected := toEnvData(t, expectedEnvs)
 
@@ -57,12 +16,35 @@ func TestEnvironment_GetCurrentFilteredEnvironment(t *testing.T) {
 	}
 }
 
-func toEnvData(t *testing.T, inputEnvs string) map[string]string {
-	env := Environment{}
-	encodedEnvs := base64.StdEncoding.EncodeToString([]byte(inputEnvs))
-	err := ParseEnv(&encodedEnvs, &env)
+func TestParseBuildContext(t *testing.T) {
+	expected := make(map[string]string)
+	expected["GOVERSION"] = "1.17"
+	expected["GOROOT"] = "/opt/hostedtoolcache/go/1.17.6/x64"
+	encodedContext := base64.StdEncoding.EncodeToString([]byte(envContext))
+	env, err := ParseBuild(&encodedContext)
 	assert.NoError(t, err)
-	return env.GetCurrentFilteredEnvironment()
+	assert.Equal(t, 2, len(env.GetEnvs()))
+}
+
+func TestParseBuildNoContext(t *testing.T) {
+	data := ""
+	env, err := ParseBuild(&data)
+	assert.NoError(t, err)
+	assert.Nil(t, env)
+}
+
+func TestParseBuildFailContext(t *testing.T) {
+	data := "yolo"
+	env, err := ParseBuild(&data)
+	assert.Nil(t, env)
+	assert.EqualError(t, err, "unmarshal environmental context json: invalid character 'Ê' looking for beginning of value")
+}
+
+func toEnvData(t *testing.T, inputEnvs string) map[string]string {
+	encodedEnvs := base64.StdEncoding.EncodeToString([]byte(inputEnvs))
+	env, err := ParseBuild(&encodedEnvs)
+	assert.NoError(t, err)
+	return env.FilterEnvs()
 }
 
 var envs = `
@@ -114,26 +96,6 @@ var expectedEnvs = `
         "GOOGLE_GHA_CREDS_PATH": "/github/workspace/gha-creds-f1d01cf9a81874ff.json",
 		"LC_COLLATE":"C"
 }`
-
-var runnerContext = `{
-		"os": "Linux",
-		"arch": "X64",
-		"name": "Hosted Agent",
-		"tool_cache": "/opt/hostedtoolcache",
-		"temp": "/home/runner/work/_temp",
-		"workspace": "/home/runner/work/nais-salsa-action"
-	  }`
-
-func TestCreateCurrentEnvironmentContext(t *testing.T) {
-	env := Environment{}
-	expected := make(map[string]string)
-	expected["GOVERSION"] = "1.17"
-	expected["GOROOT"] = "/opt/hostedtoolcache/go/1.17.6/x64"
-	encodedContext := base64.StdEncoding.EncodeToString([]byte(envContext))
-	err := ParseEnv(&encodedContext, &env)
-	assert.NoError(t, err)
-	assert.Equal(t, 2, len(env.CurrentEnvironment.Envs))
-}
 
 var envContext = `{
   		"GOVERSION": "1.17",

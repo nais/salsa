@@ -2,7 +2,7 @@ package commands
 
 import (
 	"errors"
-	"github.com/nais/salsa/pkg/vcs"
+	"github.com/nais/salsa/pkg/clone"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -21,7 +21,7 @@ var cloneCmd = &cobra.Command{
 
 		path := PathFlags.WorkDir()
 		log.Infof("prepare to checkout %s into path %s ...", PathFlags.Repo, path)
-		err := vcs.CloneRepo(owner, PathFlags.Repo, path, Auth.GithubToken)
+		err := clone.Repo(owner, PathFlags.Repo, path, Auth.GithubToken)
 		if err != nil {
 			return err
 		}

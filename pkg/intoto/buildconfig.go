@@ -5,6 +5,7 @@ import (
 	"github.com/nais/salsa/pkg/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"strings"
 )
 
 type BuildConfig struct {
@@ -39,7 +40,11 @@ func salsaCmdFlags(cmd *cobra.Command) string {
 
 	cmdFlags := ""
 	for _, c := range flagsUsed {
-		cmdFlags += fmt.Sprintf("--%s %s", c.Name, c.Value.String())
+		if strings.Contains(c.Name, "token") {
+			cmdFlags += fmt.Sprintf(" --%s %s", c.Name, "***")
+		} else {
+			cmdFlags += fmt.Sprintf(" --%s %s", c.Name, c.Value.String())
+		}
 	}
 
 	return cmdFlags

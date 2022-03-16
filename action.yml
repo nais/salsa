@@ -12,6 +12,12 @@ inputs:
     required: false
     default: ${{ github.workspace }}
 
+  repo_sub_dir:
+    description: |-
+      Specify a sub directory if build file not found in working root directory
+    required: false
+    default: ""
+
   repo_name:
     description: |-
       Name of the file and path to provenance.
@@ -49,3 +55,4 @@ runs:
     - ${{ inputs.runner_context }}
     - ${{ inputs.image }}
     - ${{ inputs.env_context }}
+    - ${{ inputs.repo_sub_dir }}

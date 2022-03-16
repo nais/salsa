@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/nais/salsa/pkg/dsse"
+	"github.com/nais/salsa/pkg/intoto"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -49,7 +50,7 @@ var findCmd = &cobra.Command{
 			if err != nil {
 				return fmt.Errorf("could not read file %s, %w", attFilePath, err)
 			}
-			result := dsse.FindMaterials(provenance.Predicate.Materials, artifact)
+			result := intoto.FindMaterials(provenance.Predicate.Materials, artifact)
 			app := strings.Split(file.Name(), ".")[0]
 
 			if len(result) == 0 {

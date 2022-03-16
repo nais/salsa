@@ -10,16 +10,19 @@ ENVS=$(jq -n env | base64 -w 0)
 echo "---------- Preparing pico-de-galo Slsa for repository: $REPO_NAME ----------"
 salsa scan \
   --repo "$REPO_NAME" \
-  --github-context "$GITHUB" \
+  --build-context "$GITHUB" \
   --runner-context "$RUNNER" \
   --env-context "$ENVS" \
+  --subDir "$INPUT_REPO_SUB_DIR" \
   --remote-run &&
   salsa attest \
     --repo "$REPO_NAME" \
     --config salsa-sample.yaml "$INPUT_IMAGE" \
+    --subDir "$INPUT_REPO_SUB_DIR" \
     --remote-run &&
   salsa attest \
     --verify \
     --repo "$REPO_NAME" \
     --config salsa-sample.yaml "$INPUT_IMAGE" \
+    --subDir "$INPUT_REPO_SUB_DIR" \
     --remote-run

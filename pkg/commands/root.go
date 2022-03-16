@@ -21,6 +21,7 @@ const (
 type RootFlags struct {
 	Repo    string
 	RepoDir string
+	SubDir  string
 	Remote  bool
 }
 
@@ -47,9 +48,16 @@ var rootCmd = &cobra.Command{
 func (r RootFlags) WorkDir() string {
 	if r.Remote {
 		current, _ := os.Getwd()
+		return r.withSubDir(current)
+	}
+	return r.withSubDir(fmt.Sprintf("%s/%s", r.RepoDir, r.Repo))
+}
+
+func (r RootFlags) withSubDir(current string) string {
+	if r.SubDir == "" {
 		return current
 	}
-	return r.RepoDir + "/" + r.Repo
+	return fmt.Sprintf("%s/%s", current, r.SubDir)
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -63,6 +71,7 @@ func init() {
 	Auth = &Principal{}
 	rootCmd.PersistentFlags().StringVar(&PathFlags.Repo, "repo", "", "name of git repo")
 	rootCmd.PersistentFlags().StringVar(&PathFlags.RepoDir, "repoDir", "tmp", "path to folder for cloned projects")
+	rootCmd.PersistentFlags().StringVar(&PathFlags.SubDir, "subDir", "", "build file not found in working directory but in a sub directory")
 	rootCmd.PersistentFlags().BoolVar(&PathFlags.Remote, "remote-run", false, "remote run use another current path (can be deleted with introduction of containers)")
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/."+cmdName+".yaml)")
 	rootCmd.PersistentFlags().StringVar(&Auth.GithubToken, "token", "", "Github token or PAT. When cloning a private repo or repo use private dependencies")

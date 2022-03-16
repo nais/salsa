@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/config"
-	"github.com/nais/salsa/pkg/github"
+	"github.com/nais/salsa/pkg/vcs"
 	"github.com/spf13/cobra"
 	"testing"
 	"time"
@@ -30,9 +30,9 @@ func TestCreateProvenanceOptions(t *testing.T) {
 	}{
 		{
 			name:              "create provenance artifact with default values",
-			buildType:         github.AdHocBuildType,
+			buildType:         vcs.AdHocBuildType,
 			buildInvocationId: "",
-			builderId:         github.DefaultBuildId,
+			builderId:         vcs.DefaultBuildId,
 			buildConfig:       buildConfig(),
 			builderRepoDigest: (*slsa.ProvenanceMaterial)(nil),
 			configSource: slsa.ConfigSource{
@@ -45,7 +45,7 @@ func TestCreateProvenanceOptions(t *testing.T) {
 		},
 		{
 			name:              "create provenance artifact with runner context",
-			buildType:         github.BuildType,
+			buildType:         vcs.BuildType,
 			buildInvocationId: "https://github.com/nais/salsa/actions/runs/1234",
 			builderId:         "https://github.com/nais/salsa/Attestations/GitHubHostedActions@v1",
 			buildConfig:       nil,
@@ -59,11 +59,11 @@ func TestCreateProvenanceOptions(t *testing.T) {
 			if test.runnerContext {
 				env := Environment()
 				scanCfg := &config.ScanConfiguration{
-					WorkDir:       "",
-					RepoName:      "artifact",
-					Dependencies:  artDeps,
-					CiEnvironment: env,
-					Cmd:           nil,
+					WorkDir:            "",
+					RepoName:           "artifact",
+					Dependencies:       artDeps,
+					ContextEnvironment: env,
+					Cmd:                nil,
 				}
 				provenanceArtifact := CreateProvenanceOptions(scanCfg)
 				assert.Equal(t, "artifact", provenanceArtifact.Name)
@@ -82,11 +82,11 @@ func TestCreateProvenanceOptions(t *testing.T) {
 			} else {
 
 				scanCfg := &config.ScanConfiguration{
-					WorkDir:       "",
-					RepoName:      "artifact",
-					Dependencies:  artDeps,
-					CiEnvironment: nil,
-					Cmd:           &cobra.Command{Use: "salsa"},
+					WorkDir:            "",
+					RepoName:           "artifact",
+					Dependencies:       artDeps,
+					ContextEnvironment: nil,
+					Cmd:                &cobra.Command{Use: "salsa"},
 				}
 
 				provenanceArtifact := CreateProvenanceOptions(scanCfg)
@@ -134,9 +134,9 @@ func ExpectedArtDeps(deps map[string]build.Dependency) *build.ArtifactDependenci
 	}
 }
 
-func Environment() *github.Environment {
-	return &github.Environment{
-		GitHubContext: github.GitHubContext{
+func Environment() *vcs.GithubCIEnvironment {
+	return &vcs.GithubCIEnvironment{
+		GitHubContext: &vcs.GitHubContext{
 			Repository: "nais/salsa",
 			RunId:      "1234",
 			SHA:        "4321",
@@ -144,10 +144,10 @@ func Environment() *github.Environment {
 			ServerUrl:  "https://github.com",
 			EventName:  "workflow_dispatch",
 		},
-		Event: &github.Event{
+		Event: &vcs.Event{
 			Inputs: []byte("some user inputs"),
 		},
-		RunnerContext: github.RunnerContext{
+		RunnerContext: &vcs.RunnerContext{
 			OS:        "Linux",
 			Temp:      "/home/runner/work/_temp",
 			ToolCache: "/opt/hostedtoolcache",
