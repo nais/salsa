@@ -45,7 +45,7 @@ var scanCmd = &cobra.Command{
 			return fmt.Errorf("detecting dependecies: %v", err)
 		}
 
-		contextEnvironment, err := vcs.CreateGithubCIEnvironment(&buildContext, &runnerContext, &envContext)
+		contextEnvironment, err := vcs.ResolveBuildContext(&buildContext, &runnerContext, &envContext)
 		if err != nil {
 			return err
 		}

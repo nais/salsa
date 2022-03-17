@@ -2,78 +2,89 @@ package vcs
 
 import (
 	"fmt"
+	"github.com/nais/salsa/pkg/vcs/github"
 	"os"
 )
 
+const (
+	IdentificationVersion = "v1"
+)
+
 type GithubCIEnvironment struct {
-	GitHubContext    *GitHubContext
+	BuildContext     *github.Context
 	Event            *Event
-	RunnerContext    *RunnerContext
-	BuildEnvironment BuildEnvironment
+	RunnerContext    *github.RunnerContext
+	BuildEnvironment *github.CurrentBuildEnvironment
+	StaticBuild      *github.StaticBuild
 }
 
-func integrationEnvironment(context *GitHubContext, runner *RunnerContext, current BuildEnvironment) ContextEnvironment {
+func CreateGithubCIEnvironment(githubContext []byte, runnerContext, envsContext *string) (ContextEnvironment, error) {
+	// Required when creating CI CiEnvironment
+	if len(githubContext) == 0 || len(*runnerContext) == 0 {
+		return nil, nil
+	}
+
+	context, err := github.ParseContext(githubContext)
+	if err != nil {
+		return nil, fmt.Errorf("parsing context: %w", err)
+	}
+
+	runner, err := github.ParseRunner(runnerContext)
+	if err != nil {
+		return nil, fmt.Errorf("parsing runner: %w", err)
+	}
+
+	current, err := github.ParseBuild(envsContext)
+	if err != nil {
+		return nil, fmt.Errorf("parsing envs: %w", err)
+	}
+
+	return IntegrationEnvironment(context, runner, current), nil
+}
+
+func IntegrationEnvironment(context *github.Context, runner *github.RunnerContext, current *github.CurrentBuildEnvironment) ContextEnvironment {
 	return &GithubCIEnvironment{
-		GitHubContext: context,
+		BuildContext: context,
 		Event: &Event{
 			Inputs: context.Event,
 		},
 		RunnerContext:    runner,
 		BuildEnvironment: current,
+		StaticBuild:      github.Identification(IdentificationVersion),
 	}
-}
-
-func CreateGithubCIEnvironment(githubContext, runnerContext, envsContext *string) (ContextEnvironment, error) {
-	// Required when creating CI CiEnvironment
-	if len(*githubContext) == 0 || len(*runnerContext) == 0 {
-		return nil, nil
-	}
-
-	context, err := ParseContext(githubContext)
-	if err != nil {
-		return nil, fmt.Errorf("parsing context: %w", err)
-	}
-
-	runner, err := ParseRunner(runnerContext)
-	if err != nil {
-		return nil, fmt.Errorf("parsing runner: %w", err)
-	}
-
-	current, err := ParseBuild(envsContext)
-	if err != nil {
-		return nil, fmt.Errorf("parsing envs: %w", err)
-	}
-
-	return integrationEnvironment(context, runner, current), nil
 }
 
 func (in *GithubCIEnvironment) Context() string {
-	return in.GitHubContext.Workflow
+	return in.BuildContext.Workflow
+}
+
+func (in *GithubCIEnvironment) BuildType() string {
+	return in.StaticBuild.BuildType
 }
 
 func (in *GithubCIEnvironment) RepoUri() string {
-	return fmt.Sprintf("%s/%s", in.GitHubContext.ServerUrl, in.GitHubContext.Repository)
+	return fmt.Sprintf("%s/%s", in.BuildContext.ServerUrl, in.BuildContext.Repository)
 }
 
 func (in *GithubCIEnvironment) BuildInvocationId() string {
-	return fmt.Sprintf("%s/actions/runs/%s", in.RepoUri(), in.GitHubContext.RunId)
+	return fmt.Sprintf("%s/actions/runs/%s", in.RepoUri(), in.BuildContext.RunId)
 }
 
 func (in *GithubCIEnvironment) Sha() string {
-	return in.GitHubContext.SHA
+	return in.BuildContext.SHA
 }
 
 func (in *GithubCIEnvironment) BuilderId() string {
 	if os.Getenv("GITHUB_ACTIONS") == "true" {
-		return in.RepoUri() + GitHubHostedIdSuffix
+		return in.RepoUri() + in.StaticBuild.HostedIdSuffix
 	}
-	return in.RepoUri() + GitHubHostedIdSuffix
+	return in.RepoUri() + in.StaticBuild.SelfHostedIdSuffix
 }
 
 func (in *GithubCIEnvironment) UserDefinedParameters() *Event {
 	// Only possible user-defined parameters
 	// This is unset/null for all other events.
-	if in.GitHubContext.EventName != "workflow_dispatch" {
+	if in.BuildContext.EventName != "workflow_dispatch" {
 		return nil
 	}
 
@@ -97,7 +108,7 @@ func (in *GithubCIEnvironment) NonReproducibleMetadata() *Metadata {
 		Env:  in.CurrentFilteredEnvironment(),
 		Context: Context{
 			Github: Github{
-				RunId: in.GitHubContext.RunId,
+				RunId: in.BuildContext.RunId,
 			},
 			Runner: Runner{
 				Os:   in.RunnerContext.OS,

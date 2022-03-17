@@ -1,17 +1,15 @@
-package vcs
+package github
 
 import (
-	"encoding/base64"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 )
 
 func TestParseGithubContext(t *testing.T) {
-	githubContext, err := os.ReadFile("testdata/github-context.json")
+	githubContext, err := os.ReadFile("../testdata/github-context.json")
 	assert.NoError(t, err)
-	encodedContext := base64.StdEncoding.EncodeToString(githubContext)
-	context, err := ParseContext(&encodedContext)
+	context, err := ParseContext(githubContext)
 	assert.NoError(t, err)
 
 	assert.Equal(t, "90dc9f2bc4007d1099a941ba3d408d2c896fe8dd", context.SHA)

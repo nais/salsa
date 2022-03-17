@@ -9,6 +9,12 @@ import (
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
 )
 
+const (
+	// AdHocBuildType no entry point, and the commands were run in an ad-hoc fashion
+	AdHocBuildType = "https://github.com/nais/salsa/ManuallyRunCommands@v1"
+	DefaultBuildId = "https://github.com/nais/salsa"
+)
+
 type ProvenanceOptions struct {
 	BuildConfig       *BuildConfig
 	BuilderId         string
@@ -24,21 +30,23 @@ type ProvenanceOptions struct {
 func CreateProvenanceOptions(scanCfg *config.ScanConfiguration) *ProvenanceOptions {
 	opts := &ProvenanceOptions{
 		BuildStartedOn: time.Now().UTC(),
+		BuilderId:      DefaultBuildId,
+		BuildType:      AdHocBuildType,
 		Dependencies:   scanCfg.Dependencies,
 		Name:           scanCfg.RepoName,
 	}
 
-	if scanCfg.ContextEnvironment != nil {
-		opts.BuildType = vcs.BuildType
-		opts.BuildInvocationId = scanCfg.ContextEnvironment.BuildInvocationId()
-		opts.BuilderId = scanCfg.ContextEnvironment.BuilderId()
-		opts.withBuilderRepoDigest(scanCfg.ContextEnvironment).withBuilderInvocation(scanCfg.ContextEnvironment)
+	context := scanCfg.ContextEnvironment
+	if context != nil {
+		opts.BuildType = context.BuildType()
+		opts.BuildInvocationId = context.BuildInvocationId()
+		opts.BuilderId = context.BuilderId()
+		opts.withBuilderRepoDigest(context).
+			withBuilderInvocation(context)
 		return opts
 	}
 
 	opts.BuildConfig = GenerateBuildConfig(scanCfg)
-	opts.BuilderId = vcs.DefaultBuildId
-	opts.BuildType = vcs.AdHocBuildType
 	opts.Invocation = nil
 	return opts
 }

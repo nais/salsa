@@ -2,8 +2,9 @@ name: NAIS SALSA
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 env:
   IMAGE: ttl.sh/nais/salsa-test:1h

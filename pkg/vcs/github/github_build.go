@@ -1,4 +1,4 @@
-package vcs
+package github
 
 import (
 	"encoding/base64"
@@ -11,13 +11,7 @@ type CurrentBuildEnvironment struct {
 	Envs map[string]string
 }
 
-func build(envs map[string]string) BuildEnvironment {
-	return &CurrentBuildEnvironment{
-		Envs: envs,
-	}
-}
-
-func ParseBuild(envs *string) (BuildEnvironment, error) {
+func ParseBuild(envs *string) (*CurrentBuildEnvironment, error) {
 	current := make(map[string]string)
 	if len(*envs) == 0 {
 		return nil, nil
@@ -32,7 +26,9 @@ func ParseBuild(envs *string) (BuildEnvironment, error) {
 		return nil, fmt.Errorf("unmarshal environmental context json: %w", err)
 	}
 
-	return build(current), nil
+	return &CurrentBuildEnvironment{
+		Envs: current,
+	}, nil
 }
 
 func (in *CurrentBuildEnvironment) FilterEnvs() map[string]string {

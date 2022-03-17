@@ -5,7 +5,9 @@ import (
 	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/config"
 	"github.com/nais/salsa/pkg/vcs"
+	"github.com/nais/salsa/pkg/vcs/github"
 	"github.com/spf13/cobra"
+	"os"
 	"testing"
 	"time"
 
@@ -30,9 +32,9 @@ func TestCreateProvenanceOptions(t *testing.T) {
 	}{
 		{
 			name:              "create provenance artifact with default values",
-			buildType:         vcs.AdHocBuildType,
+			buildType:         "https://github.com/nais/salsa/ManuallyRunCommands@v1",
 			buildInvocationId: "",
-			builderId:         vcs.DefaultBuildId,
+			builderId:         "https://github.com/nais/salsa",
 			buildConfig:       buildConfig(),
 			builderRepoDigest: (*slsa.ProvenanceMaterial)(nil),
 			configSource: slsa.ConfigSource{
@@ -45,7 +47,7 @@ func TestCreateProvenanceOptions(t *testing.T) {
 		},
 		{
 			name:              "create provenance artifact with runner context",
-			buildType:         vcs.BuildType,
+			buildType:         "https://github.com/Attestations/GitHubActionsWorkflow@v1",
 			buildInvocationId: "https://github.com/nais/salsa/actions/runs/1234",
 			builderId:         "https://github.com/nais/salsa/Attestations/GitHubHostedActions@v1",
 			buildConfig:       nil,
@@ -57,6 +59,8 @@ func TestCreateProvenanceOptions(t *testing.T) {
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			if test.runnerContext {
+				err := os.Setenv("GITHUB_ACTIONS", "true")
+				assert.NoError(t, err)
 				env := Environment()
 				scanCfg := &config.ScanConfiguration{
 					WorkDir:            "",
@@ -136,7 +140,7 @@ func ExpectedArtDeps(deps map[string]build.Dependency) *build.ArtifactDependenci
 
 func Environment() *vcs.GithubCIEnvironment {
 	return &vcs.GithubCIEnvironment{
-		GitHubContext: &vcs.GitHubContext{
+		BuildContext: &github.Context{
 			Repository: "nais/salsa",
 			RunId:      "1234",
 			SHA:        "4321",
@@ -147,11 +151,12 @@ func Environment() *vcs.GithubCIEnvironment {
 		Event: &vcs.Event{
 			Inputs: []byte("some user inputs"),
 		},
-		RunnerContext: &vcs.RunnerContext{
+		RunnerContext: &github.RunnerContext{
 			OS:        "Linux",
 			Temp:      "/home/runner/work/_temp",
 			ToolCache: "/opt/hostedtoolcache",
 		},
+		StaticBuild: github.Identification("v1"),
 	}
 }
 
