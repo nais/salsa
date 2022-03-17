@@ -140,7 +140,7 @@ func ExpectedArtDeps(deps map[string]build.Dependency) *build.ArtifactDependenci
 
 func Environment() *vcs.GithubCIEnvironment {
 	return &vcs.GithubCIEnvironment{
-		GitHubContext: &github.Context{
+		BuildContext: &github.Context{
 			Repository: "nais/salsa",
 			RunId:      "1234",
 			SHA:        "4321",
@@ -148,15 +148,15 @@ func Environment() *vcs.GithubCIEnvironment {
 			ServerUrl:  "https://github.com",
 			EventName:  "workflow_dispatch",
 		},
-		GithubEvent: &vcs.Event{
+		Event: &vcs.Event{
 			Inputs: []byte("some user inputs"),
 		},
-		GithubRunnerContext: &github.RunnerContext{
+		RunnerContext: &github.RunnerContext{
 			OS:        "Linux",
 			Temp:      "/home/runner/work/_temp",
 			ToolCache: "/opt/hostedtoolcache",
 		},
-		GithubStaticBuild: github.Identification("v1"),
+		StaticBuild: github.Identification("v1"),
 	}
 }
 

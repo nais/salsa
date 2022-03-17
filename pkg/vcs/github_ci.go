@@ -11,11 +11,11 @@ const (
 )
 
 type GithubCIEnvironment struct {
-	GitHubContext          *github.Context
-	GithubEvent            *Event
-	GithubRunnerContext    *github.RunnerContext
-	GithubBuildEnvironment *github.CurrentBuildEnvironment
-	GithubStaticBuild      *github.StaticBuild
+	BuildContext     *github.Context
+	Event            *Event
+	RunnerContext    *github.RunnerContext
+	BuildEnvironment *github.CurrentBuildEnvironment
+	StaticBuild      *github.StaticBuild
 }
 
 func CreateGithubCIEnvironment(githubContext []byte, runnerContext, envsContext *string) (ContextEnvironment, error) {
@@ -44,59 +44,59 @@ func CreateGithubCIEnvironment(githubContext []byte, runnerContext, envsContext 
 
 func IntegrationEnvironment(context *github.Context, runner *github.RunnerContext, current *github.CurrentBuildEnvironment) ContextEnvironment {
 	return &GithubCIEnvironment{
-		GitHubContext: context,
-		GithubEvent: &Event{
+		BuildContext: context,
+		Event: &Event{
 			Inputs: context.Event,
 		},
-		GithubRunnerContext:    runner,
-		GithubBuildEnvironment: current,
-		GithubStaticBuild:      github.Identification(IdentificationVersion),
+		RunnerContext:    runner,
+		BuildEnvironment: current,
+		StaticBuild:      github.Identification(IdentificationVersion),
 	}
 }
 
 func (in *GithubCIEnvironment) Context() string {
-	return in.GitHubContext.Workflow
+	return in.BuildContext.Workflow
 }
 
 func (in *GithubCIEnvironment) BuildType() string {
-	return in.GithubStaticBuild.BuildType
+	return in.StaticBuild.BuildType
 }
 
 func (in *GithubCIEnvironment) RepoUri() string {
-	return fmt.Sprintf("%s/%s", in.GitHubContext.ServerUrl, in.GitHubContext.Repository)
+	return fmt.Sprintf("%s/%s", in.BuildContext.ServerUrl, in.BuildContext.Repository)
 }
 
 func (in *GithubCIEnvironment) BuildInvocationId() string {
-	return fmt.Sprintf("%s/actions/runs/%s", in.RepoUri(), in.GitHubContext.RunId)
+	return fmt.Sprintf("%s/actions/runs/%s", in.RepoUri(), in.BuildContext.RunId)
 }
 
 func (in *GithubCIEnvironment) Sha() string {
-	return in.GitHubContext.SHA
+	return in.BuildContext.SHA
 }
 
 func (in *GithubCIEnvironment) BuilderId() string {
 	if os.Getenv("GITHUB_ACTIONS") == "true" {
-		return in.RepoUri() + in.GithubStaticBuild.HostedIdSuffix
+		return in.RepoUri() + in.StaticBuild.HostedIdSuffix
 	}
-	return in.RepoUri() + in.GithubStaticBuild.SelfHostedIdSuffix
+	return in.RepoUri() + in.StaticBuild.SelfHostedIdSuffix
 }
 
 func (in *GithubCIEnvironment) UserDefinedParameters() *Event {
 	// Only possible user-defined parameters
 	// This is unset/null for all other events.
-	if in.GitHubContext.EventName != "workflow_dispatch" {
+	if in.BuildContext.EventName != "workflow_dispatch" {
 		return nil
 	}
 
-	return in.GithubEvent
+	return in.Event
 }
 
 func (in *GithubCIEnvironment) CurrentFilteredEnvironment() map[string]string {
-	if in.GithubBuildEnvironment == nil {
+	if in.BuildEnvironment == nil {
 		return map[string]string{}
 	}
 
-	return in.GithubBuildEnvironment.FilterEnvs()
+	return in.BuildEnvironment.FilterEnvs()
 }
 
 func (in *GithubCIEnvironment) NonReproducibleMetadata() *Metadata {
@@ -104,15 +104,15 @@ func (in *GithubCIEnvironment) NonReproducibleMetadata() *Metadata {
 	// recomputed using existing information.
 	//(Documentation would explain how to recompute the rest of the fields.)
 	return &Metadata{
-		Arch: in.GithubRunnerContext.Arch,
+		Arch: in.RunnerContext.Arch,
 		Env:  in.CurrentFilteredEnvironment(),
 		Context: Context{
 			Github: Github{
-				RunId: in.GitHubContext.RunId,
+				RunId: in.BuildContext.RunId,
 			},
 			Runner: Runner{
-				Os:   in.GithubRunnerContext.OS,
-				Temp: in.GithubRunnerContext.Temp,
+				Os:   in.RunnerContext.OS,
+				Temp: in.RunnerContext.Temp,
 			},
 		},
 	}
