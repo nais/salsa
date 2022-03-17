@@ -15,10 +15,8 @@ import (
 )
 
 func TestGenerateSlsaPredicate(t *testing.T) {
-
 	deps := ExpectedDeps()
 	artDeps := ExpectedArtDeps(deps)
-
 	for _, test := range []struct {
 		name                    string
 		buildType               string
@@ -33,9 +31,9 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 	}{
 		{
 			name:              "create slsa provenance artifact with default values",
-			buildType:         vcs.AdHocBuildType,
+			buildType:         "https://github.com/nais/salsa/ManuallyRunCommands@v1",
 			buildInvocationId: "",
-			builderId:         vcs.DefaultBuildId,
+			builderId:         "https://github.com/nais/salsa",
 			buildConfig:       buildConfig(),
 			materials:         ExpectedDependenciesMaterial(),
 			configSource: slsa.ConfigSource{
@@ -49,7 +47,7 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 		},
 		{
 			name:                    "create slsa provenance with runner context",
-			buildType:               vcs.BuildType,
+			buildType:               "https://github.com/Attestations/GitHubActionsWorkflow@v1",
 			buildInvocationId:       "https://github.com/nais/salsa/actions/runs/1234",
 			builderId:               "https://github.com/nais/salsa/Attestations/GitHubHostedActions@v1",
 			buildConfig:             nil,

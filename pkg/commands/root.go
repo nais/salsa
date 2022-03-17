@@ -96,7 +96,7 @@ func initConfig(cmd *cobra.Command) error {
 
 	// If a config file is found, read it in.
 	if err := v.ReadInConfig(); err == nil {
-		log.Infof("Using config file: %s", v.ConfigFileUsed())
+		log.Infof("using config file: %s", v.ConfigFileUsed())
 	}
 
 	v.SetEnvPrefix(envVarPrefix + "_" + cmd.Name())

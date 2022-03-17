@@ -9,10 +9,12 @@ import (
 )
 
 func TestCreateCIEnvironment(t *testing.T) {
+	err := os.Setenv("GITHUB_ACTIONS", "true")
+	assert.NoError(t, err)
 	context := githubContext(t)
 	runner := runnerContext()
 	env := envC()
-	ci, err := CreateGithubCIEnvironment(&context, &runner, &env)
+	ci, err := CreateGithubCIEnvironment(context, &runner, &env)
 	assert.NoError(t, err)
 	assert.Equal(t, "https://github.com/nais/salsa", ci.RepoUri())
 	assert.Equal(t, "90dc9f2bc4007d1099a941ba3d408d2c896fe8dd", ci.Sha())
@@ -50,10 +52,10 @@ func TestCreateCIEnvironment(t *testing.T) {
 
 }
 
-func githubContext(t *testing.T) string {
+func githubContext(t *testing.T) []byte {
 	githubContext, err := os.ReadFile("testdata/github-context.json")
 	assert.NoError(t, err)
-	return base64.StdEncoding.EncodeToString(githubContext)
+	return githubContext
 }
 
 func runnerContext() string {
@@ -67,4 +69,13 @@ func envC() string {
 var envTestContext = `{
   		"GO_VERSION": "1.17",
 		"GO_ROOT": "/opt/hostedtoolcache/go/1.17.6/x64"
+	  }`
+
+var RunnerTestContext = `{
+		"os": "Linux",
+		"arch": "X64",
+		"name": "Hosted Agent",
+		"tool_cache": "/opt/hostedtoolcache",
+		"temp": "/home/runner/work/_temp",
+		"workspace": "/home/runner/work/nais-salsa-action"
 	  }`
