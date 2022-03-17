@@ -44,6 +44,7 @@ brews:
     name: salsa
     homepage: "https://github.com/nais/salsa"
     description: "Command-line interface for SLSA provenance"
+    license: MIT
     folder: Formula
     install: |
       bin.install "salsa"
