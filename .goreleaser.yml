@@ -1,0 +1,63 @@
+project_name: nais-salsa
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - env: [ CGO_ENABLED=0 ]
+    targets:
+      - linux_amd64
+      - windows_amd64
+      - darwin_amd64
+      - darwin_arm64
+    id: nais
+    dir: .
+    main: ./cmd/main
+    binary: salsa
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{ .CommitDate }} -X main.builtBy=goreleaser
+
+checksum:
+  name_template: 'checksums.txt'
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+
+release:
+  github:
+    owner: nais
+    name: salsa
+  header: |
+    ## nais-salsa ({{ .Version }})
+
+brews:
+  - tap:
+      owner: nais
+      name: homebrew-tap
+      token: "{{ .Env.PUSH_TOKEN }}"
+    name: salsa
+    homepage: "https://github.com/nais/salsa"
+    description: "Command-line interface for SLSA provenance"
+    folder: Formula
+    install: |
+      bin.install "salsa"
+    test: |
+      assert_match version, shell_output("#{bin}/salsa version")
+
+nfpms:
+  - package_name: salsa
+    file_name_template: "{{ .PackageName }}_{{ .Version }}"
+    vendor: NAV / nais team
+    homepage: "https://github.com/nais/salsa"
+    maintainer: NAV / nais team
+    description: "Command-line interface for SLSA provenance"
+    license: MIT
+    formats:
+      - deb
+    version_metadata: git
