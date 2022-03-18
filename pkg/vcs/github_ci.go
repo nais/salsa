@@ -19,11 +19,6 @@ type GithubCIEnvironment struct {
 }
 
 func CreateGithubCIEnvironment(githubContext []byte, runnerContext, envsContext *string) (ContextEnvironment, error) {
-	// Required when creating CI CiEnvironment
-	if len(githubContext) == 0 || len(*runnerContext) == 0 {
-		return nil, nil
-	}
-
 	context, err := github.ParseContext(githubContext)
 	if err != nil {
 		return nil, fmt.Errorf("parsing context: %w", err)
@@ -34,9 +29,14 @@ func CreateGithubCIEnvironment(githubContext []byte, runnerContext, envsContext 
 		return nil, fmt.Errorf("parsing runner: %w", err)
 	}
 
-	current, err := github.ParseBuild(envsContext)
-	if err != nil {
-		return nil, fmt.Errorf("parsing envs: %w", err)
+	// Not required to build a CI environment
+	current := &github.CurrentBuildEnvironment{}
+	if envsContext != nil && len(*envsContext) != 0 {
+		parsedEnv, err := github.ParseBuild(envsContext)
+		if err != nil {
+			return nil, fmt.Errorf("parsing envs: %w", err)
+		}
+		current = parsedEnv
 	}
 
 	return IntegrationEnvironment(context, runner, current), nil

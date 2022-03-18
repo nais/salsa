@@ -18,8 +18,8 @@ func (in ContextType) String() string {
 	return string(in)
 }
 
-func ResolveBuildContext(context, ctx, env *string) (ContextEnvironment, error) {
-	if len(*context) == 0 {
+func ResolveBuildContext(context, runner, env *string) (ContextEnvironment, error) {
+	if !buildContext(context, runner) {
 		return nil, nil
 	}
 
@@ -29,15 +29,20 @@ func ResolveBuildContext(context, ctx, env *string) (ContextEnvironment, error) 
 	}
 
 	if !isJSON(decodedContext) {
-		return nil, nil
+		return nil, fmt.Errorf("decoded build context is not in json format")
 	}
 
 	if isGithub() {
 		log.Info("prepare Github CI environment...")
-		return CreateGithubCIEnvironment(decodedContext, ctx, env)
+		return CreateGithubCIEnvironment(decodedContext, runner, env)
 	}
 
-	return nil, nil
+	return nil, fmt.Errorf("build context is not supported")
+}
+
+// Required when creating CI Environment, CLI assumed to be run manually without build context
+func buildContext(context, runner *string) bool {
+	return (context != nil && len(*context) != 0) && (runner != nil && len(*runner) != 0)
 }
 
 func isGithub() bool {

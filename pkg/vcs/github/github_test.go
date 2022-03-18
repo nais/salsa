@@ -21,3 +21,10 @@ func TestParseGithubContext(t *testing.T) {
 	assert.Equal(t, "57", context.RunNumber)
 	assert.Equal(t, "jdoe", context.Actor)
 }
+
+func TestGithubStaticIdentification(t *testing.T) {
+	static := Identification("v1")
+	assert.Equal(t, "https://github.com/Attestations/GitHubActionsWorkflow@v1", static.BuildType)
+	assert.Equal(t, "/Attestations/SelfHostedActions@v1", static.SelfHostedIdSuffix)
+	assert.Equal(t, "/Attestations/GitHubHostedActions@v1", static.HostedIdSuffix)
+}

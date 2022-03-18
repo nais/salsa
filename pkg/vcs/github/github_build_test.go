@@ -26,18 +26,16 @@ func TestParseBuildContext(t *testing.T) {
 	assert.Equal(t, 2, len(env.GetEnvs()))
 }
 
-func TestParseBuildNoContext(t *testing.T) {
-	data := ""
-	env, err := ParseBuild(&data)
-	assert.NoError(t, err)
-	assert.Nil(t, env)
-}
-
-func TestParseBuildFailContext(t *testing.T) {
+func TestParseBuildFailEnvironmentalData(t *testing.T) {
 	data := "yolo"
 	env, err := ParseBuild(&data)
 	assert.Nil(t, env)
 	assert.EqualError(t, err, "unmarshal environmental context json: invalid character 'Ê' looking for beginning of value")
+}
+
+func TestParseBuildNoEnvironmentalData(t *testing.T) {
+	env := toEnvData(t, `{}`)
+	assert.Equal(t, map[string]string{}, env)
 }
 
 func toEnvData(t *testing.T, inputEnvs string) map[string]string {
