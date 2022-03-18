@@ -18,6 +18,16 @@ jobs:
       version: ${{ steps.set-version.outputs.version }}
     steps:
       - uses: actions/checkout@v3
+
+      - name: Cache Go modules
+        uses: actions/cache@v2.1.7
+        id: go-mod-cache
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
       - name: set version
         id: set-version
         run: |
@@ -39,6 +49,7 @@ jobs:
           go-version: ${{ env.GOVERSION }}
 
       - name: Test Salsa
+        if: steps.go-mod-cache.outputs.cache-hit != 'true'
         run: make test
 
       - name: Ensure no files were modified as a result of the build
