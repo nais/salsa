@@ -5,10 +5,10 @@ import (
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
 )
 
-type ArtifactType string
+type artifactType string
 
 const (
-	PkgArtifactType ArtifactType = "pkg"
+	pkgArtifactType artifactType = "pkg"
 )
 
 type ArtifactDependencies struct {
@@ -59,7 +59,7 @@ func Dependence(coordinates, version string, checksum CheckSum) Dependency {
 		Coordinates: coordinates,
 		Version:     version,
 		CheckSum:    checksum,
-		Type:        string(PkgArtifactType),
+		Type:        string(pkgArtifactType),
 	}
 }
 
