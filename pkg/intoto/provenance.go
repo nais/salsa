@@ -31,15 +31,15 @@ func withMetadata(opts *ProvenanceOptions, buildFinished time.Time) *slsa.Proven
 		BuildStartedOn:    &opts.BuildStartedOn,
 		BuildFinishedOn:   &buildFinished,
 		Completeness:      withCompleteness(opts),
-		Reproducible:      reproducible(opts),
+		Reproducible:      opts.Reproducible(),
 	}
 }
 
 func withCompleteness(opts *ProvenanceOptions) slsa.ProvenanceComplete {
 	return slsa.ProvenanceComplete{
-		Environment: opts.HasEnvironment(),
-		Materials:   hasMaterials(opts),
-		Parameters:  opts.HasParameters(),
+		Environment: opts.Environment(),
+		Materials:   opts.Materials(),
+		Parameters:  opts.Parameters(),
 	}
 }
 
@@ -64,12 +64,4 @@ func AppendBuildContext(opts *ProvenanceOptions, materials *[]slsa.ProvenanceMat
 	if opts.BuilderRepoDigest != nil {
 		*materials = append(*materials, *opts.BuilderRepoDigest)
 	}
-}
-
-func hasMaterials(opts *ProvenanceOptions) bool {
-	return opts.HasDependencies() && opts.HasBuilderRepoDigest()
-}
-
-func reproducible(opts *ProvenanceOptions) bool {
-	return opts.HasEnvironment() && hasMaterials(opts) && opts.HasParameters()
 }

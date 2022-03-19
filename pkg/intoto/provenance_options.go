@@ -93,7 +93,7 @@ func (in *ProvenanceOptions) HasDependencies() bool {
 	return len(in.Dependencies.RuntimeDeps) > 0
 }
 
-func (in *ProvenanceOptions) HasParameters() bool {
+func (in *ProvenanceOptions) Parameters() bool {
 	if in.Invocation == nil {
 		return false
 	}
@@ -109,10 +109,18 @@ func (in *ProvenanceOptions) HasParameters() bool {
 	return in.Invocation.Parameters.(*vcs.Event).Inputs != nil
 }
 
-func (in *ProvenanceOptions) HasEnvironment() bool {
+func (in *ProvenanceOptions) Environment() bool {
 	if in.Invocation == nil {
 		return false
 	}
 
 	return in.Invocation.Environment != nil
+}
+
+func (in *ProvenanceOptions) Materials() bool {
+	return in.HasDependencies() && in.HasBuilderRepoDigest()
+}
+
+func (in *ProvenanceOptions) Reproducible() bool {
+	return in.Environment() && in.Materials() && in.Parameters()
 }
