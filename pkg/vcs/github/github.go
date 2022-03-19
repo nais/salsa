@@ -41,15 +41,19 @@ func ParseContext(github []byte) (*Context, error) {
 	return &context, nil
 }
 
-type StaticBuild struct {
+type Actions struct {
 	HostedIdSuffix     string
 	SelfHostedIdSuffix string
 	BuildType          string
 }
 
-func Identification(version string) *StaticBuild {
-	return &StaticBuild{
-		HostedIdSuffix:     fmt.Sprintf("/Attestations/GitHubHostedActions@%s", version),
+// BuildId
+// The GitHub Actions team has not yet reviewed or approved this design,
+// and it is not yet implemented. Details are subject to change!
+func BuildId(version string) *Actions {
+	return &Actions{
+		HostedIdSuffix: fmt.Sprintf("/Attestations/GitHubHostedActions@%s", version),
+		// Self-hosted runner: Not yet supported.
 		SelfHostedIdSuffix: fmt.Sprintf("/Attestations/SelfHostedActions@%s", version),
 		// BuildType Describes what the invocations buildConfig and materials was created
 		BuildType: fmt.Sprintf("https://github.com/Attestations/GitHubActionsWorkflow@%s", version),
