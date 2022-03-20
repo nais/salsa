@@ -3,11 +3,10 @@ package vcs
 import (
 	"fmt"
 	"github.com/nais/salsa/pkg/vcs/github"
-	"os"
 )
 
 const (
-	IdentificationVersion = "v1"
+	GithubActionsBuildIdVersion = "v1"
 )
 
 type GithubCIEnvironment struct {
@@ -15,15 +14,10 @@ type GithubCIEnvironment struct {
 	Event            *Event
 	RunnerContext    *github.RunnerContext
 	BuildEnvironment *github.CurrentBuildEnvironment
-	StaticBuild      *github.StaticBuild
+	Actions          *github.Actions
 }
 
 func CreateGithubCIEnvironment(githubContext []byte, runnerContext, envsContext *string) (ContextEnvironment, error) {
-	// Required when creating CI CiEnvironment
-	if len(githubContext) == 0 || len(*runnerContext) == 0 {
-		return nil, nil
-	}
-
 	context, err := github.ParseContext(githubContext)
 	if err != nil {
 		return nil, fmt.Errorf("parsing context: %w", err)
@@ -34,15 +28,21 @@ func CreateGithubCIEnvironment(githubContext []byte, runnerContext, envsContext 
 		return nil, fmt.Errorf("parsing runner: %w", err)
 	}
 
-	current, err := github.ParseBuild(envsContext)
+	// Not required to build a CI environment
+	current := &github.CurrentBuildEnvironment{}
+	if envsContext == nil || len(*envsContext) == 0 {
+		return BuildEnvironment(context, runner, current), nil
+	}
+
+	current, err = github.ParseBuild(envsContext)
 	if err != nil {
 		return nil, fmt.Errorf("parsing envs: %w", err)
 	}
 
-	return IntegrationEnvironment(context, runner, current), nil
+	return BuildEnvironment(context, runner, current), nil
 }
 
-func IntegrationEnvironment(context *github.Context, runner *github.RunnerContext, current *github.CurrentBuildEnvironment) ContextEnvironment {
+func BuildEnvironment(context *github.Context, runner *github.RunnerContext, current *github.CurrentBuildEnvironment) ContextEnvironment {
 	return &GithubCIEnvironment{
 		BuildContext: context,
 		Event: &Event{
@@ -50,7 +50,7 @@ func IntegrationEnvironment(context *github.Context, runner *github.RunnerContex
 		},
 		RunnerContext:    runner,
 		BuildEnvironment: current,
-		StaticBuild:      github.Identification(IdentificationVersion),
+		Actions:          github.BuildId(GithubActionsBuildIdVersion),
 	}
 }
 
@@ -59,7 +59,7 @@ func (in *GithubCIEnvironment) Context() string {
 }
 
 func (in *GithubCIEnvironment) BuildType() string {
-	return in.StaticBuild.BuildType
+	return in.Actions.BuildType
 }
 
 func (in *GithubCIEnvironment) RepoUri() string {
@@ -75,10 +75,10 @@ func (in *GithubCIEnvironment) Sha() string {
 }
 
 func (in *GithubCIEnvironment) BuilderId() string {
-	if os.Getenv("GITHUB_ACTIONS") == "true" {
-		return in.RepoUri() + in.StaticBuild.HostedIdSuffix
+	if ContextTypeGithub.Hosted() {
+		return in.RepoUri() + in.Actions.HostedIdSuffix
 	}
-	return in.RepoUri() + in.StaticBuild.SelfHostedIdSuffix
+	return in.RepoUri() + in.Actions.SelfHostedIdSuffix
 }
 
 func (in *GithubCIEnvironment) UserDefinedParameters() *Event {
