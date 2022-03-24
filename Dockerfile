@@ -3,9 +3,6 @@ FROM alpine:3.14
 ENV COSIGN_VERSION=v1.6.0
 ENV SALSA_VERSION=0.1.20220324094800
 
-COPY --from=builder /src/bin/salsa /usr/local/bin/
-RUN chmod +x /usr/local/bin/salsa
-
 RUN apk add --no-cache ca-certificates git curl
 RUN curl -L -f https://github.com/sigstore/cosign/releases/download/$COSIGN_VERSION/cosign-linux-amd64 > /usr/local/bin/cosign && chmod +x /usr/local/bin/cosign
 
