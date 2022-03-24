@@ -8,11 +8,14 @@ COPY . /src
 RUN make salsa
 
 FROM alpine:3.14
+
+ENV COSIGN_VERSION=v1.6.0
+
 COPY --from=builder /src/bin/salsa /usr/local/bin/
 RUN chmod +x /usr/local/bin/salsa
 
 RUN apk add --no-cache ca-certificates git curl
-RUN curl -L -f https://github.com/sigstore/cosign/releases/download/v1.5.1/cosign-linux-amd64 > /usr/local/bin/cosign && chmod +x /usr/local/bin/cosign
+RUN curl -L -f https://github.com/sigstore/cosign/releases/download/$COSIGN_VERSION/cosign-linux-amd64 > /usr/local/bin/cosign && chmod +x /usr/local/bin/cosign
 
 RUN apk add --no-cache jq httpie
 

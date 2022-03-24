@@ -29,10 +29,18 @@ type Principal struct {
 	GithubToken string
 }
 
+type ClientInformation struct {
+	Version string
+	Commit  string
+	Date    string
+	BuiltBy string
+}
+
 var (
 	cfgFile   string
 	PathFlags *RootFlags
 	Auth      *Principal
+	Client    *ClientInformation
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -62,7 +70,13 @@ func (r RootFlags) withSubDir(current string) string {
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
+func Execute(version, commit, date, builtBy string) {
+	Client = &ClientInformation{
+		Version: version,
+		Commit:  commit,
+		Date:    date,
+		BuiltBy: builtBy,
+	}
 	cobra.CheckErr(rootCmd.Execute())
 }
 
