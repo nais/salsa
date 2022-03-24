@@ -21,13 +21,13 @@ builds:
 checksum:
   name_template: 'checksums.txt'
 
-changelog:
-  sort: asc
-  use: github
-  filters:
-    exclude:
-      - '^docs:'
-      - '^test:'
+#hangelog:
+# sort: asc
+# use: github
+# filters:
+#   exclude:
+#     - '^docs:'
+#     - '^test:'
 
 release:
   github:
