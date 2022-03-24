@@ -156,7 +156,7 @@ func Environment() *vcs.GithubCIEnvironment {
 			Temp:      "/home/runner/work/_temp",
 			ToolCache: "/opt/hostedtoolcache",
 		},
-		StaticBuild: github.Identification("v1"),
+		Actions: github.BuildId("v1"),
 	}
 }
 

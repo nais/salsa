@@ -13,9 +13,6 @@ type CurrentBuildEnvironment struct {
 
 func ParseBuild(envs *string) (*CurrentBuildEnvironment, error) {
 	current := make(map[string]string)
-	if len(*envs) == 0 {
-		return nil, nil
-	}
 
 	decodedEnvsBytes, err := base64.StdEncoding.DecodeString(*envs)
 	if err != nil {
@@ -35,23 +32,16 @@ func (in *CurrentBuildEnvironment) FilterEnvs() map[string]string {
 	if len(in.Envs) < 1 {
 		return map[string]string{}
 	}
-	for key, val := range in.Envs {
+	for key, _ := range in.Envs {
 		in.filterEnvsWithPrefix(key, "INPUT_", "GITHUB_", "RUNNER_", "ACTIONS_")
 		in.filterEnv(key, "TOKEN")
 		in.filterSingleLineEnv(key)
-		in.filterEmptyValue(key, val)
 	}
 	return in.Envs
 }
 
 func (in *CurrentBuildEnvironment) filterSingleLineEnv(key string) {
 	if !strings.Contains(key, "_") {
-		delete(in.Envs, key)
-	}
-}
-
-func (in *CurrentBuildEnvironment) filterEmptyValue(key, val string) {
-	if val == "" {
 		delete(in.Envs, key)
 	}
 }

@@ -8,8 +8,8 @@ fmt:
 vet:
 	go vet ./...
 
-cover-out:
+coverage.out:
 	go test -race -v -count=1 -covermode=atomic -coverprofile=coverage.out ./... || true
 
-cover-html: cover-out
+cover-html: coverage.out
 	go tool cover -html=$<
