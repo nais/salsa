@@ -10,6 +10,9 @@ concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  VERSION: 0.1
+
 jobs:
 
   set-version:
@@ -23,7 +26,7 @@ jobs:
         id: set-version
         run: |
           echo Faking a Semantic Version
-          echo ::set-output name=version::1.$(date "+%Y%m%d%H%M%S")
+          echo ::set-output name=version::${{ env.VERSION }}.$(date "+%Y%m%d%H%M%S")
 
   test:
     needs:
@@ -47,10 +50,6 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
-
-      - name: Prepare Salsa
-        if: steps.go-mod-cache.outputs.cache-hit != 'true'
-        run: make salsa
 
       - name: Test Salsa
         run: make test
@@ -100,36 +99,36 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PUSH_TOKEN: ${{ steps.get-homebrew-token.outputs.token }}
 
-     #- uses: navikt/github-app-token-generator@v1
-     #  id: get-token
-     #  with:
-     #    private-key: ${{ secrets.NAIS_APP_PRIVATE_KEY }}
-     #    app-id: ${{ secrets.NAIS_APP_ID }}
-     #    repo: nais/nais-ppa
+      #- uses: navikt/github-app-token-generator@v1
+      #  id: get-token
+      #  with:
+      #    private-key: ${{ secrets.NAIS_APP_PRIVATE_KEY }}
+      #    app-id: ${{ secrets.NAIS_APP_ID }}
+      #    repo: nais/nais-ppa
 
-     #- name: Checkout nais-ppa
-     #  uses: actions/checkout@v2
-     #  with:
-     #    repository: nais/nais-ppa
-     #    token: ${{ steps.get-token.outputs.token }}
-     #    path: pparepo
+      #- name: Checkout nais-ppa
+      #  uses: actions/checkout@v2
+      #  with:
+      #    repository: nais/nais-ppa
+      #    token: ${{ steps.get-token.outputs.token }}
+      #    path: pparepo
 
-     #- name: Add new deb to ppa
-     #  id: update_ppa
-     #  env:
-     #    VERSION: ${{ needs.set-version.outputs.version }}
-     #    EMAIL: aura@nav.no
-     #  run: |
-     #    echo "Version ${VERSION} was released, adding to PPA"
-     #    cd pparepo
+      #- name: Add new deb to ppa
+      #  id: update_ppa
+      #  env:
+      #    VERSION: ${{ needs.set-version.outputs.version }}
+      #    EMAIL: aura@nav.no
+      #  run: |
+      #    echo "Version ${VERSION} was released, adding to PPA"
+      #    cd pparepo
 
-     #    # Fetch latest deb
-     #    wget https://github.com/${{ github.repository }}/releases/download/${VERSION}/salsa_${VERSION}.deb
+      #    # Fetch latest deb
+      #    wget https://github.com/${{ github.repository }}/releases/download/${VERSION}/salsa_${VERSION}.deb
 
-     #    # Commit and push changes
-     #    git config user.name "$GITHUB_ACTOR"
-     #    git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-     #    git add salsa_${VERSION}.deb
-     #    git --no-pager diff --cached
-     #    git commit --all --message "Add version ${VERSION} of salsa"
-     #    git push
+      #    # Commit and push changes
+      #    git config user.name "$GITHUB_ACTOR"
+      #    git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+      #    git add salsa_${VERSION}.deb
+      #    git --no-pager diff --cached
+      #    git commit --all --message "Add version ${VERSION} of salsa"
+      #    git push
