@@ -7,7 +7,7 @@ WORKDIR /src
 COPY . /src
 RUN make salsa
 
-FROM maven:3.8.4-eclipse-temurin-17
+FROM maven:3.8.4-eclipse-temurin-17-alpine
 
 ENV COSIGN_VERSION=v1.6.0
 
