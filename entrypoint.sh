@@ -6,8 +6,10 @@ REPO_NAME="${INPUT_REPO_NAME##*/}"
 GITHUB=$(echo "${INPUT_GITHUB_CONTEXT}" | base64 -w 0)
 RUNNER=$(echo "${INPUT_RUNNER_CONTEXT}" | base64 -w 0)
 ENVS=$(jq -n env | base64 -w 0)
-
+echo "JAVA_HOME: $JAVA_HOME"
+echo "MAVEN_HOME: $MAVEN_HOME"
 echo "---------- Preparing pico-de-galo Slsa for repository: $REPO_NAME ----------"
+
 salsa scan \
   --repo "$REPO_NAME" \
   --build-context "$GITHUB" \
