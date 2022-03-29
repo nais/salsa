@@ -12,6 +12,7 @@ FROM maven:3.8.4-eclipse-temurin-17-alpine
 ENV COSIGN_VERSION=v1.6.0
 
 COPY --from=builder /src/bin/salsa /usr/local/bin/
+COPY --from=builder /src/salsa-sample.yaml $HOME/.salsa.yaml
 RUN chmod +x /usr/local/bin/salsa
 
 RUN apk add --no-cache ca-certificates git curl

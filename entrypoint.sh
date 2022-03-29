@@ -20,12 +20,13 @@ salsa scan \
   --remote-run &&
   salsa attest \
     --repo "$REPO_NAME" \
-    --config salsa-sample.yaml "$INPUT_IMAGE" \
     --subDir "$INPUT_REPO_SUB_DIR" \
-    --remote-run &&
+    --remote-run \
+    "$INPUT_IMAGE" \
+    &&
   salsa attest \
     --verify \
     --repo "$REPO_NAME" \
-    --config salsa-sample.yaml "$INPUT_IMAGE" \
     --subDir "$INPUT_REPO_SUB_DIR" \
-    --remote-run
+    --remote-run \
+    "$INPUT_IMAGE" \
