@@ -26,6 +26,11 @@ inputs:
     required: false
     default: ${{ github.repository }}
 
+  key:
+    description: |-
+      The key used to sign the attestation
+    required: true
+
   image:
     description: |-
       docker image to sign. Defaults to $ENV_IMAGE.
@@ -56,3 +61,4 @@ runs:
     - ${{ inputs.image }}
     - ${{ inputs.env_context }}
     - ${{ inputs.repo_sub_dir }}
+    - ${{ inputs.key }}
