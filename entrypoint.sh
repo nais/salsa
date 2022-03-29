@@ -10,6 +10,8 @@ export JAVA_HOME=/opt/java/openjdk
 echo "JAVA_HOME: $JAVA_HOME"
 echo "MAVEN_HOME: $MAVEN_HOME"
 echo "---------- Preparing pico-de-galo Slsa for repository: $REPO_NAME ----------"
+echo "Config: "
+cat $HOME/.salsa.yaml
 
 salsa scan \
   --repo "$REPO_NAME" \
@@ -22,6 +24,7 @@ salsa scan \
     --repo "$REPO_NAME" \
     --subDir "$INPUT_REPO_SUB_DIR" \
     --remote-run \
+    --config "$HOME/.salsa.yaml" \
     "$INPUT_IMAGE" \
     &&
   salsa attest \
@@ -29,4 +32,5 @@ salsa scan \
     --repo "$REPO_NAME" \
     --subDir "$INPUT_REPO_SUB_DIR" \
     --remote-run \
+    --config "$HOME/.salsa.yaml" \
     "$INPUT_IMAGE" \
