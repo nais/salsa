@@ -10,6 +10,7 @@ RUN make salsa
 FROM maven:3.8.4-eclipse-temurin-17-alpine
 
 ENV COSIGN_VERSION=v1.6.0
+ENV JAVA_HOME=/opt/java/openjdk
 
 COPY --from=builder /src/bin/salsa /usr/local/bin/
 RUN chmod +x /usr/local/bin/salsa
