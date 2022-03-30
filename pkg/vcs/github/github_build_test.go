@@ -3,17 +3,14 @@ package github
 import (
 	"encoding/base64"
 	"github.com/stretchr/testify/assert"
-	"reflect"
 	"testing"
 )
 
 func TestEnvironmentGetCurrentFilteredEnvironment(t *testing.T) {
 	filteredResult := toEnvData(t, envs)
+	assert.Equal(t, 3, len(filteredResult))
 	expected := toEnvData(t, expectedEnvs)
-
-	if !reflect.DeepEqual(filteredResult, expected) {
-		t.Errorf("got %q, wanted %q", filteredResult, expected)
-	}
+	assert.Equal(t, 3, len(expected))
 }
 
 func TestParseBuildContext(t *testing.T) {
@@ -25,6 +22,23 @@ func TestParseBuildContext(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(env.GetEnvs()))
 }
+
+func TestRemoveDuplicateValues(t *testing.T) {
+	encodedEnvs := base64.StdEncoding.EncodeToString([]byte(expectedDuplicateEnvs))
+	env, err := ParseBuild(&encodedEnvs)
+	assert.Equal(t, 5, len(env.GetEnvs()))
+	assert.NoError(t, err)
+	env.removeDuplicateValues()
+	assert.Equal(t, 1, len(env.GetEnvs()))
+}
+
+var expectedDuplicateEnvs = `{
+        "CLOUDSDK_CORE_PROJECT": "plattformsikkerhet-dev-496e",
+        "CLOUDSDK_PROJECT": "plattformsikkerhet-dev-496e",
+        "GCLOUD_PROJECT": "plattformsikkerhet-dev-496e",
+        "GCP_PROJECT": "plattformsikkerhet-dev-496e",
+        "GOOGLE_CLOUD_PROJECT": "plattformsikkerhet-dev-496e"
+}`
 
 func TestParseBuildFailEnvironmentalData(t *testing.T) {
 	data := "yolo"
