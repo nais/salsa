@@ -8,12 +8,13 @@ on:
 
 env:
   IMAGE: ttl.sh/nais/salsa-test:1h
+  KEY: gcpkms://projects/plattformsikkerhet-dev-496e/locations/europe-north1/keyRings/cosign/cryptoKeys/cosign-test/versions/1
 
 jobs:
   generate-provenance:
     runs-on: ubuntu-20.04
     steps:
-      # Required step?
+      # Required step
       - name: Checkout Code
         uses: actions/checkout@v3
 
@@ -40,6 +41,10 @@ jobs:
         uses: ./
         with:
           image: ${{ env.IMAGE }}
+          key: ${{ env.KEY }}
+          docker_registry: ghcr.io
+          docker_user: ${{ github.actor }}
+          docker_pwd: ${{ secrets.GITHUB_TOKEN }}
 
       # For test output
       - name: Upload provenance
