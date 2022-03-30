@@ -36,6 +36,7 @@ func (in *CurrentBuildEnvironment) FilterEnvs() map[string]string {
 		in.filterEnvsWithPrefix(key, "INPUT_", "GITHUB_", "RUNNER_", "ACTIONS_")
 		in.filterEnv(key, "TOKEN")
 		in.filterSingleLineEnv(key)
+		in.removeDuplicateValues()
 	}
 	return in.Envs
 }
@@ -64,4 +65,14 @@ func (in *CurrentBuildEnvironment) filterEnvsWithPrefix(key string, prefixes ...
 
 func (in *CurrentBuildEnvironment) GetEnvs() map[string]string {
 	return in.Envs
+}
+
+func (in *CurrentBuildEnvironment) removeDuplicateValues() {
+	var current = make(map[string]struct{})
+	for key, v := range in.Envs {
+		if _, has := current[v]; has {
+			delete(in.Envs, key)
+		}
+		current[v] = struct{}{}
+	}
 }
