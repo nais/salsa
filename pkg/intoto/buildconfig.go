@@ -15,19 +15,24 @@ type BuildConfig struct {
 }
 
 func GenerateBuildConfig(scanConfig *config.ScanConfiguration) *BuildConfig {
-	return &BuildConfig{
+	buildConfig := &BuildConfig{
 		Commands: []string{
 			fmt.Sprintf("%s %s",
 				scanConfig.Cmd.CommandPath(),
 				salsaCmdFlags(scanConfig.Cmd),
 			),
-			fmt.Sprintf("%s %s",
-				scanConfig.Dependencies.CmdPath(),
-				scanConfig.Dependencies.CmdFlags(),
-			),
 		},
 		Shell: "bash",
 	}
+
+	if len(scanConfig.Dependencies.RuntimeDeps) > 0 {
+		buildConfig.Commands = append(buildConfig.Commands, fmt.Sprintf("%s %s",
+			scanConfig.Dependencies.CmdPath(),
+			scanConfig.Dependencies.CmdFlags(),
+		))
+	}
+
+	return buildConfig
 }
 
 func salsaCmdFlags(cmd *cobra.Command) string {

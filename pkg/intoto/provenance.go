@@ -51,6 +51,10 @@ func withMaterials(opts *ProvenanceOptions) []slsa.ProvenanceMaterial {
 }
 
 func AppendRuntimeDependencies(opts *ProvenanceOptions, materials *[]slsa.ProvenanceMaterial) {
+	if opts.Dependencies == nil {
+		return
+	}
+
 	for _, dep := range opts.Dependencies.RuntimeDeps {
 		m := slsa.ProvenanceMaterial{
 			URI:    dep.ToUri(),
