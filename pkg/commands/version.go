@@ -27,5 +27,5 @@ var versionCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(versionCmd)
-	scanCmd.Flags().BoolVar(&info, "info", false, "Detailed commit information")
+	versionCmd.Flags().BoolVar(&info, "info", false, "Detailed commit information")
 }
