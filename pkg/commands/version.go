@@ -19,6 +19,7 @@ var versionCmd = &cobra.Command{
 				Client.Date,
 				Client.BuiltBy,
 			)
+			return nil
 		}
 		log.Infof("%s: %s", command.CommandPath(), Client.Version)
 		return nil
