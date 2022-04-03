@@ -41,11 +41,11 @@ inputs:
       Pwd to login to docker
     required: true
 
-  docker_registry:
+  dependencies:
     description: |-
-      docker registry
-    required: true
-    default: "ghcr.io"
+      if the provenance should contain dependecies
+    required: false
+    default: "true"
 
   image:
     description: |-
@@ -80,4 +80,4 @@ runs:
     - ${{ inputs.key }}
     - ${{ inputs.docker_user }}
     - ${{ inputs.docker_pwd }}
-    - ${{ inputs.docker_registry }}
+    - ${{ inputs.dependencies }}
