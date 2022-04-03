@@ -18,9 +18,16 @@ import (
 	"os"
 )
 
-var buildContext string
-var runnerContext string
-var envContext string
+var (
+	buildContext  string
+	runnerContext string
+	envContext    string
+	Config        *ProvenanceConfig
+)
+
+type ProvenanceConfig struct {
+	WithDependencies bool
+}
 
 var scanCmd = &cobra.Command{
 	Use:   "scan",
@@ -40,9 +47,13 @@ var scanCmd = &cobra.Command{
 		workDir := PathFlags.WorkDir()
 		log.Infof("prepare to scan path %s ...", workDir)
 
-		deps, err := InitBuildTools().DetectDeps(workDir)
-		if err != nil {
-			return fmt.Errorf("detecting dependecies: %v", err)
+		deps := &build.ArtifactDependencies{}
+		if Config.WithDependencies {
+			generatedDeps, err := InitBuildTools().DetectDeps(workDir)
+			if err != nil {
+				return fmt.Errorf("detecting dependecies: %v", err)
+			}
+			deps = generatedDeps
 		}
 
 		contextEnvironment, err := vcs.ResolveBuildContext(&buildContext, &runnerContext, &envContext)
@@ -99,8 +110,10 @@ func InitBuildTools() build.Tools {
 }
 
 func init() {
+	Config = &ProvenanceConfig{}
 	rootCmd.AddCommand(scanCmd)
 	scanCmd.Flags().StringVar(&buildContext, "build-context", "", "context of build tool")
 	scanCmd.Flags().StringVar(&runnerContext, "runner-context", "", "context of runner")
 	scanCmd.Flags().StringVar(&envContext, "env-context", "", "environmental variables of current context")
+	scanCmd.Flags().BoolVar(&Config.WithDependencies, "with-deps", true, "specify if the cli should generate dependencies for a provenance")
 }

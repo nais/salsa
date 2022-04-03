@@ -19,6 +19,7 @@ var versionCmd = &cobra.Command{
 				Client.Date,
 				Client.BuiltBy,
 			)
+			return nil
 		}
 		log.Infof("%s: %s", command.CommandPath(), Client.Version)
 		return nil
@@ -27,5 +28,5 @@ var versionCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(versionCmd)
-	scanCmd.Flags().BoolVar(&info, "info", false, "Detailed commit information")
+	versionCmd.Flags().BoolVar(&info, "info", false, "Detailed commit information")
 }
