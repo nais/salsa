@@ -115,5 +115,5 @@ func init() {
 	scanCmd.Flags().StringVar(&buildContext, "build-context", "", "context of build tool")
 	scanCmd.Flags().StringVar(&runnerContext, "runner-context", "", "context of runner")
 	scanCmd.Flags().StringVar(&envContext, "env-context", "", "environmental variables of current context")
-	scanCmd.PersistentFlags().BoolVar(&Config.WithDependencies, "with-deps", true, "specify if the cli should generate dependencies for the provenance")
+	scanCmd.Flags().BoolVar(&Config.WithDependencies, "with-deps", true, "specify if the cli should generate dependencies for a provenance")
 }

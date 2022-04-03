@@ -13,7 +13,7 @@ echo "JAVA_HOME: $JAVA_HOME"
 echo "MAVEN_HOME: $MAVEN_HOME"
 
 echo "---------- Preparing pico-de-galo Slsa for repository: $REPO_NAME ----------"
-echo $INPUT_DOCKER_PWD | docker login $DOCKER_REGISTRY -u $INPUT_DOCKER_USER --password-stdin
+echo "$INPUT_DOCKER_PWD" | docker login "$DOCKER_REGISTRY" -u "$INPUT_DOCKER_USER" --password-stdin
 
 salsa scan \
   --repo "$REPO_NAME" \
@@ -21,7 +21,7 @@ salsa scan \
   --runner-context "$RUNNER" \
   --env-context "$ENVS" \
   --subDir "$INPUT_REPO_SUB_DIR" \
-  --with-deps="$INPUTS_DEPENDENCIES" \
+  --with-deps="$INPUT_DEPENDENCIES" \
   --remote-run &&
   salsa attest \
     --repo "$REPO_NAME" \
