@@ -29,15 +29,15 @@ type ProvenanceOptions struct {
 
 func CreateProvenanceOptions(scanCfg *config.ScanConfiguration) *ProvenanceOptions {
 	opts := &ProvenanceOptions{
-		BuildStartedOn: time.Now().UTC(),
-		BuilderId:      DefaultBuildId,
-		BuildType:      AdHocBuildType,
-		Dependencies:   scanCfg.Dependencies,
-		Name:           scanCfg.RepoName,
+		BuilderId:    DefaultBuildId,
+		BuildType:    AdHocBuildType,
+		Dependencies: scanCfg.Dependencies,
+		Name:         scanCfg.RepoName,
 	}
 
 	context := scanCfg.ContextEnvironment
 	if context != nil {
+		opts.BuildStartedOn = context.GetBuildStartedOn()
 		opts.BuildType = context.BuildType()
 		opts.BuildInvocationId = context.BuildInvocationId()
 		opts.BuilderId = context.BuilderId()
@@ -47,6 +47,7 @@ func CreateProvenanceOptions(scanCfg *config.ScanConfiguration) *ProvenanceOptio
 	}
 
 	opts.BuildConfig = GenerateBuildConfig(scanCfg)
+	opts.BuildStartedOn = time.Now().UTC()
 	opts.Invocation = nil
 	return opts
 }

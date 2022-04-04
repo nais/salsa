@@ -2,17 +2,16 @@ package intoto
 
 import (
 	"fmt"
+	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
 	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/config"
 	"github.com/nais/salsa/pkg/vcs"
 	"github.com/nais/salsa/pkg/vcs/github"
 	"github.com/spf13/cobra"
+	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 	"time"
-
-	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateProvenanceOptions(t *testing.T) {
@@ -27,7 +26,6 @@ func TestCreateProvenanceOptions(t *testing.T) {
 		buildConfig       *BuildConfig
 		builderRepoDigest *slsa.ProvenanceMaterial
 		configSource      slsa.ConfigSource
-		buildTimerIsSet   bool
 		runnerContext     bool
 	}{
 		{
@@ -42,8 +40,7 @@ func TestCreateProvenanceOptions(t *testing.T) {
 				Digest:     slsa.DigestSet(nil),
 				EntryPoint: "",
 			},
-			buildTimerIsSet: true,
-			runnerContext:   false,
+			runnerContext: false,
 		},
 		{
 			name:              "create provenance artifact with runner context",
@@ -53,7 +50,6 @@ func TestCreateProvenanceOptions(t *testing.T) {
 			buildConfig:       nil,
 			builderRepoDigest: ExpectedBuilderRepoDigestMaterial(),
 			configSource:      ExpectedConfigSource(),
-			buildTimerIsSet:   true,
 			runnerContext:     true,
 		},
 	} {
@@ -73,7 +69,7 @@ func TestCreateProvenanceOptions(t *testing.T) {
 				assert.Equal(t, "artifact", provenanceArtifact.Name)
 				assert.Equal(t, test.buildType, provenanceArtifact.BuildType)
 				assert.Equal(t, deps, provenanceArtifact.Dependencies.RuntimeDeps)
-				assert.Equal(t, test.buildTimerIsSet, time.Now().UTC().After(provenanceArtifact.BuildStartedOn))
+				assert.Equal(t, "2022-02-14 09:38:16 +0100 CET", provenanceArtifact.BuildStartedOn.String())
 				assert.Equal(t, test.buildInvocationId, provenanceArtifact.BuildInvocationId)
 				assert.Equal(t, test.buildConfig, provenanceArtifact.BuildConfig)
 				assert.NotEmpty(t, provenanceArtifact.Invocation)
@@ -97,7 +93,7 @@ func TestCreateProvenanceOptions(t *testing.T) {
 				assert.Equal(t, "artifact", provenanceArtifact.Name)
 				assert.Equal(t, test.buildType, provenanceArtifact.BuildType)
 				assert.Equal(t, deps, provenanceArtifact.Dependencies.RuntimeDeps)
-				assert.Equal(t, test.buildTimerIsSet, time.Now().UTC().After(provenanceArtifact.BuildStartedOn))
+				assert.NotEmpty(t, provenanceArtifact.BuildStartedOn.String())
 				assert.Equal(t, test.buildInvocationId, provenanceArtifact.BuildInvocationId)
 				assert.Equal(t, test.buildConfig, provenanceArtifact.BuildConfig)
 				assert.Empty(t, provenanceArtifact.Invocation)
@@ -139,6 +135,15 @@ func ExpectedArtDeps(deps map[string]build.Dependency) *build.ArtifactDependenci
 }
 
 func Environment() *vcs.GithubCIEnvironment {
+	fixedTime := "2022-02-14T09:38:16+01:00"
+	eventMetadata := []byte(fmt.Sprintf("%v", github.EventMetadata{
+		HeadCommit: github.HeadCommit{
+			Timestamp: fixedTime,
+		},
+	}))
+
+	parsedTime, _ := time.Parse(time.RFC3339, fixedTime)
+
 	return &vcs.GithubCIEnvironment{
 		BuildContext: &github.Context{
 			Repository: "nais/salsa",
@@ -147,6 +152,7 @@ func Environment() *vcs.GithubCIEnvironment {
 			Workflow:   "Create a provenance",
 			ServerUrl:  "https://github.com",
 			EventName:  "workflow_dispatch",
+			Event:      eventMetadata,
 		},
 		Event: &vcs.Event{
 			Inputs: []byte("some user inputs"),
@@ -156,7 +162,8 @@ func Environment() *vcs.GithubCIEnvironment {
 			Temp:      "/home/runner/work/_temp",
 			ToolCache: "/opt/hostedtoolcache",
 		},
-		Actions: github.BuildId("v1"),
+		Actions:        github.BuildId("v1"),
+		BuildStartedOn: parsedTime,
 	}
 }
 

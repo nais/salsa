@@ -20,6 +20,7 @@ func TestCreateCIEnvironment(t *testing.T) {
 	assert.Equal(t, "90dc9f2bc4007d1099a941ba3d408d2c896fe8dd", ci.Sha())
 	assert.Equal(t, "https://github.com/nais/salsa/Attestations/GitHubHostedActions@v1", ci.BuilderId())
 	assert.Equal(t, "https://github.com/nais/salsa/actions/runs/1839977840", ci.BuildInvocationId())
+	assert.Equal(t, "2022-02-14 09:38:16 +0100 CET", ci.GetBuildStartedOn().String())
 
 	metadata := Metadata{
 		Arch: "X64",

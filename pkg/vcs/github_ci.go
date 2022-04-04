@@ -3,6 +3,7 @@ package vcs
 import (
 	"fmt"
 	"github.com/nais/salsa/pkg/vcs/github"
+	"time"
 )
 
 const (
@@ -15,6 +16,7 @@ type GithubCIEnvironment struct {
 	RunnerContext    *github.RunnerContext
 	BuildEnvironment *github.CurrentBuildEnvironment
 	Actions          *github.Actions
+	BuildStartedOn   time.Time
 }
 
 func CreateGithubCIEnvironment(githubContext []byte, runnerContext, envsContext *string) (ContextEnvironment, error) {
@@ -28,10 +30,20 @@ func CreateGithubCIEnvironment(githubContext []byte, runnerContext, envsContext 
 		return nil, fmt.Errorf("parsing runner: %w", err)
 	}
 
+	eventMetadata, err := github.ParseEventMetaData(context)
+	if err != nil {
+		return nil, fmt.Errorf("parsing event meatdata: %w", err)
+	}
+
+	buildStartedOn, err := eventMetadata.BuildStartedOn()
+	if err != nil {
+		return nil, fmt.Errorf("parsing build started on: %w", err)
+	}
+
 	// Not required to build a CI environment
 	current := &github.CurrentBuildEnvironment{}
 	if envsContext == nil || len(*envsContext) == 0 {
-		return BuildEnvironment(context, runner, current), nil
+		return BuildEnvironment(context, runner, current, buildStartedOn), nil
 	}
 
 	current, err = github.ParseBuild(envsContext)
@@ -39,10 +51,15 @@ func CreateGithubCIEnvironment(githubContext []byte, runnerContext, envsContext 
 		return nil, fmt.Errorf("parsing envs: %w", err)
 	}
 
-	return BuildEnvironment(context, runner, current), nil
+	return BuildEnvironment(context, runner, current, buildStartedOn), nil
 }
 
-func BuildEnvironment(context *github.Context, runner *github.RunnerContext, current *github.CurrentBuildEnvironment) ContextEnvironment {
+func BuildEnvironment(
+	context *github.Context,
+	runner *github.RunnerContext,
+	current *github.CurrentBuildEnvironment,
+	buildStartedOn time.Time,
+) ContextEnvironment {
 	return &GithubCIEnvironment{
 		BuildContext: context,
 		Event: &Event{
@@ -51,6 +68,7 @@ func BuildEnvironment(context *github.Context, runner *github.RunnerContext, cur
 		RunnerContext:    runner,
 		BuildEnvironment: current,
 		Actions:          github.BuildId(GithubActionsBuildIdVersion),
+		BuildStartedOn:   buildStartedOn,
 	}
 }
 
@@ -116,4 +134,8 @@ func (in *GithubCIEnvironment) NonReproducibleMetadata() *Metadata {
 			},
 		},
 	}
+}
+
+func (in *GithubCIEnvironment) GetBuildStartedOn() time.Time {
+	return in.BuildStartedOn
 }
