@@ -8,7 +8,7 @@ import (
 
 func TestEnvironmentGetCurrentFilteredEnvironment(t *testing.T) {
 	filteredResult := toEnvData(t, envs)
-	assert.Equal(t, 3, len(filteredResult))
+	assert.Equal(t, 13, len(filteredResult))
 	expected := toEnvData(t, expectedEnvs)
 	assert.Equal(t, 3, len(expected))
 }

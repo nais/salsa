@@ -32,12 +32,13 @@ func (in *CurrentBuildEnvironment) FilterEnvs() map[string]string {
 	if len(in.Envs) < 1 {
 		return map[string]string{}
 	}
+
 	for key, _ := range in.Envs {
 		in.filterEnvsWithPrefix(key, "INPUT_", "GITHUB_", "RUNNER_", "ACTIONS_")
 		in.filterEnv(key, "TOKEN")
-		in.filterSingleLineEnv(key)
-		in.removeDuplicateValues()
 	}
+
+	in.removeDuplicateValues()
 	return in.Envs
 }
 
