@@ -4,10 +4,9 @@
 
 ## About
 
-GitHub Action to create a SBOM / [in-toto attestation](https://github.com/in-toto/attestation), upload, sign and verify
-using [cosign](https://github.com/sigstore/cosign). All predicate payloads are signed using
-the [DSSE](https://github.com/secure-systems-lab/dsse).
-
+GitHub Action to create a SBOM / [in-toto attestation](https://github.com/in-toto/attestation) and to upload, sign and
+verify using [cosign](https://github.com/sigstore/cosign).  
+All predicate payloads are signed using the [DSSE](https://github.com/secure-systems-lab/dsse).
 ___
 
 * [Usage](#usage)
@@ -20,8 +19,8 @@ ___
 
 In the examples below we are also using 3 other required actions:
 
-* Action [checkout of repository](https://github.com/actions/checkout)
-* Action Google Cloud credentials to establishes [authentication](https://github.com/google-github-actions/auth) to
+* Action to [check out of repository](https://github.com/actions/checkout)
+* Action for Google Cloud credentials to establishes [authentication](https://github.com/google-github-actions/auth) to
   Google Cloud
 * Action to build and push [Docker images](https://github.com/docker/build-push-action)
 
@@ -29,12 +28,12 @@ In the examples below we are also using 3 other required actions:
 
 The github context contains information about the workflow run and the event that triggered the run. You can also read
 most of the github context data in environment variables By default, this action uses
-the [Git context](https://docs.github.com/en/actions/learn-github-actions/contexts#github-context)
+the [Git context](https://docs.github.com/en/actions/learn-github-actions/contexts#github-context).
 
 ### Runner Context
 
 The runner context contains information about the runner that is executing the current job. By default, this action uses
-the [Runner context](https://docs.github.com/en/actions/learn-github-actions/contexts#runner-context)
+the [Runner context](https://docs.github.com/en/actions/learn-github-actions/contexts#runner-context).
 
 ```yaml
 name: ci
