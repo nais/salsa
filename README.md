@@ -26,9 +26,8 @@ In the examples below we are also using 3 other required actions:
 
 ### Git context
 
-The github context contains information about the workflow run and the event that triggered the run. You can also read
-most of the github context data in environment variables By default, this action uses
-the [Git context](https://docs.github.com/en/actions/learn-github-actions/contexts#github-context).
+The github context contains information about the workflow run and the event that triggered the run. By default, this
+action uses the [Git context](https://docs.github.com/en/actions/learn-github-actions/contexts#github-context).
 
 ### Runner Context
 
