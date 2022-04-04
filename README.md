@@ -1,124 +1,97 @@
-# salsa
+# nais slsa action
 
 > in line with the best from abroad
 
+## About
+
+GitHub Action to create a SBOM / [in-toto attestation](https://github.com/in-toto/attestation), upload, sign and verify
+using [cosign](https://github.com/sigstore/cosign). All predicate payloads are signed using
+the [DSSE](https://github.com/secure-systems-lab/dsse).
+
+___
+
+* [Usage](#usage)
+    * [Git context](#git-context)
+    * [Runner context](#runner-context)
+* [Customizing](#customizing)
+    * [Inputs](#inputs)
+
 ## Usage
 
-`Prerequisites to run locally`
+In the examples below we are also using 3 other required actions:
 
-* Google Setup
-    * KMS is enabled in project
-        * create keyring
-            * create keys: `Elliptic Curve P-256 key SHA256 Digest`
-    * Serviceuser in project has roles:
-        * Cloud KMS CryptoKey signer/verifier
-        * Cloud KMS viewer
-* Logged in to Google
-* Set: `GOOGLE_APPLICATION_CREDENTIALS` with path to .json file containing serviceuser credentials.
+* Action [checkout of repository](https://github.com/actions/checkout)
+* Action Google Cloud credentials to establishes [authentication](https://github.com/google-github-actions/auth) to
+  Google Cloud
+* Action to build and push [Docker images](https://github.com/docker/build-push-action)
 
-```text
-export GOOGLE_APPLICATION_CREDENTIALS=~/path/to/file/cosign-private-key.json
+### Git context
+
+The github context contains information about the workflow run and the event that triggered the run. You can also read
+most of the github context data in environment variables By default, this action uses
+the [Git context](https://docs.github.com/en/actions/learn-github-actions/contexts#github-context)
+
+### Runner Context
+
+The runner context contains information about the runner that is executing the current job. By default, this action uses
+the [Runner context](https://docs.github.com/en/actions/learn-github-actions/contexts#runner-context)
+
+```yaml
+name: ci
+
+on:
+  push:
+    branches:
+      - 'main'
+
+env:
+  IMAGE: ttl.sh/nais/salsa-test:1h
+  KEY: gcpkms://projects/plattformsikkerhet-dev-496e/locations/europe-north1/keyRings/cosign/cryptoKeys/cosign-test/versions/1
+
+jobs:
+  provenance:
+    runs-on: ubuntu-20.04
+    steps:
+
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: 'Authenticate to Google Cloud'
+        id: 'google'
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: ${{ env.IMAGE }}
+
+      - name: Provenance, upload and sign attestation
+        uses: nais/salsa@v0.0.1-alpha-10
+        with:
+          image: ${{ env.IMAGE }}
+          key: ${{ env.KEY }}
+          docker_user: ${{ github.actor }}
+          docker_pwd: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-* Install
-    * Cosign: https://github.com/sigstore/cosign
+## Customizing
 
-## Local install
+### inputs
 
-```
-make
-```
+The Following inputs can be used as `step.with` keys
 
-### Commands
-
-clone: `clones the given project into user defined path`
-
-```
-bin/salsa clone --repo salsa --url https://github.com/nais/salsa
-```
-
-scan: `Scan files and dependencies for a given project`
-
-```
-bin/salsa scan --repo salsa
-```
-
-attest: `sign and upload in-toto attestation`
-
-```
-bin/salsa attest --repo salsa --predicate salsa.provenance --no-upload --key gcpkms://projects/$PROJECT/locations/$LOCATION/keyRings/$KEYRING/cryptoKeys/$KEY/versions/$KEY_VERSION  ttl.sh/salsax:1h
-```
-
-Info:
-Image can be pushed to ttl.sh, who offers free, short-lived (ie: hours), anonymous container image hosting if you just
-want to try these commands out.  
-**Quick Start** [Cosign](https://github.com/sigstore/cosign#quick-start)  
-**ttl.sh** [tt.sh info](https://ttl.sh/)
-
-find: `find artifact from attestations`
-
-```
-bin/salsa find go-crypto
-```
-
-Instead of setting a bunch of flags, in home directory create a config file with name ".salsa" (without extension)
-
-```yml
-attest:
-  key: gcpkms://projects/$PROJECT/locations/$LOCATION/keyRings/$KEYRING/cryptoKeys/$KEY/versions/$KEY_VERSION
-...
-```
-
-Another possibility is to set Environment variables with prefix `SALSA`
-
-```
-SALSA_ATTEST_KEY
-```
-
-## Status
-
-Proof of Concept for a SLSA github action / cli.
-
-### Relevant concepts to test
-
-* get all dependencies (including transitive) for a given repo and language
-    * One language at a time
-* create a SBOM / in-toto attestation
-    * Should contain a Predicate for SLSA Provenance
-* sign attestation using DSSE (leverage some of sigstore functionality)
-* upload attestation somewhere
-* explore tools like cosign, Fulcio and Reko from sigstore to see where they can fit in
-* how to make attestations searchable
-
-### Concepts tested so far
-
-Created simple CLI to test concepts:
-
-* clone github project
-* list all dependencies in a gradle project
-* create attestation with materials based on dependencies
-* sign attestation with DSSE
-* sign docker image and put into attestation, using cosign
-* digest over dependencies etc in attestation
-
-### Stuff we should explore
-
-* include build steps from workflow
-* create a pipeline where a "provenance" action can be used
-* upload attestation somewhere
-* explore tools like cosign, Fulcio and Reko from sigstore to see where they can fit in
-    * https://github.com/sigstore/fulcio:
-        * Fulcio is a work in progress. There's working code and a running instance and a plan, but you should not
-          attempt to try to actually use it for anything
-* how to make attestations searchable
-* how to get/add the digest for dependency artifacts for all build tools
-    * currently, implemented only in golang
-* Handle the ability to resolve packages that's private
-
-## Relevant links
-
-* https://github.com/in-toto/attestation/blob/main/spec/README.md
-* https://github.com/slsa-framework/slsa/blob/main/controls/attestations.md
-* https://github.com/secure-systems-lab/dsse
-* https://slsa.dev/provenance/v0.2
-* Mostly cosign, reko and fulcio: https://docs.sigstore.dev/
+| Name             | Type   | Description                                                                                                                 | Required |
+|------------------|--------|-----------------------------------------------------------------------------------------------------------------------------|----------|
+| `key`            | String | The key used to sign the attestation                                                                                        | True     |
+| `docker_user`    | String | User to login to docker                                                                                                     | True     |
+| `docker_pwd`     | String | Pwd to login to docker                                                                                                      | True     |
+| `image`          | String | Docker image to sign. Defaults to $ENV_IMAGE.                                                                               | True     |
+| `repo_name`      | String | Name of the file and path to provenance. Used as an relative path under $GITHUB_WORKSPACE. Defaults to "github.repository". | False    |
+| `repo_sub_dir`   | String | Specify a sub directory if build file not found in working root directory                                                   | False    |
+| `dependencies`   | Bool   | If the provenance should contain dependencies                                                                               | False    |
+| `repo_dir`       | String | Internal value (do not set): Root of directory to look for build files. Defaults to $GITHUB_WORKSPACE                       | False    |
+| `github_context` | String | Internal value (do not set): the "github" context object in json. The context is used when generating provenance            | False    |
+| `runner_context` | String | Internal value (do not set): the "runner" context object in json. The context is used when generating provenance.           | False    |

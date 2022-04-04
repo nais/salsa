@@ -8,7 +8,7 @@ inputs:
   repo_dir:
     description: |-
       Internal value (do not set): Root of directory to look for build files.
-      Defualts to $GITHUB_WORKSPACE.
+      Defaults to $GITHUB_WORKSPACE.
     required: false
     default: ${{ github.workspace }}
 
@@ -20,8 +20,7 @@ inputs:
 
   repo_name:
     description: |-
-      Name of the file and path to provenance.
-      Used as an relative path under $GITHUB_WORKSPACE.
+      Name of the file and path to provenance. Used as an relative path under $GITHUB_WORKSPACE.
       Defaults to "github.repository".
     required: false
     default: ${{ github.repository }}
