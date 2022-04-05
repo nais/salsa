@@ -1,6 +1,8 @@
-# NAIS SLSA Action
-
+# NAIS SLSA Provenance Action
+___
 > in line with the best from abroad
+
+[![Salsa CI](https://github.com/nais/salsa/actions/workflows/main.yml/badge.svg)](https://github.com/nais/salsa/actions/workflows/main.yml)
 
 ## About
 
@@ -49,11 +51,14 @@ ___
 
 ## Usage
 
-In the examples below we are also using 3 other `required` actions:
+In the examples below we are also using 2 other `required` actions:
 
 * Action to [check out of repository](https://github.com/actions/checkout)
 * Action for Google Cloud credentials to establishes [authentication](https://github.com/google-github-actions/auth) to
   Google Cloud
+
+Not `required`:
+
 * Action to build and push [Docker images](https://github.com/docker/build-push-action)
 
 ### Git context
