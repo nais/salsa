@@ -4,14 +4,17 @@
 
 ## About
 
-GitHub Action to create a SBOM / [in-toto attestation](https://github.com/in-toto/attestation) and to upload, sign and
-verify using [cosign](https://github.com/sigstore/cosign).  
+[SLSA](https://github.com/slsa-framework/slsa) is a framework intended to codify and promote
+secure [software supply-chain](https://slsa.dev/) practices. This GitHub Action is used to create a SBOM
+/ [in-toto attestation](https://github.com/in-toto/attestation) to upload, sign and verify
+a [provenance](https://slsa.dev/provenance/v0.2) using [cosign](https://github.com/sigstore/cosign).  
 All predicate payloads are signed using the [DSSE](https://github.com/secure-systems-lab/dsse).
 ___
 
 * [Usage](#usage)
     * [Git context](#git-context)
     * [Runner context](#runner-context)
+    * [Examples](#examples)
 * [Customizing](#customizing)
     * [Inputs](#inputs)
 
@@ -33,6 +36,13 @@ action uses the [Git context](https://docs.github.com/en/actions/learn-github-ac
 
 The runner context contains information about the runner that is executing the current job. By default, this action uses
 the [Runner context](https://docs.github.com/en/actions/learn-github-actions/contexts#runner-context).
+
+### Examples
+
+* github action [nais-salsa-demo.yml](.github/workflows/nais-salsa-demo.yml)
+* generated [salsa provenance](pkg/dsse/testdata/salsa.provenance) with transitive dependencies
+* signed [cosign dsse attestation](pkg/dsse/testdata/cosign-attestation.json)
+    * decoded [cosign attestation](pkg/dsse/testdata/cosign-attestation.json)
 
 ```yaml
 name: ci

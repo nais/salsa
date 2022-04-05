@@ -1,0 +1,408 @@
+{
+  "builder": {
+    "id": "https://github.com/nais/salsa/Attestations/GitHubHostedActions@v1"
+  },
+  "buildType": "https://github.com/Attestations/GitHubActionsWorkflow@v1",
+  "invocation": {
+    "configSource": {
+      "uri": "git+https://github.com/nais/salsa",
+      "digest": {
+        "sha1": "f394956040306b3c849a5359ed6280ba24cd9964"
+      },
+      "entryPoint": "NAIS SALSA"
+    },
+    "parameters": null,
+    "environment": {
+      "arch": "X64",
+      "env": {
+        "CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE": "/github/workspace/gha-creds-b198ec89666bfe5a.json",
+        "COSIGN_VERSION": "v1.6.0",
+        "GOOGLE_CLOUD_PROJECT": "plattformsikkerhet-dev-496e",
+        "JAVA_HOME": "/opt/java/openjdk",
+        "JAVA_VERSION": "jdk-17.0.2+8",
+        "LC_ALL": "en_US.UTF-8",
+        "LC_COLLATE": "C",
+        "MAVEN_CONFIG": "/root/.m2",
+        "MAVEN_HOME": "/usr/share/maven",
+        "MUSL_LOCPATH": "/usr/share/i18n/locales/musl"
+      },
+      "context": {
+        "Github": {
+          "RunId": "2086721278"
+        },
+        "Runner": {
+          "Os": "Linux",
+          "Temp": "/home/runner/work/_temp"
+        }
+      }
+    }
+  },
+  "buildConfig": null,
+  "metadata": {
+    "buildInvocationID": "https://github.com/nais/salsa/actions/runs/2086721278",
+    "buildStartedOn": "2022-04-03T22:39:02.675008189Z",
+    "buildFinishedOn": "2022-04-03T22:39:02.675602525Z",
+    "completeness": {
+      "parameters": false,
+      "environment": true,
+      "materials": true
+    },
+    "reproducible": false
+  },
+  "materials": [
+    {
+      "uri": "pkg:github.com/Microsoft/go-winio:0.5.1",
+      "digest": {
+        "sha256": "68f269d900fb38eae13b9b505ea42819225cf838c3b564c62ce98dc809ba1606"
+      }
+    },
+    {
+      "uri": "pkg:github.com/codahale/rfc6979:0.0.0-20141003034818-6a90f24967eb",
+      "digest": {
+        "sha256": "103993e90f59b3e49b52873b224f447eb16a732958aa03d9f403526d3027b671"
+      }
+    },
+    {
+      "uri": "pkg:github.com/pmezard/go-difflib:1.0.0",
+      "digest": {
+        "sha256": "e030700c4d0d1b24280476cb4183f04943e808c591e41133224fdfd6565b0103"
+      }
+    },
+    {
+      "uri": "pkg:github.com/shibumi/go-pathspec:1.3.0",
+      "digest": {
+        "sha256": "414c8c661168d0c77907ccd5f31dad7aca216dbe647dba538bdac19ca8797642"
+      }
+    },
+    {
+      "uri": "pkg:github.com/go-git/go-git/v5:5.4.2",
+      "digest": {
+        "sha256": "057c99bbdb745646e21edaabb2f76adfd503846253975879e555ba0920b8698e"
+      }
+    },
+    {
+      "uri": "pkg:github.com/magiconair/properties:1.8.5",
+      "digest": {
+        "sha256": "6fa909b3e1263c53181a4a30f46894c82c8ebc8c187ad609ddf49a59a93f1a5b"
+      }
+    },
+    {
+      "uri": "pkg:github.com/spf13/afero:1.6.0",
+      "digest": {
+        "sha256": "c686b1dac2760d3f12f31036a5a3c58c309270235e5ac83be551b40cb46b7a26"
+      }
+    },
+    {
+      "uri": "pkg:github.com/spf13/cobra:1.4.0",
+      "digest": {
+        "sha256": "cbec09a71eb8c5c80ed55f91727c16d0b107c532918b66433d20635a7ae0f3c4"
+      }
+    },
+    {
+      "uri": "pkg:github.com/davecgh/go-spew:1.1.1",
+      "digest": {
+        "sha256": "be3f63feed5baa7bc211f24ec1486d94e011aacdfeae41d8635de36164d4f7b7"
+      }
+    },
+    {
+      "uri": "pkg:github.com/fatih/color:1.13.0",
+      "digest": {
+        "sha256": "f0b3987352983cf9b228cb8df105760cd45635b2e8e8b67488bb3cfa6947e77c"
+      }
+    },
+    {
+      "uri": "pkg:github.com/go-git/gcfg:1.5.0",
+      "digest": {
+        "sha256": "43956235f185f33160c8958fa98c00eea185a0c4c488199d96471f466a4831ae"
+      }
+    },
+    {
+      "uri": "pkg:gopkg.in/warnings.v0:0.1.2",
+      "digest": {
+        "sha256": "c055d56c563c0d8e7fc4e7b510289674a0b3665c60b2171854d9011ecb4044c1"
+      }
+    },
+    {
+      "uri": "pkg:github.com/in-toto/in-toto-golang:0.3.4-0.20211211042327-af1f9fb822bf",
+      "digest": {
+        "sha256": "154f2db8be085b1fc7ab9e403b8fb5dc0667dca77aba4dd9e38382219f5ca13c"
+      }
+    },
+    {
+      "uri": "pkg:github.com/mattn/go-colorable:0.1.12",
+      "digest": {
+        "sha256": "8c5f83bba0253c88ecd8189489094a397d2bb774ae8c7c4f9e4b0f2996da038d"
+      }
+    },
+    {
+      "uri": "pkg:github.com/spf13/pflag:1.0.5",
+      "digest": {
+        "sha256": "8b2f951543823f56bef3216da3f76b836089e6ed3246807b7d9c370cabff2570"
+      }
+    },
+    {
+      "uri": "pkg:golang.org/x/term:0.0.0-20210927222741-03fcf44c2211",
+      "digest": {
+        "sha256": "2468113a02a5f4df03b96db4a054b983173e944ebbfcddc57309813cc7bb02b6"
+      }
+    },
+    {
+      "uri": "pkg:github.com/fsnotify/fsnotify:1.5.1",
+      "digest": {
+        "sha256": "9997105075505105a83d75edb9ff72b845cab9d915dacc75134e9469d296a602"
+      }
+    },
+    {
+      "uri": "pkg:github.com/sergi/go-diff:1.2.0",
+      "digest": {
+        "sha256": "5d4fabbcc022a01d140b7ab5305ac8432e15a39ff856c4434105c7b04c9aeb14"
+      }
+    },
+    {
+      "uri": "pkg:github.com/spf13/jwalterweatherman:1.1.0",
+      "digest": {
+        "sha256": "b9eeafa02e5b47917c6312394baee3f62e7cd8553842fa366e6aa7a8c6000c59"
+      }
+    },
+    {
+      "uri": "pkg:github.com/xanzy/ssh-agent:0.3.0",
+      "digest": {
+        "sha256": "c14333b8ab4a8a54600400f5b146fc80ec3046bd851a8055ba6723a0e0020a52"
+      }
+    },
+    {
+      "uri": "pkg:github.com/armon/go-socks5:0.0.0-20160902184237-e75332964ef5",
+      "digest": {
+        "sha256": "d02c193596f1a7af521cf74f24037f859226d02e0e22d764942166311598a62a"
+      }
+    },
+    {
+      "uri": "pkg:github.com/jbenet/go-context:0.0.0-20150711004518-d14ea06fba99",
+      "digest": {
+        "sha256": "05048578f03545624e968707e85c72f0c9b00edfb25506142ca7cdd11a1337c0"
+      }
+    },
+    {
+      "uri": "pkg:github.com/mitchellh/mapstructure:1.4.3",
+      "digest": {
+        "sha256": "395a300d20a5970fd88dd2e46a6dffb26ef012d3b2e7d77c9dd1a009cca3f1cb"
+      }
+    },
+    {
+      "uri": "pkg:github.com/stretchr/testify:1.7.1",
+      "digest": {
+        "sha256": "e5340ae7d5b9137bf4af676e1406fb3fde41ea111e3b21271d16bc3236123136"
+      }
+    },
+    {
+      "uri": "pkg:gopkg.in/check.v1:1.0.0-20201130134442-10cb98267c6c",
+      "digest": {
+        "sha256": "1de8bfe000df756a8993564cc54369aa7b4dc1a59cba0ac18c088796aa918959"
+      }
+    },
+    {
+      "uri": "pkg:gopkg.in/yaml.v2:2.4.0",
+      "digest": {
+        "sha256": "0fcc60c04098ec262fc7e6369f8b01cfddc99fd251bf1762cb2a3c0937ee29a6"
+      }
+    },
+    {
+      "uri": "pkg:github.com/acomagu/bufpipe:1.0.3",
+      "digest": {
+        "sha256": "7f1006ac7653810f70e50a9522d833c23db7e7fb9865881b5e2b41f9d2eea4e9"
+      }
+    },
+    {
+      "uri": "pkg:github.com/rogpeppe/go-internal:1.8.0",
+      "digest": {
+        "sha256": "1426c20ad5cd398dd4b54b875186a0849838cbb15dd78ad789f018500b4bf51f"
+      }
+    },
+    {
+      "uri": "pkg:github.com/secure-systems-lab/go-securesystemslib:0.3.0",
+      "digest": {
+        "sha256": "3c7d2650ab944975445436eb28c8063dcaeaae7280f202628bad78f8428a8bb8"
+      }
+    },
+    {
+      "uri": "pkg:github.com/spf13/viper:1.10.1",
+      "digest": {
+        "sha256": "9ee259b98a46ee04e3fd7aa253083c6c0d1ca75f8cda60b727883996e51804a9"
+      }
+    },
+    {
+      "uri": "pkg:github.com/go-git/go-git-fixtures/v4:4.2.1",
+      "digest": {
+        "sha256": "9fd8062f50adff2230fa77ec7ebf2ce3eb1b853f8d72ed92b9b7d78c85a0722f"
+      }
+    },
+    {
+      "uri": "pkg:github.com/imdario/mergo:0.3.12",
+      "digest": {
+        "sha256": "6fa47606c9536c8113a002ca3fb2f152f8a34ec348f5301ef34a4b58dda0fc75"
+      }
+    },
+    {
+      "uri": "pkg:github.com/inconshreveable/mousetrap:1.0.0",
+      "digest": {
+        "sha256": "67cb6ee6cada2d709721c011c41a7ff1c6ef97055aed9d4d1e0f5710a86d4af3"
+      }
+    },
+    {
+      "uri": "pkg:github.com/sirupsen/logrus:1.8.1",
+      "digest": {
+        "sha256": "7492ae1e0aa4d4d35096aa00e814e533559ff43387dcd063432bb487df806591"
+      }
+    },
+    {
+      "uri": "pkg:github.com/go-git/go-billy/v5:5.3.1",
+      "digest": {
+        "sha256": "08f88e500ccab4c46fa2510ac3e6c6d4f2d1a53ec3dcb22cdffddecb8022bb7e"
+      }
+    },
+    {
+      "uri": "pkg:github.com/mattn/go-isatty:0.0.14",
+      "digest": {
+        "sha256": "c95b806b2b3a0477f18a38193f3c3edd996ee724202863f6fe17106c76fb4bd6"
+      }
+    },
+    {
+      "uri": "pkg:github.com/pkg/errors:0.9.1",
+      "digest": {
+        "sha256": "14404bc75cd2db5e28c298f2eeab017a2c5b51192e850030acae54c0b193c2de"
+      }
+    },
+    {
+      "uri": "pkg:golang.org/x/crypto:0.0.0-20211215153901-e495a2d5b3d3",
+      "digest": {
+        "sha256": "d1eb3eff9df7d511903dc5e531f3fe5ab9c8212e9d3673517b4581d365b41783"
+      }
+    },
+    {
+      "uri": "pkg:gopkg.in/yaml.v3:3.0.0-20210107192922-496545a6307b",
+      "digest": {
+        "sha256": "87ca83a2d6843ee2404eb3265b4e0d0b083bbf6d9a1c7dbcc30a5ab9484af4ea"
+      }
+    },
+    {
+      "uri": "pkg:github.com/kevinburke/ssh_config:0.0.0-20201106050909-4977a11b4351",
+      "digest": {
+        "sha256": "0e8c12f61be0c98497e133b9369c82eb4ebf6784b19cd61b4fe597dbba2be829"
+      }
+    },
+    {
+      "uri": "pkg:github.com/kr/pretty:0.3.0",
+      "digest": {
+        "sha256": "5a0365eddc0da4467a8c9f64d6c9eae2966c83b0ce10df213fd5f0d13b23c24d"
+      }
+    },
+    {
+      "uri": "pkg:golang.org/x/sys:0.0.0-20211216021012-1d35b9e2eb4e",
+      "digest": {
+        "sha256": "7cb392939434d1e7e44af026fb8c5ca170fe45198b9a6ba53e7e48dd8f45d843"
+      }
+    },
+    {
+      "uri": "pkg:golang.org/x/text:0.3.7",
+      "digest": {
+        "sha256": "a25a70bcfd8a69c5b5656bec47bb90868c9362f280ba97d0ad118114cdf9d869"
+      }
+    },
+    {
+      "uri": "pkg:gopkg.in/ini.v1:1.66.2",
+      "digest": {
+        "sha256": "5df47574e62e6f2b4acb84a1cdcd8b1ebac6854d250c27c3186d722cf9a982c2"
+      }
+    },
+    {
+      "uri": "pkg:github.com/subosito/gotenv:1.2.0",
+      "digest": {
+        "sha256": "4a5af547d1f102510a79f82ae639fd53e0e711394851ae877e01338f483977bb"
+      }
+    },
+    {
+      "uri": "pkg:github.com/ProtonMail/go-crypto:0.0.0-20210428141323-04723f9f07d7",
+      "digest": {
+        "sha256": "62825b7a72bd0baed29339037e642e5659f4e328078f7be365f77d14bf869904"
+      }
+    },
+    {
+      "uri": "pkg:github.com/gliderlabs/ssh:0.2.2",
+      "digest": {
+        "sha256": "eb3b216b9ce8fd35a1461c2a083dfe11aac2020676c8ddbc8a946718f9f0908d"
+      }
+    },
+    {
+      "uri": "pkg:github.com/google/go-cmp:0.5.6",
+      "digest": {
+        "sha256": "04a6ca0aabcfe88fab9851edd3a666c90b6f07cc40916761172af46543597314"
+      }
+    },
+    {
+      "uri": "pkg:github.com/hashicorp/hcl:1.0.0",
+      "digest": {
+        "sha256": "d009e5ce3a62e2f11ab1378d167da62c98134b0b74fbab1fb224c6f2a7161b1e"
+      }
+    },
+    {
+      "uri": "pkg:github.com/pelletier/go-toml:1.9.4",
+      "digest": {
+        "sha256": "b6310d17a31f64083c7b8666653796696893daf5edb283bafa2b8e8c58440b03"
+      }
+    },
+    {
+      "uri": "pkg:github.com/spf13/cast:1.4.1",
+      "digest": {
+        "sha256": "b348737be274d7de997c4313b3cd0ded4945b74043b90ed0f890e71e231629d0"
+      }
+    },
+    {
+      "uri": "pkg:github.com/emirpasic/gods:1.12.0",
+      "digest": {
+        "sha256": "4005083d2682bb81be3ce725c5ea9bdc5f963e974aa851a5c37ebec8ecc696b8"
+      }
+    },
+    {
+      "uri": "pkg:github.com/kr/text:0.2.0",
+      "digest": {
+        "sha256": "e4dc7461ad19a98db2815dfae90cedbab1c8d7726af79029715689061a52f806"
+      }
+    },
+    {
+      "uri": "pkg:github.com/matryer/is:1.2.0",
+      "digest": {
+        "sha256": "f765131e9cbc083c1a274f06a8b0f3861ba2c62054503d69dc053a3c775dcf80"
+      }
+    },
+    {
+      "uri": "pkg:github.com/mitchellh/go-homedir:1.1.0",
+      "digest": {
+        "sha256": "96e905f738971710c53e4035becaf9ce97355ee3c39ffc059edab9986fb81346"
+      }
+    },
+    {
+      "uri": "pkg:github.com/anmitsu/go-shlex:0.0.0-20161002113705-648efa622239",
+      "digest": {
+        "sha256": "90539f3eae9d50cd614e8e091ba2d1e405d2504b0e8ed766d24c3416d42d3090"
+      }
+    },
+    {
+      "uri": "pkg:github.com/briandowns/spinner:1.18.1",
+      "digest": {
+        "sha256": "ca142642d335ceca85b28ba1d3d064fe30a3779d290b710e1ac876f202d5bf06"
+      }
+    },
+    {
+      "uri": "pkg:golang.org/x/net:0.0.0-20211118161319-6a13c67c3ce4",
+      "digest": {
+        "sha256": "0d9b21bf10dd56878a21bb9d01d1442a2f9fef4979d65b92cbfedbefa89b4d8d"
+      }
+    },
+    {
+      "uri": "git+https://github.com/nais/salsa",
+      "digest": {
+        "sha1": "f394956040306b3c849a5359ed6280ba24cd9964"
+      }
+    }
+  ]
+}
