@@ -9,12 +9,32 @@ secure [software supply-chain](https://slsa.dev/) practices. This GitHub Action 
 / [in-toto attestation](https://github.com/in-toto/attestation) then upload, sign and verify a
 generated [provenance](https://slsa.dev/provenance/v0.2) using [cosign](https://github.com/sigstore/cosign).  
 All predicate payloads are signed using the [DSSE](https://github.com/secure-systems-lab/dsse).
+
+### Materials
+
+This actions creates attestation with [materials](https://slsa.dev/provenance/v0.2#example) based on dependencies, the
+action digest over listed dependencies from a [supported](#support) build tool.
+
+### Support
+
+#### Build tools
+
+> jvm: [gradle](https://gradle.org/) and [maven](https://maven.apache.org/)
+
+> nodejs: [yarn](https://yarnpkg.com/) and [npm](https://www.npmjs.com/)
+
+> [Golang](https://go.dev/)
+
+> [PHP](https://www.php.net/) (with known limitation: no digest over dependencies)
+
 ___
 
 * [Usage](#usage)
     * [Git context](#git-context)
     * [Runner context](#runner-context)
-    * [Examples](#examples)
+    * [Example](#example)
+        * [Workflows](#workflows)
+        * [Attestation](#attestation)
 * [Customizing](#customizing)
     * [Inputs](#inputs)
 
@@ -37,12 +57,9 @@ action uses the [Git context](https://docs.github.com/en/actions/learn-github-ac
 The runner context contains information about the runner that is executing the current job. By default, this action uses
 the [Runner context](https://docs.github.com/en/actions/learn-github-actions/contexts#runner-context).
 
-### Examples
+### Example
 
-* github action [nais-salsa-demo.yml](.github/workflows/nais-salsa-demo.yml)
-* generated [salsa provenance](pkg/dsse/testdata/salsa.provenance) with transitive dependencies
-* signed [cosign dsse attestation](pkg/dsse/testdata/cosign-dsse-attestation.json)
-    * decoded [cosign attestation](pkg/dsse/testdata/cosign-attestation.json)
+#### Workflows
 
 ```yaml
 name: ci
@@ -84,6 +101,13 @@ jobs:
           docker_user: ${{ github.actor }}
           docker_pwd: ${{ secrets.GITHUB_TOKEN }}
 ```
+
+#### Attestation
+
+* github action [nais-salsa-demo.yml](.github/workflows/nais-salsa-demo.yml)
+* generated [salsa provenance](pkg/dsse/testdata/salsa.provenance) with transitive dependencies
+* signed [cosign dsse attestation](pkg/dsse/testdata/cosign-dsse-attestation.json)
+    * decoded [cosign attestation](pkg/dsse/testdata/cosign-attestation.json)
 
 ## Customizing
 
