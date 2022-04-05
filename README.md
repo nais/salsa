@@ -1,4 +1,4 @@
-# nais slsa action
+# NAIS SLSA Action
 
 > in line with the best from abroad
 
@@ -9,6 +9,15 @@ secure [software supply-chain](https://slsa.dev/) practices. This GitHub Action 
 / [in-toto attestation](https://github.com/in-toto/attestation) then upload, sign and verify a
 generated [provenance](https://slsa.dev/provenance/v0.2) using [cosign](https://github.com/sigstore/cosign).  
 All predicate payloads are signed using the [DSSE](https://github.com/secure-systems-lab/dsse).
+
+### SLSA Levels
+
+SLSA is organized into a series of [levels](https://slsa.dev/spec/v0.1/levels) that provide increasing integrity
+guarantees. This gives the action user confidence that software hasn’t been tampered with and can be securely traced
+back to its source.
+
+TODO
+[Action Level](https://slsa.dev/spec/v0.1/requirements#provenance-requirements)
 
 ### Materials
 
