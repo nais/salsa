@@ -6,8 +6,8 @@
 
 [SLSA](https://github.com/slsa-framework/slsa) is a framework intended to codify and promote
 secure [software supply-chain](https://slsa.dev/) practices. This GitHub Action is used to create a SBOM
-/ [in-toto attestation](https://github.com/in-toto/attestation) to upload, sign and verify
-a [provenance](https://slsa.dev/provenance/v0.2) using [cosign](https://github.com/sigstore/cosign).  
+/ [in-toto attestation](https://github.com/in-toto/attestation) then upload, sign and verify a
+generated [provenance](https://slsa.dev/provenance/v0.2) using [cosign](https://github.com/sigstore/cosign).  
 All predicate payloads are signed using the [DSSE](https://github.com/secure-systems-lab/dsse).
 ___
 
@@ -20,7 +20,7 @@ ___
 
 ## Usage
 
-In the examples below we are also using 3 other required actions:
+In the examples below we are also using 3 other `required` actions:
 
 * Action to [check out of repository](https://github.com/actions/checkout)
 * Action for Google Cloud credentials to establishes [authentication](https://github.com/google-github-actions/auth) to
@@ -41,7 +41,7 @@ the [Runner context](https://docs.github.com/en/actions/learn-github-actions/con
 
 * github action [nais-salsa-demo.yml](.github/workflows/nais-salsa-demo.yml)
 * generated [salsa provenance](pkg/dsse/testdata/salsa.provenance) with transitive dependencies
-* signed [cosign dsse attestation](pkg/dsse/testdata/cosign-attestation.json)
+* signed [cosign dsse attestation](pkg/dsse/testdata/cosign-dsse-attestation.json)
     * decoded [cosign attestation](pkg/dsse/testdata/cosign-attestation.json)
 
 ```yaml
