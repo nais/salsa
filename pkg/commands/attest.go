@@ -63,6 +63,9 @@ var attestCmd = &cobra.Command{
 					return fmt.Errorf("could not write file %s %w", filePath, err)
 				}
 				err = os.WriteFile(fmt.Sprintf("%s/%s.%s", workDir, PathFlags.Repo, "raw.txt"), []byte(raw), os.FileMode(0755))
+				if err != nil {
+					return fmt.Errorf("could not write file %s %w", workDir, err)
+				}
 			} else {
 				log.Infof("no attestations found from cosign verify-attest command")
 			}

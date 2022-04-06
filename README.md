@@ -8,15 +8,21 @@
 
 <div id="top"></div>
 
-<br />
+<div align="center">
 
 [![Salsa CI](https://github.com/nais/salsa/actions/workflows/main.yml/badge.svg)](https://github.com/nais/salsa/actions/workflows/main.yml)
+[![GitHub license](https://badgen.net/github/license/Naereen/Strapdown.js)](https://github.com/nais/salsa/blob/main/LICENSE)
+[![GitHub stars](https://badgen.net/github/stars/Naereen/Strapdown.js)](https://github.com/nais/salsa/stargazers/)
+[![Go Report Card](https://goreportcard.com/badge/github.com/nais/salsa)](https://goreportcard.com/report/github.com/nais/salsa)
+[![GitHub release](https://img.shields.io/github/release/Naereen/StrapDown.js.svg)](https://github.com/nais/salsa/releases)
+
+</div>
 
 ## About
 
 [SLSA](https://github.com/slsa-framework/slsa) is a framework intended to codify and promote
 secure [software supply-chain](https://slsa.dev/) practices. This GitHub Action is used to create a SBOM
-/ [in-toto attestation](https://github.com/in-toto/attestation) then upload, sign and verify a
+/ [in-toto attestation](https://github.com/in-toto/attestation) to upload, sign and verify a
 generated [provenance](https://slsa.dev/provenance/v0.2) using [cosign](https://github.com/sigstore/cosign).  
 All predicate payloads are signed using the [DSSE](https://github.com/secure-systems-lab/dsse).
 

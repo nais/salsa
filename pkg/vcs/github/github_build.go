@@ -33,7 +33,7 @@ func (in *CurrentBuildEnvironment) FilterEnvs() map[string]string {
 		return map[string]string{}
 	}
 
-	for key, _ := range in.Envs {
+	for key := range in.Envs {
 		in.filterEnvsWithPrefix(key, "INPUT_", "GITHUB_", "RUNNER_", "ACTIONS_")
 		in.filterEnv(key, "TOKEN")
 	}
