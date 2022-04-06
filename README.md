@@ -3,7 +3,7 @@
 <a href="https://github.com/nais/salsa">
     <img src="https://slsa.dev/images/SLSA-Badge-full-level2.svg"/>
  </a>
-    <h2 align="center">NAIS SLSA Provenance</h2>
+    <h2 align="center">NAIS SLSA Provenance Action</h2>
 </div>
 
 <div id="top"></div>
@@ -15,16 +15,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/nais/salsa.svg)](https://github.com/nais/salsa/stargazers/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/nais/salsa)](https://goreportcard.com/report/github.com/nais/salsa)
 [![Github all releases](https://img.shields.io/github/downloads/nais/salsa/total.svg)](https://github.com/nais/salsa/releases/)
-
-<h5 align="center">ACTION
-</h5>
-
 [![Github tag](https://badgen.net/github/tag/nais/salsa)](https://github.com/nais/salsa/tags/)
-
-<h5 align="center">CLI
-</h5>
-
-[![GitHub release](https://img.shields.io/github/release/nais/salsa.svg)](https://github.com/nais/salsa/releases)
 
 </div>
 
