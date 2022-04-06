@@ -28,7 +28,7 @@ func Exec(cmd *exec.Cmd) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("%s failed:\n%w\n", cmd, err)
 	}
-	outStr, _ := string(stdoutBuf.Bytes()), string(stderrBuf.Bytes())
+	outStr, _ := stdoutBuf.String(), stderrBuf.String()
 	return outStr, nil
 }
 

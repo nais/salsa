@@ -1,7 +1,6 @@
 package build
 
 import (
-	"errors"
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
@@ -39,7 +38,7 @@ func (t Tools) DetectDeps(workDir string) (*ArtifactDependencies, error) {
 			return deps, nil
 		}
 	}
-	return nil, errors.New(fmt.Sprintf("no supported build files found: %s", workDir))
+	return nil, fmt.Errorf(fmt.Sprintf("no supported build files found: %s", workDir))
 }
 
 func match(t Tool, workDir string) (bool, error) {

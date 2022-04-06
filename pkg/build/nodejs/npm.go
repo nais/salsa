@@ -60,11 +60,11 @@ func transform(input map[string]interface{}) (map[string]build.Dependency, error
 		dependency := value.(map[string]interface{})
 		integrity := fmt.Sprintf("%s", dependency["integrity"])
 		shaDig := strings.Split(integrity, "-")
-		decodedDigest, err := utils.DecodeDigest(fmt.Sprintf("%s", shaDig[1]))
+		decodedDigest, err := utils.DecodeDigest(shaDig[1])
 		if err != nil {
 			return nil, err
 		}
-		checksum := build.Verification(fmt.Sprintf("%s", shaDig[0]), decodedDigest)
+		checksum := build.Verification(shaDig[0], decodedDigest)
 		deps[key] = build.Dependence(key, fmt.Sprintf("%s", dependency["version"]), checksum)
 	}
 	return deps, nil

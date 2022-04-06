@@ -2,7 +2,6 @@ package vcs
 
 import (
 	"encoding/base64"
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -47,7 +46,7 @@ func TestCreateCIEnvironment(t *testing.T) {
 	result, err := ci.UserDefinedParameters().Inputs.MarshalJSON()
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
-	assert.NotEmpty(t, fmt.Sprintf("%s", result))
+	assert.NotEmpty(t, "%s", result)
 	assert.Equal(t, "Salsa CI", ci.Context())
 
 }

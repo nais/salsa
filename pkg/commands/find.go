@@ -79,5 +79,8 @@ var findCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(findCmd)
 	findCmd.Flags().StringVar(&artifact, "artifact", "", "artifact to search after")
-	viper.BindPFlags(findCmd.Flags())
+	err := viper.BindPFlags(findCmd.Flags())
+	if err != nil {
+		log.Errorf("setting viper flag: %v", err)
+	}
 }

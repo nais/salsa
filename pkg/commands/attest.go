@@ -147,5 +147,8 @@ func init() {
 		"the predicate file used for attestation")
 	attestCmd.Flags().String("type", "slsaprovenance",
 		"specify a predicate type (slsaprovenance|link|spdx|custom) or an URI (default \"slsaprovenance\")\n")
-	viper.BindPFlags(attestCmd.Flags())
+	err := viper.BindPFlags(attestCmd.Flags())
+	if err != nil {
+		log.Errorf("setting viper flag: %v", err)
+	}
 }

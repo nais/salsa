@@ -1,7 +1,6 @@
 package intoto
 
 import (
-	"fmt"
 	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/config"
 	"github.com/nais/salsa/pkg/vcs"
@@ -80,7 +79,7 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 				assert.NotEmpty(t, slsaPredicate.Invocation)
 				i, err := slsaPredicate.Invocation.Parameters.(*vcs.Event).Inputs.MarshalJSON()
 				assert.NoError(t, err)
-				assert.Equal(t, "some user inputs", fmt.Sprintf("%s", i))
+				assert.Equal(t, "some user inputs", string(i))
 				e := slsaPredicate.Invocation.Environment.(*vcs.Metadata)
 				assert.NoError(t, err)
 				assert.Equal(t, expectedMetadata(), e)

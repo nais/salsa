@@ -42,12 +42,6 @@ func (in *CurrentBuildEnvironment) FilterEnvs() map[string]string {
 	return in.Envs
 }
 
-func (in *CurrentBuildEnvironment) filterSingleLineEnv(key string) {
-	if !strings.Contains(key, "_") {
-		delete(in.Envs, key)
-	}
-}
-
 func (in *CurrentBuildEnvironment) filterEnv(key string, contains ...string) {
 	for _, contain := range contains {
 		if strings.Contains(key, contain) {

@@ -32,5 +32,8 @@ var cloneCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(cloneCmd)
 	cloneCmd.Flags().StringVar(&owner, "owner", "", "owner of the repo")
-	viper.BindPFlags(cloneCmd.Flags())
+	err := viper.BindPFlags(cloneCmd.Flags())
+	if err != nil {
+		log.Errorf("setting viper flag: %v", err)
+	}
 }
