@@ -11,10 +11,10 @@
 <div align="center">
 
 [![Salsa CI](https://github.com/nais/salsa/actions/workflows/main.yml/badge.svg)](https://github.com/nais/salsa/actions/workflows/main.yml)
-[![GitHub license](https://badgen.net/github/license/Naereen/Strapdown.js)](https://github.com/nais/salsa/blob/main/LICENSE)
-[![GitHub stars](https://badgen.net/github/stars/Naereen/Strapdown.js)](https://github.com/nais/salsa/stargazers/)
+[![GitHub license](https://badgen.net/github/license/nais/salsa)](https://github.com/nais/salsa/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/nais/salsa.svg)](https://github.com/nais/salsa/stargazers/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/nais/salsa)](https://goreportcard.com/report/github.com/nais/salsa)
-[![GitHub release](https://img.shields.io/github/release/Naereen/StrapDown.js.svg)](https://github.com/nais/salsa/releases)
+[![GitHub release](https://img.shields.io/github/release/nais/salsa.svg)](https://github.com/nais/salsa/releases)
 
 </div>
 
