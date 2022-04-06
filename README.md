@@ -3,7 +3,7 @@
 <a href="https://github.com/nais/salsa">
     <img src="https://slsa.dev/images/SLSA-Badge-full-level2.svg"/>
  </a>
-    <h2 align="center">NAIS SLSA Provenance GitHub Action</h2>
+    <h2 align="center">NAIS SLSA Provenance</h2>
 </div>
 
 <div id="top"></div>
@@ -14,6 +14,16 @@
 [![GitHub license](https://badgen.net/github/license/nais/salsa)](https://github.com/nais/salsa/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/nais/salsa.svg)](https://github.com/nais/salsa/stargazers/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/nais/salsa)](https://goreportcard.com/report/github.com/nais/salsa)
+[![Github all releases](https://img.shields.io/github/downloads/nais/salsa/total.svg)](https://github.com/nais/salsa/releases/)
+
+<h5 align="center">ACTION
+</h5>
+
+[![Github tag](https://badgen.net/github/tag/nais/salsa)](https://github.com/nais/salsa/tags/)
+
+<h5 align="center">CLI
+</h5>
+
 [![GitHub release](https://img.shields.io/github/release/nais/salsa.svg)](https://github.com/nais/salsa/releases)
 
 </div>
@@ -134,10 +144,10 @@ jobs:
 
 #### Attestation
 
-* github action [nais-salsa-demo.yml](.github/workflows/nais-salsa-demo.yml)
-* generated [salsa provenance](pkg/dsse/testdata/salsa.provenance) with transitive dependencies
-* signed [cosign dsse attestation](pkg/dsse/testdata/cosign-dsse-attestation.json)
-    * decoded [cosign attestation](pkg/dsse/testdata/cosign-attestation.json)
+* Example of a Github action [nais-salsa-demo.yml](.github/workflows/nais-salsa-demo.yml)
+* An example of a generated [salsa provenance](pkg/dsse/testdata/salsa.provenance) with transitive dependencies
+* An example of a signed [cosign dsse attestation](pkg/dsse/testdata/cosign-dsse-attestation.json)
+    * result after an decoded [cosign attestation](pkg/dsse/testdata/cosign-attestation.json)
 
 ## Customizing
 
