@@ -1,6 +1,14 @@
-# NAIS SLSA Provenance Action
-___
-> in line with the best from abroad
+<br />
+<div align="center">
+<a href="https://github.com/nais/salsa">
+    <img src="https://slsa.dev/images/SLSA-Badge-full-level2.svg"/>
+ </a>
+    <h2 align="center">NAIS SLSA Provenance GitHub Action</h2>
+</div>
+
+<div id="top"></div>
+
+<br />
 
 [![Salsa CI](https://github.com/nais/salsa/actions/workflows/main.yml/badge.svg)](https://github.com/nais/salsa/actions/workflows/main.yml)
 
@@ -12,14 +20,16 @@ secure [software supply-chain](https://slsa.dev/) practices. This GitHub Action 
 generated [provenance](https://slsa.dev/provenance/v0.2) using [cosign](https://github.com/sigstore/cosign).  
 All predicate payloads are signed using the [DSSE](https://github.com/secure-systems-lab/dsse).
 
-### SLSA Levels
+### SLSA Security Levels
 
 SLSA is organized into a series of [levels](https://slsa.dev/spec/v0.1/levels) that provide increasing integrity
 guarantees. This gives the action user confidence that software hasn’t been tampered with and can be securely traced
 back to its source.
 
-TODO
-[Action Level](https://slsa.dev/spec/v0.1/requirements#provenance-requirements)
+#### After the build
+
+This Action fulfills the requirements for [level 2](https://slsa.dev/spec/v0.1/index) and shows more trustworthiness in
+the build, builders are source-aware, and signatures are used to prevent provenance being tampered with.
 
 ### Materials
 
