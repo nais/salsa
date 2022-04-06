@@ -58,11 +58,13 @@ var attestCmd = &cobra.Command{
 				//remove last line which is a newline
 				docs := docs[:len(docs)-1]
 				doc := docs[len(docs)-1]
+
 				err = os.WriteFile(filePath, []byte(doc), os.FileMode(0755))
 				if err != nil {
 					return fmt.Errorf("could not write file %s %w", filePath, err)
 				}
-				err = os.WriteFile(fmt.Sprintf("%s/%s.%s", workDir, PathFlags.Repo, "raw.txt"), []byte(raw), os.FileMode(0755))
+
+				err := os.WriteFile(fmt.Sprintf("%s/%s.%s", workDir, PathFlags.Repo, "raw.txt"), []byte(raw), os.FileMode(0755))
 				if err != nil {
 					return fmt.Errorf("could not write file %s %w", workDir, err)
 				}
