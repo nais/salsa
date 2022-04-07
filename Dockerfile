@@ -4,6 +4,9 @@ ENV GOOS=linux
 ENV CGO_ENABLED=0
 
 WORKDIR /src
+COPY go.* /src
+RUN go mod download
+
 COPY . /src
 RUN make salsa
 
