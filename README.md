@@ -23,13 +23,14 @@
 
 The project is started as an initiative by the [NAIS](https://nais.io/) team
 
-- `NAV's Application Infrastructure Service`
-  to establishing a [Level 2](#level-2-after-the-build) cryptographic chain of custody between trusted builds and our
-  release and code-signing workflows. [SLSA](https://github.com/slsa-framework/slsa) is a framework intended to codify
-  and promote secure [software supply-chain](https://slsa.dev/) practices. This GitHub Action can be used to create,
-  upload, sign and verify a SBOM / [in-toto attestation](https://github.com/in-toto/attestation)
-  also called a  [provenance](https://slsa.dev/provenance/v0.2) using [cosign](https://github.com/sigstore/cosign).  
-  All predicate payloads are signed using the [DSSE](https://github.com/secure-systems-lab/dsse).
+> NAV's Application Infrastructure Service
+
+to establishing a [Level 2](#level-2-after-the-build) cryptographic chain of custody between trusted builds and our
+release and code-signing workflows. [SLSA](https://github.com/slsa-framework/slsa) is a framework intended to codify and
+promote secure [software supply-chain](https://slsa.dev/) practices. This GitHub Action can be used to create, upload,
+sign and verify a SBOM / [in-toto attestation](https://github.com/in-toto/attestation)
+also called a  [provenance](https://slsa.dev/provenance/v0.2) using [cosign](https://github.com/sigstore/cosign).  
+All predicate payloads are signed using the [DSSE](https://github.com/secure-systems-lab/dsse).
 
 This is not an official GitHub Action set up and maintained by the SLSA team. This GitHub Action is built to provide
 teams and developers with the ability to trace software back to the source and define the moving parts in a complex
@@ -55,10 +56,14 @@ action digest over listed dependencies from a [supported](#support) build tool.
 
 #### Build tools
 
-* JVM: [gradle](https://gradle.org/) and [maven](https://maven.apache.org/)
-* NODEJS: [yarn](https://yarnpkg.com/) and [npm](https://www.npmjs.com/)
+* jvm
+    * [gradle](https://gradle.org/)
+    * [maven](https://maven.apache.org/)
+* nodejs
+    * [yarn](https://yarnpkg.com/)
+    * [npm](https://www.npmjs.com/)
 * [golang](https://go.dev/)
-* [PHP](https://www.php.net/) (with
+* [php](https://www.php.net/) (with
   known [limitation](https://github.com/composer/composer/issues/2540#issuecomment-850206846): there is no digest over
   dependencies)
 
@@ -186,15 +191,15 @@ the [Runner context](https://docs.github.com/en/actions/learn-github-actions/con
 
 The Following inputs can be used as `step.with` keys
 
-| Name             | Type   | Description                                                                                                                 | Required |
-|------------------|--------|-----------------------------------------------------------------------------------------------------------------------------|----------|
-| `key`            | String | The key used to sign the attestation                                                                                        | True     |
-| `docker_user`    | String | User to login to docker                                                                                                     | True     |
-| `docker_pwd`     | String | Pwd to login to docker                                                                                                      | True     |
-| `image`          | String | Docker image to sign. Defaults to $ENV_IMAGE.                                                                               | True     |
-| `repo_name`      | String | Name of the file and path to provenance. Used as an relative path under $GITHUB_WORKSPACE. Defaults to "github.repository". | False    |
-| `repo_sub_dir`   | String | Specify a sub directory if build file not found in working root directory                                                   | False    |
-| `dependencies`   | Bool   | If the provenance should contain dependencies                                                                               | False    |
-| `repo_dir`       | String | Internal value (do not set): Root of directory to look for build files. Defaults to $GITHUB_WORKSPACE                       | False    |
-| `github_context` | String | Internal value (do not set): the "github" context object in json. The context is used when generating provenance            | False    |
-| `runner_context` | String | Internal value (do not set): the "runner" context object in json. The context is used when generating provenance.           | False    |
+| Name             | Type   | Default               | Description                                                                           | Required |
+|------------------|--------|:----------------------|---------------------------------------------------------------------------------------|----------|
+| `key`            | String | ""                    | The key used to sign the attestation                                                  | True     |
+| `docker_user`    | String | ""                    | User to login to docker                                                               | True     |
+| `docker_pwd`     | String | ""                    | Pwd to login to docker                                                                | True     |
+| `image`          | String | $ENV_IMAGE            | Docker image to sign                                                                  | True     |
+| `repo_name`      | String | github.repository     | This will name the generated provenance                                               | False    |
+| `repo_sub_dir`   | String | ""                    | Specify a sub directory if build file not found in working root directory             | False    |
+| `dependencies`   | Bool   | true                  | Should the action digest dependencies                                                 | False    |
+| `repo_dir`       | String | $GITHUB_WORKSPACE     | **Internal value (do not set):** Root of directory to look for build files            | False    |
+| `github_context` | String | ${{ toJSON(github) }} | **Internal value (do not set):** the [github context](#git-context) object in json    | False    |
+| `runner_context` | String | ${{ toJSON(runner) }} | **Internal value (do not set):** the [runner context](#runner-context) object in json | False    |
