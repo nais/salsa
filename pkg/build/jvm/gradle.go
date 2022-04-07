@@ -37,7 +37,7 @@ func (g Gradle) ResolveDeps(workDir string) (*build.ArtifactDependencies, error)
 	)
 	cmd.Dir = workDir
 
-	err := utils.RequireCommand("./gradlew")
+	err := utils.RequireCommand("gradle")
 	if err != nil {
 		return nil, fmt.Errorf("required: %v\n", err)
 	}
