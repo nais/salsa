@@ -21,13 +21,15 @@
 
 ## About
 
-The project is started as an initiative by the [NAIS](https://nais.io/) -NAV's Application Infrastructure Service team
-to establishing a cryptographic chain of custody between trusted builds and our release and code-signing workflows (
-Level 2). [SLSA](https://github.com/slsa-framework/slsa) is a framework intended to codify and promote
-secure [software supply-chain](https://slsa.dev/) practices. This GitHub Action is used to create a SBOM
-/ [in-toto attestation](https://github.com/in-toto/attestation) to upload, sign and verify a
-generated [provenance](https://slsa.dev/provenance/v0.2) using [cosign](https://github.com/sigstore/cosign).  
-All predicate payloads are signed using the [DSSE](https://github.com/secure-systems-lab/dsse).
+The project is started as an initiative by the [NAIS](https://nais.io/) team
+
+- `NAV's Application Infrastructure Service`
+  to establishing a [Level 2](#level-2-after-the-build) cryptographic chain of custody between trusted builds and our
+  release and code-signing workflows. [SLSA](https://github.com/slsa-framework/slsa) is a framework intended to codify
+  and promote secure [software supply-chain](https://slsa.dev/) practices. This GitHub Action can be used to create,
+  upload, sign and verify a SBOM / [in-toto attestation](https://github.com/in-toto/attestation)
+  also called a  [provenance](https://slsa.dev/provenance/v0.2) using [cosign](https://github.com/sigstore/cosign).  
+  All predicate payloads are signed using the [DSSE](https://github.com/secure-systems-lab/dsse).
 
 This is not an official GitHub Action set up and maintained by the SLSA team. This GitHub Action is built to provide
 teams and developers with the ability to trace software back to the source and define the moving parts in a complex
@@ -39,7 +41,7 @@ SLSA is organized into a series of [levels](https://slsa.dev/spec/v0.1/levels) t
 guarantees. This gives the action user confidence that software hasn’t been tampered with and can be securely traced
 back to its source.
 
-#### Level 2: After the build
+#### Level 2 After the build
 
 This Action fulfills the requirements for [level 2](https://slsa.dev/spec/v0.1/index) and shows more trustworthiness in
 the build, builders are source-aware, and signatures are used to prevent provenance being tampered with.
