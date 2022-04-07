@@ -13,6 +13,7 @@ ENV COSIGN_VERSION=v1.6.0
 
 COPY --from=builder /src/bin/salsa /usr/local/bin/
 COPY --from=builder /src/salsa-sample.yaml .salsa.yaml
+COPY --from=builder /src/.jvmtools/* .
 RUN chmod +x /usr/local/bin/salsa
 
 RUN apk add --no-cache ca-certificates git curl docker

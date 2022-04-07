@@ -4,11 +4,12 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/nais/salsa/pkg/build"
 	"io/ioutil"
 	"os/exec"
 	"regexp"
 	"strings"
+
+	"github.com/nais/salsa/pkg/build"
 
 	"github.com/nais/salsa/pkg/utils"
 )
@@ -31,12 +32,12 @@ func (g Gradle) BuildFiles() []string {
 
 func (g Gradle) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
 	cmd := exec.Command(
-		"gradle",
+		"./gradlew",
 		"-q", "dependencies", "--configuration", "runtimeClasspath", "-M", "sha256",
 	)
 	cmd.Dir = workDir
 
-	err := utils.RequireCommand("gradle")
+	err := utils.RequireCommand("./gradlew")
 	if err != nil {
 		return nil, fmt.Errorf("required: %v\n", err)
 	}
