@@ -32,7 +32,7 @@ func (g Gradle) BuildFiles() []string {
 
 func (g Gradle) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
 	cmd := exec.Command(
-		"./gradlew",
+		"gradle",
 		"-q", "dependencies", "--configuration", "runtimeClasspath", "-M", "sha256",
 	)
 	cmd.Dir = workDir
