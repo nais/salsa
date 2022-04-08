@@ -10,18 +10,19 @@
 
 <div align="center">
 
-[![Salsa CI](https://github.com/nais/salsa/actions/workflows/main.yml/badge.svg)](https://github.com/nais/salsa/actions/workflows/main.yml)
-[![GitHub license](https://badgen.net/github/license/nais/salsa)](https://github.com/nais/salsa/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/nais/salsa.svg)](https://github.com/nais/salsa/stargazers/)
-[![Go Report Card](https://goreportcard.com/badge/github.com/nais/salsa)](https://goreportcard.com/report/github.com/nais/salsa)
-[![Github all releases](https://img.shields.io/github/downloads/nais/salsa/total.svg)](https://github.com/nais/salsa/releases/)
-[![Github tag](https://badgen.net/github/tag/nais/salsa)](https://github.com/nais/salsa/tags/)
+[![Salsa CI](https://github.com/nais/salsa/actions/workflows/main.yml/badge.svg)](https://github.com/nais/salsa/actions/workflows/main.yml?style=plastic)
+[![GitHub license](https://badgen.net/github/license/nais/salsa)](https://github.com/nais/salsa/blob/main/LICENSE?style=plastic)
+[![GitHub stars](https://img.shields.io/github/stars/nais/salsa.svg)](https://github.com/nais/salsa/stargazers/?style=plastic)
+[![Go Report Card](https://goreportcard.com/badge/github.com/nais/salsa)](https://goreportcard.com/report/github.com/nais/salsa?style=plastic)
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/nais/salsa?color=pink&label=release%40latest%40date&logo=github&style=plastic)
+![GitHub go.mod Go version (branch)](https://img.shields.io/github/go-mod/go-version/nais/salsa/master?style=plastic)
+![GitHub last commit](https://img.shields.io/github/last-commit/nais/salsa?color=yellow&logo=github&style=plastic)
 
 </div>
 
 ## About
 
-The project is started as an initiative by the [NAIS](https://nais.io/) team
+The project is started as an initiative by [NAIS](https://nais.io/)
 
 > NAV's Application Infrastructure Service
 
@@ -29,8 +30,8 @@ to establishing a [Level 2](#level-2-after-the-build) cryptographic chain of cus
 release and code-signing workflows. [SLSA](https://github.com/slsa-framework/slsa) is a framework intended to codify and
 promote secure [software supply-chain](https://slsa.dev/) practices. This GitHub Action can be used to create, upload,
 sign and verify a SBOM / [in-toto attestation](https://github.com/in-toto/attestation)
-also called a  [provenance](https://slsa.dev/provenance/v0.2) using [cosign](https://github.com/sigstore/cosign).  
-All predicate payloads are signed using the [DSSE](https://github.com/secure-systems-lab/dsse).
+also called a [provenance](https://slsa.dev/provenance/v0.2) using [cosign](https://github.com/sigstore/cosign). All
+predicate payloads are signed using the [DSSE](https://github.com/secure-systems-lab/dsse).
 
 This is not an official GitHub Action set up and maintained by the SLSA team. This GitHub Action is built to provide
 teams and developers with the ability to trace software back to the source and define the moving parts in a complex
@@ -200,6 +201,9 @@ The Following inputs can be used as `step.with` keys
 | `repo_name`      | String | github.repository     | This will name the generated provenance                                               | False    |
 | `repo_sub_dir`   | String | ""                    | Specify a sub directory if build file not found in working root directory             | False    |
 | `dependencies`   | Bool   | true                  | Should the action digest dependencies                                                 | False    |
-| `repo_dir`       | String | $GITHUB_WORKSPACE     | **Internal value (do not set):** Root of directory to look for build files            | False    |
-| `github_context` | String | ${{ toJSON(github) }} | **Internal value (do not set):** the [github context](#git-context) object in json    | False    |
-| `runner_context` | String | ${{ toJSON(runner) }} | **Internal value (do not set):** the [runner context](#runner-context) object in json | False    |
+| `repo_dir`       | String | $GITHUB_WORKSPACE     | **Internal value (do not
+set):** Root of directory to look for build files            | False    |
+| `github_context` | String | ${{ toJSON(github) }} | **Internal value (do not
+set):** the [github context](#git-context) object in json    | False    |
+| `runner_context` | String | ${{ toJSON(runner) }} | **Internal value (do not
+set):** the [runner context](#runner-context) object in json | False    |
