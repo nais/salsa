@@ -192,18 +192,15 @@ the [Runner context](https://docs.github.com/en/actions/learn-github-actions/con
 
 The Following inputs can be used as `step.with` keys
 
-| Name             | Type   | Default               | Description                                                                           | Required |
-|------------------|--------|:----------------------|---------------------------------------------------------------------------------------|----------|
-| `key`            | String | ""                    | The key used to sign the attestation                                                  | True     |
-| `docker_user`    | String | ""                    | User to login to docker                                                               | True     |
-| `docker_pwd`     | String | ""                    | Pwd to login to docker                                                                | True     |
-| `image`          | String | $ENV_IMAGE            | Docker image to sign                                                                  | True     |
-| `repo_name`      | String | github.repository     | This will name the generated provenance                                               | False    |
-| `repo_sub_dir`   | String | ""                    | Specify a sub directory if build file not found in working root directory             | False    |
-| `dependencies`   | Bool   | true                  | Should the action digest dependencies                                                 | False    |
-| `repo_dir`       | String | $GITHUB_WORKSPACE     | **Internal value (do not
-set):** Root of directory to look for build files            | False    |
-| `github_context` | String | ${{ toJSON(github) }} | **Internal value (do not
-set):** the [github context](#git-context) object in json    | False    |
-| `runner_context` | String | ${{ toJSON(runner) }} | **Internal value (do not
-set):** the [runner context](#runner-context) object in json | False    |
+| Name             | Type   | Default               | Description                                                                          | Required |
+|------------------|--------|:----------------------|--------------------------------------------------------------------------------------|----------|
+| `key`            | String | ""                    | The key used to sign the attestation                                                 | True     |
+| `docker_user`    | String | ""                    | User to login to docker                                                              | True     |
+| `docker_pwd`     | String | ""                    | Pwd to login to docker                                                               | True     |
+| `image`          | String | $ENV_IMAGE            | Docker image to sign                                                                 | True     |
+| `repo_name`      | String | github.repository     | This will name the generated provenance                                              | False    |
+| `repo_sub_dir`   | String | ""                    | Specify a sub directory if build file not found in working root directory            | False    |
+| `dependencies`   | Bool   | true                  | Should the action digest dependencies                                                | False    |
+| `repo_dir`       | String | $GITHUB_WORKSPACE     | **Internal value (do notset):** Root of directory to look for build files            | False    |
+| `github_context` | String | ${{ toJSON(github) }} | **Internal value (do notset):** the [github context](#git-context) object in json    | False    |
+| `runner_context` | String | ${{ toJSON(runner) }} | **Internal value (do notset):** the [runner context](#runner-context) object in json | False    |
