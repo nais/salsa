@@ -9,7 +9,6 @@ jobs:
   publish-release:
     name: Release versioned GitHub Action
     if: github.ref == 'refs/heads/master'
-    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Ensure no files were modified as a result of the build
