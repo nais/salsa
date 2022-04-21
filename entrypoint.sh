@@ -9,10 +9,8 @@ ENVS=$(jq -n env | base64 -w 0)
 DOCKER_REGISTRY="${INPUT_IMAGE%%/*}"
 
 export JAVA_HOME=/opt/java/openjdk
-echo "JAVA_HOME: $JAVA_HOME"
-echo "MAVEN_HOME: $MAVEN_HOME"
 
-echo "---------- Preparing pico-de-galo Slsa for repository: $REPO_NAME ----------"
+echo "---------- Preparing pico-de-galo slsa for repository: $REPO_NAME ----------"
 echo "$INPUT_DOCKER_PWD" | docker login "$DOCKER_REGISTRY" -u "$INPUT_DOCKER_USER" --password-stdin
 
 salsa scan \

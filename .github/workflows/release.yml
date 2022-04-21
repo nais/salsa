@@ -1,0 +1,98 @@
+name: Publish release
+
+on:
+  release:
+    types: [published]
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository }}
+jobs:
+  publish-release:
+    name: Release versioned GitHub Action
+    if: github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure no files were modified as a result of the build
+        run: git update-index --refresh && git diff-index --quiet HEAD -- || git diff --exit-code
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to Github
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.GITHUB_ACTOR }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set version
+        id: set-version
+        run: |
+          echo "::set-output name=version::$(echo "${GITHUB_REF}" | cut -d "/" -f3)'
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: ${{ env.IMAGE_NAME }}:${{ steps.set-version.outputs.version }}
+
+      - name: Extract version of Go to use
+        run: echo "GOVERSION=$(cat go.mod | grep -w "go" | awk ' { print $2 } ' | grep -w "^[^v]")" >> $GITHUB_ENV
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GOVERSION }}
+
+      - uses: navikt/github-app-token-generator@v1
+        id: get-homebrew-token
+        with:
+          private-key: ${{ secrets.NAIS_APP_PRIVATE_KEY }}
+          app-id: ${{ secrets.NAIS_APP_ID }}
+          repo: nais/homebrew-tap
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          distribution: goreleaser
+          version: v1.7.0
+          args: release -f .goreleaser.yml --rm-dist --debug
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PUSH_TOKEN: ${{ steps.get-homebrew-token.outputs.token }}
+
+#      - uses: navikt/github-app-token-generator@v1
+#        id: get-token
+#        with:
+#          private-key: ${{ secrets.NAIS_APP_PRIVATE_KEY }}
+#          app-id: ${{ secrets.NAIS_APP_ID }}
+#          repo: nais/nais-ppa
+#
+#      - name: Checkout nais-ppa
+#        uses: actions/checkout@v2
+#        with:
+#          repository: nais/nais-ppa
+#          token: ${{ steps.get-token.outputs.token }}
+#          path: pparepo
+#
+#      - name: Add new deb to ppa
+#        id: update_ppa
+#        env:
+#          VERSION: ${{ needs.set-version.outputs.version }}
+#          EMAIL: aura@nav.no
+#        run: |
+#          echo "Version ${VERSION} was released, adding to PPA"
+#          cd pparepo
+#
+#          # Fetch latest deb
+#          wget https://github.com/${{ github.repository }}/releases/download/${VERSION}/salsa_${VERSION}.deb
+#
+#          # Commit and push changes
+#          git config user.name "$GITHUB_ACTOR"
+#          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+#          git add salsa_${VERSION}.deb
+#          git --no-pager diff --cached
+#          git commit --all --message "Add version ${VERSION} of salsa"
+#          git push
