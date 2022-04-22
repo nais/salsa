@@ -104,22 +104,11 @@ func (g GradleChecksum) buildChecksum(groupId, artifactId, version string) build
 	for _, c := range g.Components.Components {
 		if c.Group == groupId && c.Name == artifactId && c.Version == version {
 			for _, a := range c.Artifacts {
-				if hasSuffix(a, ".jar", ".pom") {
-					return build.Verification(build.AlgorithmSHA256, a.Sha256.Value)
-				}
+				return build.Verification(build.AlgorithmSHA256, a.Sha256.Value)
 			}
 		}
 	}
 	return build.CheckSum{}
-}
-
-func hasSuffix(a Artifact, suffixes ...string) bool {
-	for _, suffix := range suffixes {
-		if strings.HasSuffix(a.Name, suffix) {
-			return true
-		}
-	}
-	return false
 }
 
 type GradleChecksum struct {
