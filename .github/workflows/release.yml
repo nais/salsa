@@ -30,36 +30,36 @@ jobs:
         run: |
           echo "::set-output name=version::$(echo "${GITHUB_REF}" | cut -d "/" -f3)'
 
-      - name: Build and push
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          tags: ${{ env.IMAGE_NAME }}:${{ steps.set-version.outputs.version }}
-
-      - name: Extract version of Go to use
-        run: echo "GOVERSION=$(cat go.mod | grep -w "go" | awk ' { print $2 } ' | grep -w "^[^v]")" >> $GITHUB_ENV
-
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: ${{ env.GOVERSION }}
-
-      - uses: navikt/github-app-token-generator@v1
-        id: get-homebrew-token
-        with:
-          private-key: ${{ secrets.NAIS_APP_PRIVATE_KEY }}
-          app-id: ${{ secrets.NAIS_APP_ID }}
-          repo: nais/homebrew-tap
-
-      - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v2
-        with:
-          distribution: goreleaser
-          version: v1.7.0
-          args: release -f .goreleaser.yml --rm-dist --debug
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PUSH_TOKEN: ${{ steps.get-homebrew-token.outputs.token }}
+ #     - name: Build and push
+ #       uses: docker/build-push-action@v2
+ #       with:
+ #         push: true
+ #         tags: ${{ env.IMAGE_NAME }}:${{ steps.set-version.outputs.version }}
+#
+ #     - name: Extract version of Go to use
+ #       run: echo "GOVERSION=$(cat go.mod | grep -w "go" | awk ' { print $2 } ' | grep -w "^[^v]")" >> $GITHUB_ENV
+#
+ #     - name: Set up Go
+ #       uses: actions/setup-go@v2
+ #       with:
+ #         go-version: ${{ env.GOVERSION }}
+#
+ #     - uses: navikt/github-app-token-generator@v1
+ #       id: get-homebrew-token
+ #       with:
+ #         private-key: ${{ secrets.NAIS_APP_PRIVATE_KEY }}
+ #         app-id: ${{ secrets.NAIS_APP_ID }}
+ #         repo: nais/homebrew-tap
+#
+ #     - name: Run GoReleaser
+ #       uses: goreleaser/goreleaser-action@v2
+ #       with:
+ #         distribution: goreleaser
+ #         version: v1.7.0
+ #         args: release -f .goreleaser.yml --rm-dist --debug
+ #       env:
+ #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+ #         PUSH_TOKEN: ${{ steps.get-homebrew-token.outputs.token }}
 
 #      - uses: navikt/github-app-token-generator@v1
 #        id: get-token

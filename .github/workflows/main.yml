@@ -1,10 +1,8 @@
 name: Salsa CI
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  release:
+    types: [published]
 
 concurrency:
   group: ${{ github.ref }}
@@ -12,9 +10,9 @@ concurrency:
 
 env:
   VERSION: 0.1
+  IMAGE_NAME: ghcr.io/${{ github.repository }}
 
 jobs:
-
   set-version:
     runs-on: ubuntu-20.04
     outputs:
@@ -53,4 +51,61 @@ jobs:
 
       - name: Test Salsa
         run: make test
+
+  build:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    needs:
+      - set-version
+      - test
+    runs-on: ubuntu-20.04
+    steps:
+
+      - name: Checkout latest code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Extract version of Go to use
+        run: echo "GOVERSION=$(cat go.mod | grep -w "go" | awk ' { print $2 } ' | grep -w "^[^v]")" >> $GITHUB_ENV
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GOVERSION }}
+
+      - name: Create tag
+        run: |
+          git tag ${{ needs.set-version.outputs.version }}
+
+      - uses: navikt/github-app-token-generator@v1
+        id: get-homebrew-token
+        with:
+          private-key: ${{ secrets.NAIS_APP_PRIVATE_KEY }}
+          app-id: ${{ secrets.NAIS_APP_ID }}
+          repo: nais/homebrew-tap
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release -f .goreleaser.yml --rm-dist --debug
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PUSH_TOKEN: ${{ steps.get-homebrew-token.outputs.token }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to Github
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.GITHUB_ACTOR }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: ${{ env.IMAGE_NAME }}:${{ steps.set-version.outputs.version }}
 
