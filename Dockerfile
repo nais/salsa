@@ -57,9 +57,14 @@ RUN chmod +x /usr/local/bin/salsa
 ENV COSIGN_VERSION=v1.8.0
 ENV COSIGN_BINARY=cosign-linux-amd64
 ENV COSIGN_CHECKSUM=cosign_checksums.txt
+ENV COSIGN_PUBLIC_KEY=release-cosign.pub
+ENV COSIGN_SIG=cosign-linux-amd64.sig
+# URL
 ARG COSIGN_BASE_URL=https://github.com/sigstore/cosign/releases/download/$COSIGN_VERSION
 ARG COSIGN_CHECKSUM_URL=${COSIGN_BASE_URL}/${COSIGN_CHECKSUM}
 ARG COSIGN_BINARY_URL=${COSIGN_BASE_URL}/${COSIGN_BINARY}
+ARG COSIGN_PUBLIC_KEY_URL=${COSIGN_BASE_URL}/${COSIGN_PUBLIC_KEY}
+ARG COSIGN_SIG_URL=${COSIGN_BASE_URL}/${COSIGN_SIG}
 
 RUN echo "Download cosign checksum" \
   && curl -fsSL -o /tmp/${COSIGN_CHECKSUM} ${COSIGN_CHECKSUM_URL} \
@@ -70,18 +75,22 @@ RUN echo "Download cosign checksum" \
   && echo "Download cosign binary version: ${COSIGN_VERSION}" \
   && curl -fsSL -o /tmp/${COSIGN_BINARY} ${COSIGN_BINARY_URL} \
   \
-  && echo "Checking downloaded checksum ${COSIGN_SHA256} with ${COSIGN_BINARY}" \
+  && echo "Verify checksum ${COSIGN_SHA256} with ${COSIGN_BINARY}" \
   && sha256sum /tmp/${COSIGN_BINARY} \
   && echo "${COSIGN_SHA256}  /tmp/${COSIGN_BINARY}" | sha256sum -c \
   \
-  && echo "Copy cosign" \
+  && echo "Move cosign to folder and make cosign executable" \
   && chmod +x /tmp/${COSIGN_BINARY} \
+  && mkdir "tmp2" \
+  && cp /tmp/${COSIGN_BINARY} tmp2/${COSIGN_BINARY} \
   && mv /tmp/${COSIGN_BINARY} /usr/local/bin/cosign \
-   \
-  && echo "Cleaning and setting rights" \
-  && rm -f /tmp/${COSIGN_BINARY} \
-  && rm -f /tmp/${COSIGN_CHECKSUM} \
-  && chmod +x /usr/local/bin/cosign
+  && chmod +x /usr/local/bin/cosign \
+  \
+  && echo "Verify ${COSIGN_BINARY} with public key and signature" \
+  && curl -fsSL -o /tmp/${COSIGN_PUBLIC_KEY} ${COSIGN_PUBLIC_KEY_URL} \
+  && curl -fsSL -o /tmp/${COSIGN_SIG} ${COSIGN_SIG_URL} \
+  && cosign \
+  && cosign verify-blob --key /tmp/${COSIGN_PUBLIC_KEY} --signature /tmp/${COSIGN_SIG} /tmp2/${COSIGN_BINARY}
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
