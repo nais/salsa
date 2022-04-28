@@ -61,11 +61,12 @@ ARG COSIGN_BASE_URL=https://github.com/sigstore/cosign/releases/download/$COSIGN
 ARG COSIGN_CHECKSUM_URL=${COSIGN_BASE_URL}/${COSIGN_CHECKSUM}
 ARG COSIGN_BINARY_URL=${COSIGN_BASE_URL}/${COSIGN_BINARY}
 
-RUN mkdir -p /usr/local/bin/cosign \
-  && echo "Download cosign checksum" \
+RUN echo "Download cosign checksum" \
   && curl -fsSL -o /tmp/${COSIGN_CHECKSUM} ${COSIGN_CHECKSUM_URL} \
+  \
   && echo "Extract cosign checksum" \
   && export COSIGN_SHA256=$(grep -w ${COSIGN_BINARY} tmp/${COSIGN_CHECKSUM} | cut -d ' ' -f1) \
+  \
   && echo "Download cosign binary version: ${COSIGN_VERSION}" \
   && curl -fsSL -o /tmp/${COSIGN_BINARY} ${COSIGN_BINARY_URL} \
   \
@@ -74,7 +75,8 @@ RUN mkdir -p /usr/local/bin/cosign \
   && echo "${COSIGN_SHA256}  /tmp/${COSIGN_BINARY}" | sha256sum -c \
   \
   && echo "Copy cosign" \
-  && cp /tmp/${COSIGN_BINARY} > /usr/local/bin/cosign \
+  && chmod +x /tmp/${COSIGN_BINARY} \
+  && /tmp/${COSIGN_BINARY} > /usr/local/bin/cosign \
    \
   && echo "Cleaning and setting rights" \
   && rm -f /tmp/${COSIGN_BINARY} \
