@@ -26,7 +26,7 @@ ARG GRADLE_SHA=b586e04868a22fd817c8971330fec37e298f3242eb85c374181b12d637f80302
 
 # 4- Create the directories, download gradle, validate the download, install it, remove downloaded file and set links
 RUN mkdir -p /usr/share/gradle /usr/share/gradle/ref \
-  && echo "Downlaoding gradle hash" \
+  && echo "Downloading gradle hash" \
   && curl -fsSL -o /tmp/gradle.zip ${GRADLE_BASE_URL}/gradle-${GRADLE_VERSION}-bin.zip \
   \
   && echo "Checking download hash" \
@@ -46,17 +46,40 @@ ENV GRADLE_USER_HOME /cache
 
 ENV PATH $PATH:$GRADLE_HOME/bin
 
-ENV COSIGN_VERSION=v1.6.0
+RUN apk add --no-cache ca-certificates git curl docker jq httpie
 
+# SALSA
 COPY --from=builder /src/bin/salsa /usr/local/bin/
 COPY --from=builder /src/salsa-sample.yaml .salsa.yaml
-#COPY --from=builder /src/.jvmtools/* ./
 RUN chmod +x /usr/local/bin/salsa
 
-RUN apk add --no-cache ca-certificates git curl docker
-RUN curl -L -f https://github.com/sigstore/cosign/releases/download/$COSIGN_VERSION/cosign-linux-amd64 > /usr/local/bin/cosign && chmod +x /usr/local/bin/cosign
+# COSIGN
+ENV COSIGN_VERSION=v1.8.0
+ENV COSIGN_BINARY=cosign-linux-amd64
+ENV COSIGN_CHECKSUM=cosign_checksums.txt
+ARG COSIGN_BASE_URL=https://github.com/sigstore/cosign/releases/download/$COSIGN_VERSION
+ARG COSIGN_CHECKSUM_URL=${COSIGN_BASE_URL}/${COSIGN_CHECKSUM}
+ARG COSIGN_BINARY_URL=${COSIGN_BASE_URL}/${COSIGN_BINARY}
 
-RUN apk add --no-cache jq httpie
+RUN mkdir -p /usr/local/bin/cosign \
+  && echo "Download cosign checksum" \
+  && curl -fsSL -o /tmp/${COSIGN_CHECKSUM} ${COSIGN_CHECKSUM_URL} \
+  && echo "Extract cosign checksum" \
+  && export COSIGN_SHA256=$(grep -w ${COSIGN_BINARY} tmp/${COSIGN_CHECKSUM} | cut -d ' ' -f1) \
+  && echo "Download cosign binary version: ${COSIGN_VERSION}" \
+  && curl -fsSL -o /tmp/${COSIGN_BINARY} ${COSIGN_BINARY_URL} \
+  \
+  && echo "Checking downloaded checksum ${COSIGN_SHA256} with ${COSIGN_BINARY}" \
+  && sha256sum /tmp/${COSIGN_BINARY} \
+  && echo "${COSIGN_SHA256}  /tmp/${COSIGN_BINARY}" | sha256sum -c \
+  \
+  && echo "Copy cosign" \
+  && cp /tmp/${COSIGN_BINARY} /usr/local/bin/cosign \
+   \
+  && echo "Cleaning and setting rights" \
+  && rm -f /tmp/${COSIGN_BINARY} \
+  && rm -f /tmp/${COSIGN_CHECKSUM} \
+  && chmod +x /usr/local/bin/cosign
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
