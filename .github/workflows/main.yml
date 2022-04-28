@@ -108,4 +108,3 @@ jobs:
         with:
           push: true
           tags: ${{ env.IMAGE_NAME }}:${{ steps.set-version.outputs.version }}
-
