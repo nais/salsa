@@ -74,7 +74,7 @@ RUN mkdir -p /usr/local/bin/cosign \
   && echo "${COSIGN_SHA256}  /tmp/${COSIGN_BINARY}" | sha256sum -c \
   \
   && echo "Copy cosign" \
-  && cp /tmp/${COSIGN_BINARY} /usr/local/bin/cosign \
+  && cp /tmp/${COSIGN_BINARY} > /usr/local/bin/cosign \
    \
   && echo "Cleaning and setting rights" \
   && rm -f /tmp/${COSIGN_BINARY} \
