@@ -1,4 +1,4 @@
-name: Salsa CI
+name: Salsa build & release
 
 on:
   push:
@@ -102,7 +102,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: ${{ secrets.GITHUB_ACTOR }}
+          username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
