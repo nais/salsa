@@ -76,7 +76,7 @@ RUN echo "Download cosign checksum" \
   \
   && echo "Copy cosign" \
   && chmod +x /tmp/${COSIGN_BINARY} \
-  && /tmp/${COSIGN_BINARY} > /usr/local/bin/cosign \
+  && mv /tmp/${COSIGN_BINARY} /usr/local/bin/cosign \
    \
   && echo "Cleaning and setting rights" \
   && rm -f /tmp/${COSIGN_BINARY} \
