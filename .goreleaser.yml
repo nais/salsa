@@ -35,7 +35,9 @@ release:
     owner: nais
     name: salsa
   header: |
-    ## nais-salsa ({{ .Version }})
+    ## nais-salsa-cli ({{ .Version }})
+  extra_files:
+    - glob: "cosign.pub"
 
 #brews:
 #  - tap:
