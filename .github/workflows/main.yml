@@ -179,6 +179,7 @@ jobs:
         run: |
           echo '${{ secrets.COSIGN_PRIVATE_KEY }}' > cosign.key
           echo '${{ secrets.COSIGN_PUBLIC_KEY }}' > cosign.pub
+          cat cosign.pub
           
           cosign verify --key cosign.pub ${{ env.CLI_IMAGE_TAG }}
           syft ${{ env.CLI_IMAGE_TAG }} -o spdx-json > sbom-spdx.json
