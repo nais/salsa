@@ -1,10 +1,10 @@
 name: NAIS SALSA
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_run:
+    workflows: [Salsa build & release]
+    types:
+      - completed
 
 env:
   IMAGE: ttl.sh/nais/salsa-test:1h
@@ -37,7 +37,7 @@ jobs:
 
     # Added to your workflow
       - name: Generate provenance, upload and sign image
-      # wil be actions/salsa-action@v01
+      # wil be actions/salsa-action@v..
         uses: ./
         with:
           image: ${{ env.IMAGE }}
@@ -45,7 +45,7 @@ jobs:
           docker_user: ${{ github.actor }}
           docker_pwd: ${{ secrets.GITHUB_TOKEN }}
 
-      # For test output
+      # For demonstration purpose
       - name: Upload provenance
         uses: actions/upload-artifact@v2
         with:

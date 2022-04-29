@@ -161,7 +161,7 @@ jobs:
           tags: ${{ env.IMAGE }}
 
       - name: Provenance, upload and sign attestation
-        uses: nais/salsa@v0.0.1-alpha-10
+        uses: nais/salsa@v0.1
         with:
           image: ${{ env.IMAGE }}
           key: ${{ env.KEY }}
@@ -171,7 +171,7 @@ jobs:
 
 #### Attestation
 
-* Example of a Github action [nais-salsa-demo.yml](.github/workflows/nais-salsa-demo.yml)
+* Example of a Github action [nais-salsa-integration.yml](.github/workflows/nais-salsa-integration.yml)
 * An example of a generated [salsa provenance](pkg/dsse/testdata/salsa.provenance) with transitive dependencies
 * An example of a signed [cosign dsse attestation](pkg/dsse/testdata/cosign-dsse-attestation.json)
     * result after an decoded [cosign attestation](pkg/dsse/testdata/cosign-attestation.json)
