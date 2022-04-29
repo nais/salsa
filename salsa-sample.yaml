@@ -1,4 +1,4 @@
 attest:
-  key:
+  key: gcpkms://projects/plattformsikkerhet-dev-496e/locations/europe-north1/keyRings/cosign/cryptoKeys/cosign-test/versions/1
   rekor-url: https://rekor.sigstore.dev
 
