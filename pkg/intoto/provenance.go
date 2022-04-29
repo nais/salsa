@@ -1,6 +1,7 @@
 package intoto
 
 import (
+	"fmt"
 	"time"
 
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
@@ -54,12 +55,17 @@ func AppendRuntimeDependencies(opts *ProvenanceOptions, materials *[]slsa.Proven
 	if opts.Dependencies == nil {
 		return
 	}
-
+	fmt.Println(opts.Dependencies)
 	for _, dep := range opts.Dependencies.RuntimeDeps {
 		m := slsa.ProvenanceMaterial{
 			URI:    dep.ToUri(),
 			Digest: dep.ToDigestSet(),
 		}
+		fmt.Println(m)
+		//s := m.Digest
+		//for _, a := range s {
+		//	fmt.Println(a)
+		//}
 		*materials = append(*materials, m)
 	}
 }

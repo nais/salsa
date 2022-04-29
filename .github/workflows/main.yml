@@ -159,7 +159,7 @@ jobs:
       ACTION_IMAGE_TAG: "${{ needs.build.outputs.action-tag }}"
     steps:
       - name: Install cosign
-        uses: sigstore/cosign-installer@v2.3.0
+        uses: sigstore/cosign-installer@main
         with:
           cosign-release: ${{ env.COSIGN_VERSION }}
 
