@@ -111,3 +111,10 @@ jobs:
           push: true
           tags: ${{ env.IMAGE_NAME }}:${{ needs.set-version.outputs.version }},${{ env.IMAGE_NAME }}:${{ env.VERSION }}
           labels: version=${{ needs.set-version.outputs.version }},revision=${{ github.sha }}
+
+      - name: Update major/minor version tag
+        run: |
+          git tag -d ${{ env.VERSION }}
+          git push origin :refs/tags/${{ env.VERSION }}
+          git tag {{ env.VERSION }} ${{ github.sha }}
+          git push origin {{ env.VERSION }}
