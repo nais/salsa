@@ -1,43 +1,51 @@
-name: NAIS SALSA
+name: nais Salsa integration
 
 on:
   workflow_run:
-    workflows: [Salsa build & release]
-    types:
-      - completed
+    workflows: [ Salsa build & release ]
+    types: [ completed ]
+    branches: [ main ]
 
 env:
   IMAGE: ttl.sh/nais/salsa-test:1h
   KEY: gcpkms://projects/plattformsikkerhet-dev-496e/locations/europe-north1/keyRings/cosign/cryptoKeys/cosign-test/versions/1
 
 jobs:
-  generate-provenance:
+
+  on-failure:
     runs-on: ubuntu-20.04
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     steps:
+      - run: echo 'The triggering workflow failed'
+
+  on-success-generate-provenance:
+    runs-on: ubuntu-20.04
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - run: echo 'The triggering workflow passed'
+
       # Required step
       - name: Checkout Code
         uses: actions/checkout@v3
 
-    # For demonstration purpose
-    # Credentials needed to authenticate to google kms and
-    # sign image. Can be backed in to an action, so users
-    # do not have to specify more than a GCP_CREDENTIALS.
+      # For demonstration purpose
+      # Credentials needed to authenticate to google kms and sign image.
       - name: 'Authenticate to Google Cloud'
         id: 'google'
         uses: 'google-github-actions/auth@v0'
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
-     # For demonstration purpose
+      # For demonstration purpose
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
           push: true
           tags: ${{ env.IMAGE }}
 
-    # Added to your workflow
+      # Added to a workflow
       - name: Generate provenance, upload and sign image
-      # wil be actions/salsa-action@v..
+        # nais/salsa@v...
         uses: ./
         with:
           image: ${{ env.IMAGE }}
