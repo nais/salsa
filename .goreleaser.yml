@@ -29,35 +29,37 @@ checksum:
 #      - '^test:'
 
 release:
+  prerelease: allow
+  draft: true
   github:
     owner: nais
     name: salsa
   header: |
     ## nais-salsa ({{ .Version }})
 
-brews:
-  - tap:
-      owner: nais
-      name: homebrew-tap
-      token: "{{ .Env.PUSH_TOKEN }}"
-    name: salsa
-    homepage: "https://github.com/nais/salsa"
-    description: "Command-line interface for SLSA provenance"
-    license: MIT
-    folder: Formula
-    install: |
-      bin.install "salsa"
-    test: |
-      assert_match version, shell_output("#{bin}/salsa version")
-
-nfpms:
-  - package_name: salsa
-    file_name_template: "{{ .PackageName }}_{{ .Version }}"
-    vendor: NAV / nais team
-    homepage: "https://github.com/nais/salsa"
-    maintainer: NAV / nais team
-    description: "Command-line interface for SLSA provenance"
-    license: MIT
-    formats:
-      - deb
-    version_metadata: git
+#brews:
+#  - tap:
+#      owner: nais
+#      name: homebrew-tap
+#      token: "{{ .Env.PUSH_TOKEN }}"
+#    name: salsa
+#    homepage: "https://github.com/nais/salsa"
+#    description: "Command-line interface for SLSA provenance"
+#    license: MIT
+#    folder: Formula
+#    install: |
+#      bin.install "salsa"
+#    test: |
+#      assert_match version, shell_output("#{bin}/salsa version")
+#
+#nfpms:
+#  - package_name: salsa
+#    file_name_template: "{{ .PackageName }}_{{ .Version }}"
+#    vendor: NAV / nais team
+#    homepage: "https://github.com/nais/salsa"
+#    maintainer: NAV / nais team
+#    description: "Command-line interface for SLSA provenance"
+#    license: MIT
+#    formats:
+#      - deb
+#    version_metadata: git

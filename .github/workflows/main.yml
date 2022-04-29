@@ -78,18 +78,18 @@ jobs:
         run: |
           git tag ${{ needs.set-version.outputs.version }}
 
-      - uses: navikt/github-app-token-generator@v1
-        id: get-homebrew-token
-        with:
-          private-key: ${{ secrets.NAIS_APP_PRIVATE_KEY }}
-          app-id: ${{ secrets.NAIS_APP_ID }}
-          repo: nais/homebrew-tap
+#      - uses: navikt/github-app-token-generator@v1
+#        id: get-homebrew-token
+#        with:
+#          private-key: ${{ secrets.NAIS_APP_PRIVATE_KEY }}
+#          app-id: ${{ secrets.NAIS_APP_ID }}
+#          repo: nais/homebrew-tap
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
           distribution: goreleaser
-          version: latest
+          version: v1.8.3
           args: release -f .goreleaser.yml --rm-dist --debug
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
