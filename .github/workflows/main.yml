@@ -114,7 +114,5 @@ jobs:
 
       - name: Update major/minor version tag
         run: |
-          git tag -d ${{ env.VERSION }}
-          git push origin ":refs/tags/${{ env.VERSION }}"
-          git tag {{ env.VERSION }} ${{ github.sha }}
+          git tag -f {{ env.VERSION }} ${{ github.sha }}
           git push origin {{ env.VERSION }}
