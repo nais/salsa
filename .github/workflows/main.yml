@@ -77,7 +77,6 @@ jobs:
       - name: Create tag
         run: |
           git tag ${{ needs.set-version.outputs.version }}
-          git -f tag ${{ env.VERSION }}
 
       - uses: navikt/github-app-token-generator@v1
         id: get-homebrew-token
