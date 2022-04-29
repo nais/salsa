@@ -110,3 +110,4 @@ jobs:
         with:
           push: true
           tags: ${{ env.IMAGE_NAME }}:${{ needs.set-version.outputs.version }},${{ env.IMAGE_NAME }}:${{ env.VERSION }}
+          labels: version=${{ needs.set-version.outputs.version }},revision=${{ github.sha }}
