@@ -191,9 +191,9 @@ jobs:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
           echo '${{ secrets.COSIGN_PRIVATE_KEY }}' > cosign.key
-          #echo '${{ secrets.COSIGN_PUBLIC_KEY }}' > cosign.pub
+          echo '${{ secrets.COSIGN_PUBLIC_KEY }}' > cosign.pub
           
-          cosign verify --key ${{ github.workspace}}/cosign.pub ${{ env.CLI_IMAGE_TAG }}
+          cosign verify --key cosign.pub ${{ env.CLI_IMAGE_TAG }}
           syft ${{ env.CLI_IMAGE_TAG }} -o spdx-json > sbom-spdx.json
           # cosign attest --predicate sbom-spdx.json --type spdx --key cosign.key ${{ env.CLI_IMAGE_TAG }}
           # cosign verify-attestation -o verified-sbom-spdx.json --key cosign.pub" ${{ env.CLI_IMAGE_TAG }}
