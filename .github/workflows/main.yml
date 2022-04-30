@@ -129,7 +129,7 @@ jobs:
 
   sign-attest:
     needs:
-      - sign
+      - build
     runs-on: ubuntu-20.04
     env:
       CLI_IMAGE_TAG: "${{ needs.build.outputs.cli-tag }}"
