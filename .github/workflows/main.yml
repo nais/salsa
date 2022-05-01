@@ -175,10 +175,10 @@ jobs:
           # syft ${{ env.CLI_IMAGE_TAG }} -o spdx-json > sbom-spdx.json
           # cosign attest --predicate sbom-spdx.json --type spdx --key cosign.key ${{ env.CLI_IMAGE_TAG }}
           
-          cosign verify --key cosign.pub ${{ env.ACTION_IMAGE_TAG }}
-          echo ${{ env.COSIGN_PASSWORD }} | syft attest -o spdx-json ${{ env.ACTION_IMAGE_TAG }} > sbom.json
-          cosign attach attestation --attestation sbom.json ${{ env.ACTION_IMAGE_TAG }}
-          cosign verify-attestation -o verified-sbom-spdx.json --key cosign.pub ${{ env.ACTION_IMAGE_TAG }}
+          # cosign verify --key cosign.pub ${{ env.ACTION_IMAGE_TAG }}
+          # echo ${{ env.COSIGN_PASSWORD }} | syft attest -o spdx-json ${{ env.ACTION_IMAGE_TAG }} > sbom.json
+          # cosign attach attestation --attestation sbom.json ${{ env.ACTION_IMAGE_TAG }}
+          # cosign verify-attestation -o verified-sbom-spdx.json --key cosign.pub ${{ env.ACTION_IMAGE_TAG }}
 
           # syft ${{ env.CLI_IMAGE_TAG }} -o spdx-json > sbom-spdx.json
           # cosign attest --predicate sbom-spdx.json --type spdx --key cosign.key ${{ env.ACTION_IMAGE_TAG }}
