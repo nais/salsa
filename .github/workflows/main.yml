@@ -81,6 +81,7 @@ jobs:
       - name: Create tag
         run: |
           git tag ${{ needs.set-version.outputs.version }}
+          echo '${{ secrets.COSIGN_PRIVATE_KEY }}' > cosign.key
 
       #      - uses: navikt/github-app-token-generator@v1
       #        id: get-homebrew-token
@@ -127,6 +128,11 @@ jobs:
           git tag -f ${{ env.VERSION }}
           git push -f origin ${{ env.VERSION }} 
 
+      - name: Clean up
+        if: ${{ always() }}
+        run: |
+          rm -f cosign.key 
+
   sign-attest:
     needs:
       - build
@@ -164,9 +170,7 @@ jobs:
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
-          echo '${{ secrets.COSIGN_PRIVATE_KEY }}' > cosign.key
           echo '${{ secrets.COSIGN_PUBLIC_KEY }}' > cosign.pub
-          
           cosign verify --key cosign.pub ${{ env.CLI_IMAGE_TAG }}
           syft attest -o spdx-json ${{ env.CLI_IMAGE_TAG }} > sbom.json
           cosign attach attestation --attestation sbom.json ${{ env.CLI_IMAGE_TAG }}

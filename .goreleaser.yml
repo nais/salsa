@@ -21,12 +21,38 @@ builds:
 checksum:
   name_template: 'checksums.txt'
 
-#changelog:
-#  sort: asc
-#  filters:
-#    exclude:
-#      - '^docs:'
-#      - '^test:'
+archives:
+  - format: binary
+
+sboms:
+  - artifacts: binary
+
+signs:
+  - cmd: cosign
+    stdin: '{{ .Env.COSIGN_PASSWORD }}'
+    args: ["sign-blob", "--key=cosign.key", "--output-signature", "${artifact}.sig"]
+    artifacts: binary
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore'
+      - Merge pull request
+      - Merge remote-tracking branch
+      - Merge branch
+  groups:
+    - title: 'New Features'
+      regexp: "^.*feat[(\\w)]*:+.*$"
+      order: 0
+    - title: 'Bug fixes'
+      regexp: "^.*fix[(\\w)]*:+.*$"
+      order: 10
+    - title: Other work
+      order: 999
 
 release:
   prerelease: allow
