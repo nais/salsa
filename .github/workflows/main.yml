@@ -168,7 +168,7 @@ jobs:
           echo '${{ secrets.COSIGN_PUBLIC_KEY }}' > cosign.pub
           
           cosign verify --key cosign.pub ${{ env.CLI_IMAGE_TAG }}
-          echo ${{ COSIGN_PASSWORD }} | syft attest -o spdx-json ${{ env.CLI_IMAGE_TAG }} > sbom.json
+          echo ${{ env.COSIGN_PASSWORD }} | syft attest -o spdx-json ${{ env.CLI_IMAGE_TAG }} > sbom.json
           cosign attach attestation --attestation sbom.json ${{ env.CLI_IMAGE_TAG }}
           cosign verify-attestation -o verified-sbom-spdx.json --key cosign.pub" ${{ env.CLI_IMAGE_TAG }}
           
