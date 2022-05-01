@@ -113,6 +113,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PUSH_TOKEN: ${{ steps.get-homebrew-token.outputs.token }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
