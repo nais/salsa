@@ -37,8 +37,11 @@ sboms:
 
 signs:
   - cmd: cosign
+    env:
+    - COSIGN_EXPERIMENTAL=true
     stdin: '{{ .Env.COSIGN_PASSWORD }}'
-    args: ["sign-blob", "--key=cosign.key", "--output-signature", "${artifact}.sig"]
+    args: ["sign-blob", "--key=cosign.key", "--output=${signature}", "${artifact}"]
+    signature: "${artifact}.sig"
     artifacts: archive
 
 changelog:
