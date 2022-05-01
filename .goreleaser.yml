@@ -22,16 +22,24 @@ checksum:
   name_template: 'checksums.txt'
 
 archives:
-  - format: binary
+  - format: tar.gz
+    replacements:
+      darwin: macOS
+    files:
+      - cosign.pub
+      - dist/*.sig
+    format_overrides:
+      - goos: windows
+        format: zip
 
 sboms:
-  - artifacts: binary
+  - artifacts: archive
 
 signs:
   - cmd: cosign
     stdin: '{{ .Env.COSIGN_PASSWORD }}'
     args: ["sign-blob", "--key=cosign.key", "--output-signature", "${artifact}.sig"]
-    artifacts: binary
+    artifacts: archive
 
 changelog:
   sort: asc
