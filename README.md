@@ -201,9 +201,9 @@ The Following inputs can be used as `step.with` keys
 | Name             | Type   | Default               | Description                                                                          | Required |
 |------------------|--------|:----------------------|--------------------------------------------------------------------------------------|----------|
 | `key`            | String | ""                    | The key used to sign the attestation                                                 | True     |
-| `docker_user`    | String | ""                    | User to login to docker                                                              | True     |
 | `docker_pwd`     | String | ""                    | Pwd to login to docker                                                               | True     |
-| `image`          | String | $ENV_IMAGE            | Docker image to sign                                                                 | True     |
+| `image`          | String | ""                    | Docker image to sign                                                                 | True     |
+| `docker_user`    | String | github.actor          | User to login to docker                                                              | False    |
 | `repo_name`      | String | github.repository     | This will name the generated provenance                                              | False    |
 | `repo_sub_dir`   | String | ""                    | Specify a sub directory if build file not found in working root directory            | False    |
 | `dependencies`   | Bool   | true                  | Should the action digest dependencies                                                | False    |

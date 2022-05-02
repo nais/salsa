@@ -1,5 +1,5 @@
-name: 'NAIS SLSA Provenance Action'
-description: 'A POC Action to generate signed SLSA provenance'
+name: 'nais SLSA Provenance Action'
+description: 'Action to generate signed SLSA provenance'
 branding:
   icon: lock
   color: red
@@ -32,8 +32,9 @@ inputs:
 
   docker_user:
     description: |-
-      User to login to docker
-    required: true
+      User to login to docker. Use by default "github.actor".
+    required: false
+    default: ""
 
   docker_pwd:
     description: |-
@@ -48,7 +49,7 @@ inputs:
 
   image:
     description: |-
-      docker image to sign. Defaults to $ENV_IMAGE.
+      docker image to sign.
     required: true
 
   github_context:
