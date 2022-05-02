@@ -4,8 +4,7 @@
 REPO_NAME="${INPUT_REPO_NAME##*/}"
 # REPO_DIR="${INPUT_REPO_DIR%/*}"
 
-if [ -n "$INPUT_DOCKER_USER" ]
-then
+if [ -n "$INPUT_DOCKER_USER" ]; then
   export GITHUB_ACTOR=$INPUT_DOCKER_USER
 fi
 
@@ -39,4 +38,5 @@ salsa scan \
     --subDir "$INPUT_REPO_SUB_DIR" \
     --remote-run \
     --key "$INPUT_KEY" \
-    "$INPUT_IMAGE"
+    "$INPUT_IMAGE" &&
+  docker logout "$DOCKER_REGISTRY"

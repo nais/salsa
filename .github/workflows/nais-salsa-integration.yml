@@ -8,7 +8,6 @@ on:
 
 env:
   IMAGE: ttl.sh/nais/salsa-test:1h
-  KEY: gcpkms://projects/plattformsikkerhet-dev-496e/locations/europe-north1/keyRings/cosign/cryptoKeys/cosign-test/versions/1
 
 jobs:
 
@@ -34,7 +33,7 @@ jobs:
         id: 'google'
         uses: 'google-github-actions/auth@v0'
         with:
-          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+          credentials_json: ${{ secrets.NAIS_SALSA_GCP_CREDENTIALS }}
 
       # For demonstration purpose
       - name: Build and push
@@ -49,8 +48,7 @@ jobs:
         uses: ./
         with:
           image: ${{ env.IMAGE }}
-          key: ${{ env.KEY }}
-         # docker_user: ${{ github.actor }}
+          key: ${{ secrets.NAIS_SALSA_KEY }}
           docker_pwd: ${{ secrets.GITHUB_TOKEN }}
 
       # For demonstration purpose
