@@ -8,10 +8,14 @@ if [ -n "$INPUT_DOCKER_USER" ]; then
   export GITHUB_ACTOR=$INPUT_DOCKER_USER
 fi
 
+if [ -n "$INPUT_IMAGE" ]; then
+  export IMAGE=$INPUT_IMAGE
+fi
+
 GITHUB=$(echo "${INPUT_GITHUB_CONTEXT}" | base64 -w 0)
 RUNNER=$(echo "${INPUT_RUNNER_CONTEXT}" | base64 -w 0)
 ENVS=$(jq -n env | base64 -w 0)
-DOCKER_REGISTRY="${INPUT_IMAGE%%/*}"
+DOCKER_REGISTRY="${IMAGE%%/*}"
 
 export JAVA_HOME=/opt/java/openjdk
 
@@ -31,12 +35,12 @@ salsa scan \
     --subDir "$INPUT_REPO_SUB_DIR" \
     --remote-run \
     --key "$INPUT_KEY" \
-    "$INPUT_IMAGE" &&
+    "$IMAGE" &&
   salsa attest \
     --verify \
     --repo "$REPO_NAME" \
     --subDir "$INPUT_REPO_SUB_DIR" \
     --remote-run \
     --key "$INPUT_KEY" \
-    "$INPUT_IMAGE" &&
+    "$IMAGE" &&
   docker logout "$DOCKER_REGISTRY"
