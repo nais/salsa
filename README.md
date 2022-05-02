@@ -50,8 +50,8 @@ the build, builders are source-aware, and signatures are used to prevent provena
 
 ### Materials
 
-This actions creates attestation with [materials](https://slsa.dev/provenance/v0.2#example) based on dependencies, the
-action digest over listed dependencies from a [supported](#support) build tool.
+This actions creates attestation with [materials](https://slsa.dev/provenance/v0.2#example) based on both runtime and
+transitive dependencies, the action digest over listed dependencies from a [supported](#support) build tool.
 
 ### Support
 
@@ -213,7 +213,7 @@ The Following inputs can be used as `step.with` keys
 
 ### Checksums
 
-nais salsa generates a `checksums.txt` file and uploads it with the release, so users can validate if the downloaded
+`nais salsa` generates a `checksums.txt` file and uploads it with the release, so users can validate if the downloaded
 files are correct. All files are by default encoded with algorithm `sha256`.
 
 ### Verify signature
