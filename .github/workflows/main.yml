@@ -191,12 +191,12 @@ jobs:
           cosign verify --key cosign.pub ${{ env.CLI_IMAGE_TAG }}
           syft attest -o spdx-json ${{ env.CLI_IMAGE_TAG }} > sbom.json
           cosign attach attestation --attestation sbom.json ${{ env.CLI_IMAGE_TAG }}
-          # cosign verify-attestation -o verified-sbom-spdx.json --key cosign.pub ${{ env.CLI_IMAGE_TAG }}
+          cosign verify-attestation -o verified-sbom-spdx.json --key cosign.pub ${{ env.CLI_IMAGE_TAG }} -d
           
           cosign verify --key cosign.pub ${{ env.ACTION_IMAGE_TAG }}
           syft attest -o spdx-json ${{ env.ACTION_IMAGE_TAG }} > sbom.json
           cosign attach attestation --attestation sbom.json ${{ env.ACTION_IMAGE_TAG }}
-          # cosign verify-attestation -o verified-sbom-spdx.json --key cosign.pub ${{ env.ACTION_IMAGE_TAG }}
+          cosign verify-attestation -o verified-sbom-spdx.json --key cosign.pub ${{ env.ACTION_IMAGE_TAG }} -d
 
       - name: Clean up
         if: ${{ always() }}
