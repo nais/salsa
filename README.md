@@ -94,7 +94,7 @@ In the examples below we are also using 2 other `required` actions:
 
 * Action to [check out of repository](https://github.com/actions/checkout)
 * Action for Google Cloud credentials to establishes [authentication](https://github.com/google-github-actions/auth) to
-  Google Cloud
+  Google. Customizing for [other providers](#other-kms-providers)
 
 Not `required`:
 
@@ -111,7 +111,7 @@ or [pull request](https://github.com/nais/salsa/pulls).
 
 #### Setup
 
-KMS with cosign requires som pre-setup at you provider, in short for Google KMS:
+KMS with cosign requires som pre-setup at you provider. In short for Google KMS:
 
 1. KMS is enabled in Google project
     1. create keyring
@@ -125,10 +125,9 @@ KMS with cosign requires som pre-setup at you provider, in short for Google KMS:
 
 ##### Other KMS providers
 
-NB! **This is not tested**, but theoretically it should be possible to switch [Key Management](#key-management) provider
-from Google Action with for example [Azure Action](https://github.com/marketplace/actions/azure-login). Please
-see [cosign KMS](https://github.com/sigstore/cosign/blob/main/KMS.md)
-for more information about setup and URI formats.
+NB! **This is not tested**, it should be possible to switch [Key Management](#key-management) provider
+from [Google](https://github.com/google-github-actions/auth) with for example [Azure](https://github.com/marketplace/actions/azure-login). See the [cosign KMS](https://github.com/sigstore/cosign/blob/main/KMS.md)
+for more information about provider setup and key URI formats.
 
 ### Example
 
@@ -154,9 +153,8 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: 'Authenticate to Google Cloud'
-        id: 'google'
-        uses: 'google-github-actions/auth@v0'
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v0
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
@@ -169,7 +167,6 @@ jobs:
       - name: Provenance, upload and sign attestation
         uses: nais/salsa@v0.1
         with:
-          image: ${{ env.IMAGE }}
           key: ${{ env.KEY }}
           docker_pwd: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -199,13 +196,13 @@ The Following inputs can be used as `step.with` keys
 
 | Name             | Type   | Default               | Description                                                                          | Required |
 |------------------|--------|:----------------------|--------------------------------------------------------------------------------------|----------|
-| `key`            | String | ""                    | The key used to sign the attestation                                                 | True     |
-| `docker_pwd`     | String | ""                    | Pwd to login to docker                                                               | True     |
-| `image`          | String | ""                    | Docker image to sign                                                                 | True     |
+| `key`            | String | ""                    | Private key (cosign.key) or kms provider, for signing the attestation                | True     |
+| `docker_pwd`     | String | ""                    | Password for docker                                                                  | True     |
+| `image`          | String | $IMAGE                | Docker image to sign                                                                 | False    |
 | `docker_user`    | String | github.actor          | User to login to docker                                                              | False    |
 | `repo_name`      | String | github.repository     | This will name the generated provenance                                              | False    |
 | `repo_sub_dir`   | String | ""                    | Specify a sub directory if build file not found in working root directory            | False    |
-| `dependencies`   | Bool   | true                  | Should the action digest dependencies                                                | False    |
+| `dependencies`   | Bool   | true                  | Set to false if action should not digest over dependencies                           | False    |
 | `repo_dir`       | String | $GITHUB_WORKSPACE     | **Internal value (do notset):** Root of directory to look for build files            | False    |
 | `github_context` | String | ${{ toJSON(github) }} | **Internal value (do notset):** the [github context](#git-context) object in json    | False    |
 | `runner_context` | String | ${{ toJSON(runner) }} | **Internal value (do notset):** the [runner context](#runner-context) object in json | False    |
