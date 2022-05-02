@@ -171,7 +171,6 @@ jobs:
         with:
           image: ${{ env.IMAGE }}
           key: ${{ env.KEY }}
-          docker_user: ${{ github.actor }}
           docker_pwd: ${{ secrets.GITHUB_TOKEN }}
 ```
 
