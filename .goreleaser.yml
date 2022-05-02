@@ -36,17 +36,21 @@ sboms:
   - artifacts: archive
 
 signs:
-  - cmd: cosign
-    env:
-    - COSIGN_EXPERIMENTAL=true
+  - id: sign archives
+    cmd: cosign
     stdin: '{{ .Env.COSIGN_PASSWORD }}'
     args: ["sign-blob", "--key=cosign.key", "--output=${signature}", "${artifact}"]
     signature: "${artifact}.sig"
     artifacts: archive
+  - id: sign checksum.txt
+    cmd: cosign
+    stdin: '{{ .Env.COSIGN_PASSWORD }}'
+    args: [ "sign-blob", "--key=cosign.key", "--output=${signature}", "${artifact}" ]
+    signature: "${artifact}.sig"
+    artifacts: checksum
 
 changelog:
   sort: asc
-  use: github
   filters:
     exclude:
       - '^docs:'
@@ -72,7 +76,11 @@ release:
     owner: nais
     name: salsa
   header: |
-    ## nais-salsa-cli ({{ .Version }})
+    ## {{.ProjectName}} ({{ .Version }})
+  footer: |
+    ## Enjoy some {{.ProjectName}} verde.
+
+    Those were the changes on {{ .Tag }}!
   extra_files:
     - glob: "cosign.pub"
 
