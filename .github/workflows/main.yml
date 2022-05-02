@@ -189,16 +189,27 @@ jobs:
         run: |
           echo '${{ secrets.COSIGN_PUBLIC_KEY }}' > cosign.pub
           cosign verify --key cosign.pub ${{ env.CLI_IMAGE_TAG }}
-          syft attest -o spdx-json ${{ env.CLI_IMAGE_TAG }} > sbom.json
-          cosign attach attestation --attestation sbom.json ${{ env.CLI_IMAGE_TAG }}
-          cosign verify-attestation  --key cosign.pub ${{ env.CLI_IMAGE_TAG }} -d
+
+          syft attest -o spdx-json ${{ env.CLI_IMAGE_TAG }} > sbom-cli.json
+          cosign attach attestation --attestation sbom-cli.json ${{ env.CLI_IMAGE_TAG }}
+          cosign verify-attestation --key cosign.pub ${{ env.CLI_IMAGE_TAG }}  > cosignverify-cli.json
           
           cosign verify --key cosign.pub ${{ env.ACTION_IMAGE_TAG }}
-          syft attest -o spdx-json ${{ env.ACTION_IMAGE_TAG }} > sbom.json
-          cosign attach attestation --attestation sbom.json ${{ env.ACTION_IMAGE_TAG }}
-          cosign verify-attestation  --key cosign.pub ${{ env.ACTION_IMAGE_TAG }} -d
+          syft attest -o spdx-json ${{ env.ACTION_IMAGE_TAG }} > sbom-action.json
+          cosign attach attestation --attestation sbom-action.json ${{ env.ACTION_IMAGE_TAG }}
+          cosign verify-attestation --key cosign.pub ${{ env.ACTION_IMAGE_TAG }}  > cosignverify-action.json
+
+      - name: Upload provenance
+        uses: actions/upload-artifact@v2
+        with:
+          path: |
+            ./sbom-cli.json
+            ./sbom-action.json
+            ./cosignverify-cli.json
+            ./cosignverify-action.json
 
       - name: Clean up
         if: ${{ always() }}
         run: |
-          rm -f cosign.key  
+          rm -f cosign.key
+      
