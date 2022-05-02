@@ -10,13 +10,15 @@
 
 <div align="center">
 
-[![Salsa CI](https://github.com/nais/salsa/actions/workflows/main.yml/badge.svg)](https://github.com/nais/salsa/actions/workflows/main.yml)
-[![GitHub license](https://badgen.net/github/license/nais/salsa)](https://github.com/nais/salsa/blob/main/LICENSE)
+[![Salsa build & release](https://github.com/nais/salsa/actions/workflows/main.yml/badge.svg)](https://github.com/nais/salsa/actions/workflows/main.yml)
+[![nais Salsa integration](https://github.com/nais/salsa/actions/workflows/nais-salsa-integration.yml/badge.svg)](https://github.com/nais/salsa/actions/workflows/nais-salsa-integration.yml)
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/nais/salsa?color=pink&label=release%40latest&logo=github)
+![GitHub last commit](https://img.shields.io/github/last-commit/nais/salsa?color=yellow&logo=github)  
 [![GitHub stars](https://img.shields.io/github/stars/nais/salsa.svg)](https://github.com/nais/salsa/stargazers?color=purple)
+[![GitHub license](https://badgen.net/github/license/nais/salsa)](https://github.com/nais/salsa/blob/main/LICENSE)
 [![Go Report Card](https://goreportcard.com/badge/github.com/nais/salsa)](https://goreportcard.com/report/github.com/nais/salsa)
-![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/nais/salsa?color=pink&label=release%40latest%40date&logo=github)
 ![GitHub go.mod Go version (branch)](https://img.shields.io/github/go-mod/go-version/nais/salsa/master)
-![GitHub last commit](https://img.shields.io/github/last-commit/nais/salsa?color=yellow&logo=github)
+
 
 </div>
 
