@@ -50,7 +50,8 @@ inputs:
   image:
     description: |-
       docker image to sign.
-    required: true
+    required: false
+    default: ""
 
   github_context:
     description: |-
