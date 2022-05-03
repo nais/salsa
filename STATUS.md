@@ -6,13 +6,11 @@ Proof of Concept for a SLSA github action / cli.
 
 * upload attestation somewhere
 * how to make attestations searchable
-* * upload attestation somewhere
-* explore tools like cosign, Fulcio and Reko from sigstore to see where they can fit in
-    * https://github.com/sigstore/fulcio:
-        * Fulcio is a work in progress. There's working code and a running instance and a plan, but you should not
-          attempt to try to actually use it for anything
-* how to make attestations searchable
-* Handle the ability to resolve packages that's private
+* Fulcio and Reko from sigstore to see where they can fit in
+* https://github.com/sigstore/fulcio:
+    * Fulcio is a work in progress. There's working code and a running instance and a plan, but you should not
+      attempt to try to actually use it for anything
+* Handle the ability to resolve packages that's private (or don´t)
 
 ## Concepts tested so far
 
@@ -32,6 +30,7 @@ Created simple CLI to test concepts:
 * include build steps from workflow
 * create a pipeline where a "provenance" action can be used
 * how to get/add the digest for dependency artifacts for all build tools
+* explore cosign
 
 # Relevant links
 
