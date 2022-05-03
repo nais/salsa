@@ -113,20 +113,23 @@ or [pull request](https://github.com/nais/salsa/pulls).
 
 KMS with cosign requires som pre-setup at you provider. In short for Google KMS:
 
-1. KMS is enabled in Google project
-    1. create keyring
-        1. create keys: `Elliptic Curve P-256 key SHA256 Digest`
+1. KMS is enabled in your Google project
+    1. create a keyring
+        1. create HMS keys: `Elliptic Curve P-256 key SHA256 Digest`
 2. Serviceuser in project has roles:
     1. Cloud KMS CryptoKey signer/verifier
     2. Cloud KMS viewer Role
-3. Set actions secret in github.com containing the serviceuser credentials.
-4. Set `with.key` to the right [URI format](https://github.com/sigstore/cosign/blob/main/KMS.md#gcp) for
+3. Configure [Github](https://docs.github.com/en/actions/security-guides/encrypted-secrets) actions secret containing
+   the serviceuser
+4. Configure `with.key` with the right [URI format](https://github.com/sigstore/cosign/blob/main/KMS.md#gcp) for
    Google: `gcpkms://projects/$PROJECT/locations/$LOCATION/keyRings/$KEYRING/cryptoKeys/$KEY/versions/$KEY_VERSION`
 
 ##### Other KMS providers
 
-NB! **This is not tested**, it should be possible to switch [Key Management](#key-management) provider
-from [Google](https://github.com/google-github-actions/auth) with for example [Azure](https://github.com/marketplace/actions/azure-login). See the [cosign KMS](https://github.com/sigstore/cosign/blob/main/KMS.md)
+It should be possible to switch [Key Management](#key-management) provider
+from [Google](https://github.com/google-github-actions/auth) with for
+example [Azure](https://github.com/marketplace/actions/azure-login). See
+the [cosign KMS](https://github.com/sigstore/cosign/blob/main/KMS.md)
 for more information about provider setup and key URI formats.
 
 ### Example

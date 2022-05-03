@@ -23,17 +23,16 @@ jobs:
     steps:
       - run: echo 'The triggering workflow passed'
 
-      # Required step
       - name: Checkout Code
         uses: actions/checkout@v3
 
       # For demonstration purpose
       # Credentials needed to authenticate to google kms and sign image.
-      - name: 'Authenticate to Google Cloud'
-        id: 'google'
-        uses: 'google-github-actions/auth@v0'
+      - name: Authenticate to Google Cloud
+        id: google
+        uses: google-github-actions/auth@v0
         with:
-          credentials_json: ${{ secrets.NAIS_SALSA_CREDENTIALS }}
+          credentials_json: ${{ secrets.SALSA_CREDENTIALS }}
 
       # For demonstration purpose
       - name: Build and push
@@ -47,7 +46,7 @@ jobs:
         # nais/salsa@v...
         uses: ./
         with:
-          key: ${{ secrets.NAIS_SALSA_KEY }}
+          key: ${{ secrets.SALSA_KMS_KEY }}
           docker_pwd: ${{ secrets.GITHUB_TOKEN }}
 
       # For demonstration purpose
