@@ -13,8 +13,7 @@
 [![Salsa build & release](https://github.com/nais/salsa/actions/workflows/main.yml/badge.svg)](https://github.com/nais/salsa/actions/workflows/main.yml)
 [![Salsa integration](https://github.com/nais/salsa/actions/workflows/nais-salsa-integration.yml/badge.svg)](https://github.com/nais/salsa/actions/workflows/nais-salsa-integration.yml)
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/nais/salsa?color=pink&label=release%40latest&logo=github)
-![GitHub last commit](https://img.shields.io/github/last-commit/nais/salsa?color=yellow&logo=github)  
-[![GitHub stars](https://img.shields.io/github/stars/nais/salsa.svg)](https://github.com/nais/salsa/stargazers?color=purple)
+![GitHub last commit](https://img.shields.io/github/last-commit/nais/salsa?color=yellow&logo=github)
 [![GitHub license](https://badgen.net/github/license/nais/salsa)](https://github.com/nais/salsa/blob/main/LICENSE)
 [![Go Report Card](https://goreportcard.com/badge/github.com/nais/salsa)](https://goreportcard.com/report/github.com/nais/salsa)
 ![GitHub go.mod Go version (branch)](https://img.shields.io/github/go-mod/go-version/nais/salsa/master)
@@ -72,7 +71,8 @@ transitive dependencies, the action digest over listed dependencies from a [supp
 
 ___
 
-* [Usage](#usage)
+* [How to use](#how-to-use)
+    * [Compatibility](#compatibility)
     * [Key Management](#key-management)
         * [Setup](#setup)
         * [Other KMS providers](#other-kms-providers)
@@ -88,17 +88,23 @@ ___
     * [Verify signature](#verify-signature)
         * [Cosign](#cosign)
 
-## Usage
+## How to use
 
-In the examples below we are also using 2 other `required` actions:
+### Compatibility
 
-* Action to [check out of repository](https://github.com/actions/checkout)
-* Action for Google Cloud credentials to establishes [authentication](https://github.com/google-github-actions/auth) to
-  Google. Customizing for [other providers](#other-kms-providers)
+> nais salsa
+
+* `v0.1` requires explicit authentication step prior to using this action
+    * In the [example](#example) action we use for Google Cloud credentials to
+      establishes [authentication](https://github.com/google-github-actions/auth). See also customizing
+      for [other providers](#other-kms-providers)
+* action to [check out repository](https://github.com/actions/checkout) is required prior to using this action as `nais salsa`
+  require to locate your build file to digest over dependencies
 
 Not `required`:
 
-* Action to build and push [Docker images](https://github.com/docker/build-push-action)
+* Action to build and push [Docker images](https://github.com/docker/build-push-action). But this action requires any type of
+  image to sign the provenance
 
 ### Key Management
 
