@@ -66,19 +66,23 @@ changelog:
     - title: 'Bug fixes'
       regexp: "^.*fix[(\\w)]*:+.*$"
       order: 10
+    - title: 'Dependency updates'
+      regexp: "^.*build(deps)[(\\w)]*:+.*$"
+      order: 30
     - title: Other work
       order: 999
 
 release:
   prerelease: allow
   draft: true
+  mode: append
   github:
     owner: nais
     name: salsa
   header: |
     ## {{.ProjectName}} ({{ .Version }})
   footer: |
-    ## Enjoy some {{.ProjectName}} verde.
+    ## Enjoy some {{.ProjectName}} verde
 
     Those were the changes on {{ .Tag }}!
   extra_files:
