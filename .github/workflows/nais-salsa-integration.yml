@@ -47,7 +47,6 @@ jobs:
         # nais/salsa@v...
         uses: ./
         with:
-          image: ${{ env.IMAGE }}
           key: ${{ secrets.NAIS_SALSA_KEY }}
           docker_pwd: ${{ secrets.GITHUB_TOKEN }}
 
