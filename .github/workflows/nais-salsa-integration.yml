@@ -36,7 +36,7 @@ jobs:
 
       # For demonstration purpose
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           push: true
           tags: ${{ env.IMAGE }}
