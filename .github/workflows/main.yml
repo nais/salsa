@@ -6,6 +6,10 @@ on:
       - main
     paths-ignore:
       - '**.md'
+      - 'CODEOWNERS'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'doc/**'
 
 concurrency:
   group: ${{ github.ref }}
