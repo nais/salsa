@@ -16,7 +16,7 @@ FROM maven:3.8.5-eclipse-temurin-17-alpine
 RUN apk add --no-cache ca-certificates docker jq httpie
 
 # Define a constant with the version of gradle you want to install
-ARG GRADLE_VERSION
+ARG GRADLE_VERSION=7.3.3
 # Define the URL where gradle can be downloaded from
 ARG GRADLE_BASE_URL=https://services.gradle.org/distributions
 # Define the SHA key to validate the gradle download
@@ -50,7 +50,7 @@ COPY --from=builder /src/salsa-sample.yaml .salsa.yaml
 RUN chmod +x /usr/local/bin/salsa
 
 # Verify and install Cosign
-ARG COSIGN_VERSION
+ARG COSIGN_VERSION=v1.8.0
 ENV COSIGN_BINARY=cosign-linux-amd64
 ENV COSIGN_CHECKSUM=cosign_checksums.txt
 ENV COSIGN_PUBLIC_KEY=release-cosign.pub
