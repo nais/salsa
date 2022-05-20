@@ -16,6 +16,8 @@ env:
   IMAGE_NAME: ghcr.io/${{ github.repository }}
   COSIGN_VERSION: v1.8.0
   SYFT_VERSION: v0.44.1
+  GO_RELEASER_VERSION: v1.9.0
+  GRADLE_VERSION: 7.3.3
 
 jobs:
   set-version:
@@ -110,7 +112,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v2
         with:
           distribution: goreleaser
-          version: v1.8.3
+          version: ${{ env.GO_RELEASER_VERSION }}
           args: release -f .goreleaser.yml --rm-dist --debug
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -139,6 +141,9 @@ jobs:
           push: true
           tags: ${{ steps.container-tags.outputs.cli-tag }},${{ steps.container-tags.outputs.action-tag }}
           labels: version=${{ needs.set-version.outputs.version }},revision=${{ github.sha }}
+          build-args: |
+            COSIGN_VERSION=${{ env.COSIGN_VERSION }}
+            GRADLE_VERSION=${{ env.GRADLE_VERSION }}
 
       - name: Update major/minor version tag
         run: |
