@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
+	"strconv"
 	"strings"
 
 	"github.com/nais/salsa/pkg/utils"
@@ -27,8 +27,8 @@ var attestCmd = &cobra.Command{
 	Use:   "attest",
 	Short: "sign and upload in-toto attestation",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		var attest AttestOptions
-		err := viper.Unmarshal(&attest)
+		var options AttestOptions
+		err := viper.Unmarshal(&options)
 		if err != nil {
 			return err
 		}
@@ -37,10 +37,10 @@ var attestCmd = &cobra.Command{
 			return errors.New("repo name must be specified")
 		}
 
-		if attest.PredicateFile == "" {
+		if options.PredicateFile == "" {
 			file := utils.ProvenanceFile(PathFlags.Repo)
 			log.Infof("no predicate specified, using default pattern %s", file)
-			attest.PredicateFile = file
+			options.PredicateFile = file
 		}
 
 		workDir := PathFlags.WorkDir()
@@ -48,7 +48,8 @@ var attestCmd = &cobra.Command{
 		filePath := fmt.Sprintf("%s/%s.%s", workDir, PathFlags.Repo, "att")
 		// TODO: could be a subcommand e.g bin/salsa attest verify
 		if verify {
-			raw, err := attest.Verify(args)
+            cmd := options.VerifyCmd(args)
+			raw, err := cmd.Run()
 			if err != nil {
 				return err
 			}
@@ -72,11 +73,12 @@ var attestCmd = &cobra.Command{
 				log.Infof("no attestations found from cosign verify-attest command")
 			}
 		} else {
-			out, err := attest.Exec(args)
+            cmd := options.AttestCmd(args)
+			out, err := cmd.Run()
 			if err != nil {
 				return err
 			}
-			if attest.NoUpload {
+			if options.NoUpload {
 				err = os.WriteFile(filePath, []byte(out), os.FileMode(0755))
 				if err != nil {
 					return fmt.Errorf("could not write file %s %w", filePath, err)
@@ -88,50 +90,32 @@ var attestCmd = &cobra.Command{
 	},
 }
 
-func (o AttestOptions) Verify(a []string) (string, error) {
-	err := utils.RequireCommand("cosign")
-	if err != nil {
-		return "", err
+func (o AttestOptions) VerifyCmd(a []string) utils.ExtCmd {
+	return utils.ExtCmd{
+		Name:   "cosign",
+		SubCmd: "verify-attestation",
+		Flags: []string{
+			"--key", o.Key,
+		},
+		Args:    a,
+		WorkDir: PathFlags.WorkDir(),
 	}
-	args := []string{
-		"verify-attestation",
-		"--key", o.Key,
-	}
-	args = append(args, a...)
-
-	cmd := exec.Command(
-		"cosign",
-		args...,
-	)
-
-	cmd.Dir = PathFlags.WorkDir()
-	return utils.Exec(cmd)
 }
 
-func (o AttestOptions) Exec(a []string) (string, error) {
-	err := utils.RequireCommand("cosign")
-	if err != nil {
-		return "", err
+func (o AttestOptions) AttestCmd(a []string) utils.ExtCmd {
+	return utils.ExtCmd{
+		Name:   "cosign",
+		SubCmd: "attest",
+		Flags: []string{
+			"--key", o.Key,
+			"--predicate", o.PredicateFile,
+			"--type", o.PredicateType,
+			"--rekor-url", o.RekorURL,
+			"--no-upload", strconv.FormatBool(o.NoUpload),
+		},
+		Args:    a,
+		WorkDir: PathFlags.WorkDir(),
 	}
-	args := []string{
-		"attest",
-		"--type", o.PredicateType,
-		"--predicate", o.PredicateFile,
-		"--key", o.Key,
-		"--rekor-url", o.RekorURL,
-	}
-	if o.NoUpload {
-		args = append(args, "--no-upload")
-	}
-	args = append(args, a...)
-
-	cmd := exec.Command(
-		"cosign",
-		args...,
-	)
-
-	cmd.Dir = PathFlags.WorkDir()
-	return utils.Exec(cmd)
 }
 
 func init() {
