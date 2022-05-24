@@ -23,45 +23,44 @@
 
 ## About
 
-The project is started as an initiative by [nais](https://nais.io/)
+This is a Github Action for generating signed [provenance](https://slsa.dev/provenance/v0.2) about a build and its related artifacts.
+Provenance is an attestation (a "software bill of materials" or SBoM) about a software artifact or collection of artifacts, documenting how an artifact was produced - all in a common format.
 
-> NAV's Application Infrastructure Service
+Supply chain Levels for Software Artifacts, or SLSA (salsa), is a security framework (standards, guidelines etc.) to prevent tampering,
+improve integrity, and secure packages and infrastructure in your projects, businesses or enterprises.
 
-to establishing a [Level 2](#level-2-after-the-build) cryptographic chain of custody between trusted builds and our
-release and code-signing workflows. [SLSA](https://github.com/slsa-framework/slsa) is a framework intended to codify and
-promote secure [software supply-chain](https://slsa.dev/) practices. This GitHub Action can be used to create, upload,
-sign and verify a SBOM / [in-toto attestation](https://github.com/in-toto/attestation)
-also called a [provenance](https://slsa.dev/provenance/v0.2) using [cosign](https://github.com/sigstore/cosign). All
-predicate payloads are signed using the [DSSE](https://github.com/secure-systems-lab/dsse).
+The action implements the [level 2](https://slsa.dev/spec/v0.1/levels) requirements of the [SLSA Framework](https://slsa.dev) 
+producing a signed software [attestation](https://github.com/slsa-framework/slsa/blob/main/controls/attestations.md) of your build and dependencies.
+The attestation is signed and uploaded to your container registry using [cosign](https://github.com/sigstore/cosign) 
+and can be verified by the salsa cli (also provided in this repo) or using the `cosign verify-attestation` command.
 
-This is not an official GitHub Action set up and maintained by the SLSA team. This GitHub Action is built to provide
-teams and developers with the ability to trace software back to the source and define the moving parts in a complex
-supply chain.
+>Disclaimer: 
+This is not an official GitHub Action maintained by the SLSA team. 
+It is created by the [nais.io](nais.io) team for the purpose of securing supply chains in [NAV](https://github.com/navikt). However we encourage other organizations/users to use it and even contribute as it is built with open source in mind. 
 
-### SLSA Security Levels
+### Built with
 
-SLSA is organized into a series of [levels](https://slsa.dev/spec/v0.1/levels) that provide increasing integrity
-guarantees. This gives the action user confidence that software hasn’t been tampered with and can be securely traced
-back to its source.
+* [golang](https://golang.org)
+* [cosign](https://github.com/sigstore/cosign)
+* [Github Actions](https://github.com/features/actions)
 
-#### Level 2 After the build
-
-This Action fulfills the requirements for [level 2](https://slsa.dev/spec/v0.1/index) and shows more trustworthiness in
-the build, builders are source-aware, and signatures are used to prevent provenance being tampered with.
+### Formats/Standards implemented
+* Statement type: [in-toto v0.1](https://github.com/in-toto/attestation/)
+* Signing envelope: [DSSE](https://github.com/secure-systems-lab/dsse/)
+* Predicate type: [Provenance v0.2](https://slsa.dev/provenance/v0.2)
 
 ### Materials
 
-This actions creates attestation with [materials](https://slsa.dev/provenance/v0.2#example) based on both runtime and
-transitive dependencies, the action digest over listed dependencies from a [supported](#support) build tool.
+This actions creates attestations with [materials](https://slsa.dev/provenance/v0.2#example) based on both runtime and
+transitive dependencies, using a supported build tool.
 
-### Support
+#### Supported build tools
 
-#### Build tools
 
 * jvm
     * [gradle](https://gradle.org/)
     * [maven](https://maven.apache.org/)
-* nodejs
+* js
     * [yarn](https://yarnpkg.com/)
     * [npm](https://www.npmjs.com/)
 * [golang](https://go.dev/)
