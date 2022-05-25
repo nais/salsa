@@ -1,0 +1,39 @@
+name: checking workflows version pinned
+
+on: [ push ]
+
+jobs:
+  ratchet:
+    runs-on: ubuntu-20.04
+    name: ratchet
+    steps:
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # ratchet:actions/checkout@v3
+
+      - name: Check if main.yml is pinned
+        id: check
+        uses: 'docker://ghcr.io/sethvargo/ratchet:0.2.1'
+        with:
+          args: 'check .github/workflows/main.yml'
+          entrypoint: /ratchet
+
+      - name: Check if nais-salsa-integration.yml is pinned
+        id: check
+        uses: 'docker://ghcr.io/sethvargo/ratchet:0.2.1'
+        with:
+          args: 'check .github/workflows/nais-salsa-integration.yml'
+          entrypoint: /ratchet
+
+      - name: Check if golangci-lint.yml is pinned
+        id: check
+        uses: 'docker://ghcr.io/sethvargo/ratchet:0.2.1'
+        with:
+          args: 'check .github/workflows/nais-salsa-integration.yml'
+          entrypoint: /ratchet
+
+      - name: Checks failed for pinned workflow
+        if: ${{ failure() }}
+        run: |
+          echo see "'https://github.com/sethvargo/ratchet'" for more information.
+          echo "'make check workflow=my_workflow.yml'"
+          echo "'make update workflow=my_workflow.yml'"
+          echo "'make pin workflow=my_workflow.yml'" for new workflow file && exit 1
