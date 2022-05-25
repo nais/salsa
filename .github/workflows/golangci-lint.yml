@@ -19,3 +19,4 @@ jobs:
         with:
           # Wait for action go 1.18 support
           version: v1.44.2 #v1.45.2
+          args: --verbose
