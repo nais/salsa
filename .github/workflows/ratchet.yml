@@ -1,4 +1,4 @@
-name: checking workflows version pinned
+name: checking workflows pinned
 
 on: [ push ]
 
