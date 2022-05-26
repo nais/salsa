@@ -1,4 +1,4 @@
-name: Test & Check pinned workflows
+name: Check pinned workflows
 on:
   push:
     paths:
