@@ -27,10 +27,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # ratchet:actions/checkout@v3
       - name: Initialize CodeQL
-        uses: github/codeql-action@a3a6c128d771b6b9bdebb1c9d0583ebd2728a108 # ratchet:github/codeql-action/init@v2
+        uses: github/codeql-action/init@v2 # ratchet:exclude
         with:
           languages: ${{ matrix.language }}
       - name: Autobuild
-        uses: github/codeql-action@a3a6c128d771b6b9bdebb1c9d0583ebd2728a108 # ratchet:github/codeql-action/autobuild@v2
+        uses: github/codeql-action/autobuild@v2 # ratchet:exclude
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action@a3a6c128d771b6b9bdebb1c9d0583ebd2728a108 # ratchet:github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v2 # ratchet:exclude
