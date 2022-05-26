@@ -1,5 +1,8 @@
 name: Test & Check pinned workflows
-on: [push]
+on:
+  push:
+    paths:
+      - '.github/workflows/**'
 jobs:
   test-ci:
     runs-on: ubuntu-20.04
