@@ -12,6 +12,7 @@
 
 [![Salsa build & release](https://github.com/nais/salsa/actions/workflows/main.yml/badge.svg)](https://github.com/nais/salsa/actions/workflows/main.yml)
 [![Salsa integration](https://github.com/nais/salsa/actions/workflows/nais-salsa-integration.yml/badge.svg)](https://github.com/nais/salsa/actions/workflows/nais-salsa-integration.yml)
+[![Check pinned workflows](https://github.com/nais/salsa/actions/workflows/ratchet.yml/badge.svg)](https://github.com/nais/salsa/actions/workflows/ratchet.yml)  
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/nais/salsa?color=pink&label=release%40latest&logo=github)
 ![GitHub last commit](https://img.shields.io/github/last-commit/nais/salsa?color=yellow&logo=github)
 [![GitHub license](https://badgen.net/github/license/nais/salsa)](https://github.com/nais/salsa/blob/main/LICENSE)
