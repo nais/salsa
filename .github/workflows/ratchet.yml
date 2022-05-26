@@ -1,0 +1,37 @@
+name: Check pinned workflows
+on:
+  push:
+    paths:
+      - '.github/workflows/**'
+jobs:
+  ratchet:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # ratchet:actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+      - name: Check if main.yml is pinned
+        uses: 'docker://ghcr.io/sethvargo/ratchet@sha256:35c4b5f020000ee9c77a4af7cbe04f1d3e88718e533e6cb949146d4dc2c89220' # ratchet:docker://ghcr.io/sethvargo/ratchet:0.2.1
+        with:
+          args: 'check .github/workflows/main.yml'
+          entrypoint: /ratchet
+      - name: Check if nais-salsa-integration.yml is pinned
+        uses: 'docker://ghcr.io/sethvargo/ratchet@sha256:35c4b5f020000ee9c77a4af7cbe04f1d3e88718e533e6cb949146d4dc2c89220' # ratchet:docker://ghcr.io/sethvargo/ratchet:0.2.1
+        with:
+          args: 'check .github/workflows/nais-salsa-integration.yml'
+          entrypoint: /ratchet
+      - name: Check if golangci-lint.yml is pinned
+        uses: 'docker://ghcr.io/sethvargo/ratchet@sha256:35c4b5f020000ee9c77a4af7cbe04f1d3e88718e533e6cb949146d4dc2c89220' # ratchet:docker://ghcr.io/sethvargo/ratchet:0.2.1
+        with:
+          args: 'check .github/workflows/golangci-lint.yml'
+          entrypoint: /ratchet
+      - name: Check if ratchet.yml is pinned
+        uses: 'docker://ghcr.io/sethvargo/ratchet@sha256:35c4b5f020000ee9c77a4af7cbe04f1d3e88718e533e6cb949146d4dc2c89220' # ratchet:docker://ghcr.io/sethvargo/ratchet:0.2.1
+        with:
+          args: 'check .github/workflows/ratchet.yml'
+          entrypoint: /ratchet
+      - name: Checks failed
+        if: ${{ failure() }}
+        run: |-
+          echo see "'https://github.com/sethvargo/ratchet'" for more information.
+          echo "'make check workflow=my_workflow.yml'"
+          echo "'make update workflow=my_workflow.yml'"
+          echo "'make pin workflow=my_workflow.yml'" for new workflow file && exit 1

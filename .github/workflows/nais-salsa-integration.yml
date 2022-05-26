@@ -1,46 +1,37 @@
 name: nais Salsa integration
-
 on:
   workflow_run:
-    workflows: [ Salsa build & release ]
-    types: [ completed ]
-    branches: [ main ]
-
+    workflows: [Salsa build & release]
+    types: [completed]
+    branches: [main]
 env:
   IMAGE: ttl.sh/nais/salsa-test:1h
-
 jobs:
-
   on-failure:
     runs-on: ubuntu-20.04
     if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     steps:
       - run: echo 'The triggering workflow failed'
-
   on-success-generate-provenance:
     runs-on: ubuntu-20.04
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - run: echo 'The triggering workflow passed'
-
       - name: Checkout Code
-        uses: actions/checkout@v3
-
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # ratchet:actions/checkout@v3
       # For demonstration purpose
       # Credentials needed to authenticate to google kms and sign image.
       - name: Authenticate to Google Cloud
         id: google
-        uses: google-github-actions/auth@v0
+        uses: google-github-actions/auth@ceee102ec2387dd9e844e01b530ccd4ec87ce955 # ratchet:google-github-actions/auth@v0
         with:
           credentials_json: ${{ secrets.SALSA_CREDENTIALS }}
-
       # For demonstration purpose
       - name: Build and push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@e551b19e49efd4e98792db7592c17c09b89db8d8 # ratchet:docker/build-push-action@v3
         with:
           push: true
           tags: ${{ env.IMAGE }}
-
       # Added to a workflow
       - name: Generate provenance, upload and sign image
         # nais/salsa@v...
@@ -48,12 +39,11 @@ jobs:
         with:
           key: ${{ secrets.SALSA_KMS_KEY }}
           docker_pwd: ${{ secrets.GITHUB_TOKEN }}
-
       # For demonstration purpose
       - name: Upload provenance
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@82c141cc518b40d92cc801eee768e7aafc9c2fa2 # ratchet:actions/upload-artifact@v2
         with:
-          path: |
+          path: |-
             ./salsa.provenance
             ./salsa.raw.txt
             ./salsa.att
