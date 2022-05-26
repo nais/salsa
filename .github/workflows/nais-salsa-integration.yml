@@ -41,7 +41,7 @@ jobs:
           docker_pwd: ${{ secrets.GITHUB_TOKEN }}
       # For demonstration purpose
       - name: Upload provenance
-        uses: actions/upload-artifact@82c141cc518b40d92cc801eee768e7aafc9c2fa2 # ratchet:actions/upload-artifact@v2
+        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # ratchet:actions/upload-artifact@v2
         with:
           path: |-
             ./salsa.provenance
