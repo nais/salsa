@@ -4,25 +4,6 @@ on:
     paths:
       - '.github/workflows/**'
 jobs:
-  test-ci:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # ratchet:actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-      - name: Extract version of Go to use
-        run: echo "GOVERSION=$(cat go.mod | grep -w "go" | awk ' { print $2 } ' | grep -w "^[^v]")" >> $GITHUB_ENV
-      - uses: actions/setup-go@bfdd3570ce990073878bf10f6b2d79082de49492 # ratchet:actions/setup-go@bfdd3570ce990073878bf10f6b2d79082de49492
-        with:
-          go-version: ${{ env.GOVERSION }}
-      - name: Cache Go modules
-        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 # ratchet:actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09
-        id: go-mod-cache
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-      - name: Test Salsa
-        run: make test
   ratchet:
     runs-on: ubuntu-20.04
     steps:
