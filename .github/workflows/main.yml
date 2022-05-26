@@ -1,8 +1,6 @@
 name: Salsa build & release
 on:
   push:
-    branches:
-      - main
     paths-ignore:
       - '**.md'
       - 'CODEOWNERS'
@@ -21,6 +19,7 @@ env:
   GRADLE_VERSION: 7.3.3
 jobs:
   set-version:
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-20.04
     outputs:
       version: ${{ steps.set-version.outputs.version }}
@@ -32,8 +31,6 @@ jobs:
           echo Faking a Semantic Version
           echo ::set-output name=version::${{ env.VERSION }}.$(date "+%Y%m%d%H%M%S")
   test:
-    needs:
-      - set-version
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # ratchet:actions/checkout@v3
