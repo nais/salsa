@@ -37,7 +37,7 @@ jobs:
       - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # ratchet:actions/checkout@v3
       - name: Extract version of Go to use
         run: echo "GOVERSION=$(cat go.mod | grep -w "go" | awk ' { print $2 } ' | grep -w "^[^v]")" >> $GITHUB_ENV
-      - uses: actions/setup-go@b22fbbc2921299758641fab08929b4ac52b32923 # ratchet:actions/setup-go@v2
+      - uses: actions/setup-go@bfdd3570ce990073878bf10f6b2d79082de49492 # ratchet:actions/setup-go@v2
         with:
           go-version: ${{ env.GOVERSION }}
       - name: Cache Go modules
@@ -67,7 +67,7 @@ jobs:
       - name: Extract version of Go to use
         run: echo "GOVERSION=$(cat go.mod | grep -w "go" | awk ' { print $2 } ' | grep -w "^[^v]")" >> $GITHUB_ENV
       - name: Set up Go
-        uses: actions/setup-go@b22fbbc2921299758641fab08929b4ac52b32923 # ratchet:actions/setup-go@v2
+        uses: actions/setup-go@bfdd3570ce990073878bf10f6b2d79082de49492 # ratchet:actions/setup-go@v2
         with:
           go-version: ${{ env.GOVERSION }}
       - name: Create tag
@@ -172,7 +172,7 @@ jobs:
           cosign attach attestation --attestation sbom-action.json ${{ env.ACTION_IMAGE_TAG }}
           cosign verify-attestation --key cosign.pub ${{ env.ACTION_IMAGE_TAG }}  > cosignverify-action.json
       - name: Upload provenance
-        uses: actions/upload-artifact@82c141cc518b40d92cc801eee768e7aafc9c2fa2 # ratchet:actions/upload-artifact@v2
+        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # ratchet:actions/upload-artifact@v3
         with:
           path: |
             ./sbom-cli.json
