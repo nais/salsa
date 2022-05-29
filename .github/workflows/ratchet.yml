@@ -14,22 +14,22 @@ jobs:
           args: 'check .github/workflows/main.yml'
           entrypoint: /ratchet
       - name: Check if nais-salsa-integration.yml is pinned
-        uses: 'docker://ghcr.io/sethvargo/ratchet@sha256:35c4b5f020000ee9c77a4af7cbe04f1d3e88718e533e6cb949146d4dc2c89220' # ratchet:docker://ghcr.io/sethvargo/ratchet:0.2.1
+        uses: 'docker://ghcr.io/sethvargo/ratchet@sha256:35c4b5f020000ee9c77a4af7cbe04f1d3e88718e533e6cb949146d4dc2c89220' # ratchet:docker://ghcr.io/sethvargo/ratchet:0.2.2
         with:
           args: 'check .github/workflows/nais-salsa-integration.yml'
           entrypoint: /ratchet
       - name: Check if golangci-lint.yml is pinned
-        uses: 'docker://ghcr.io/sethvargo/ratchet@sha256:35c4b5f020000ee9c77a4af7cbe04f1d3e88718e533e6cb949146d4dc2c89220' # ratchet:docker://ghcr.io/sethvargo/ratchet:0.2.1
+        uses: 'docker://ghcr.io/sethvargo/ratchet@sha256:35c4b5f020000ee9c77a4af7cbe04f1d3e88718e533e6cb949146d4dc2c89220' # ratchet:docker://ghcr.io/sethvargo/ratchet:0.2.2
         with:
           args: 'check .github/workflows/golangci-lint.yml'
           entrypoint: /ratchet
       - name: Check if ratchet.yml is pinned
-        uses: 'docker://ghcr.io/sethvargo/ratchet@sha256:35c4b5f020000ee9c77a4af7cbe04f1d3e88718e533e6cb949146d4dc2c89220' # ratchet:docker://ghcr.io/sethvargo/ratchet:0.2.1
+        uses: 'docker://ghcr.io/sethvargo/ratchet@sha256:35c4b5f020000ee9c77a4af7cbe04f1d3e88718e533e6cb949146d4dc2c89220' # ratchet:docker://ghcr.io/sethvargo/ratchet:0.2.2
         with:
           args: 'check .github/workflows/ratchet.yml'
           entrypoint: /ratchet
       - name: Check if codeql-analysis.yml is pinned
-        uses: 'docker://ghcr.io/sethvargo/ratchet@sha256:35c4b5f020000ee9c77a4af7cbe04f1d3e88718e533e6cb949146d4dc2c89220' # ratchet:docker://ghcr.io/sethvargo/ratchet:0.2.1
+        uses: 'docker://ghcr.io/sethvargo/ratchet@sha256:35c4b5f020000ee9c77a4af7cbe04f1d3e88718e533e6cb949146d4dc2c89220' # ratchet:docker://ghcr.io/sethvargo/ratchet:0.2.2
         with:
           args: 'check .github/workflows/codeql-analysis.yml'
           entrypoint: /ratchet

@@ -1,4 +1,4 @@
-RATCHET_VERSION=0.2.1
+RATCHET_VERSION=0.2.2
 WORKFLOWS_PATH=.github/workflows
 
 .PHONY: ratchet
