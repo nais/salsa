@@ -85,3 +85,56 @@ Another possibility is to set Environment variables with prefix `SALSA`
 ```
 SALSA_ATTEST_KEY
 ```
+
+## Ratchet
+
+Ratchet is a tool for improving the security of CI/CD workflows by automating the process of pinning and unpinning
+upstream versions.
+
+More info in [ratchet](https://github.com/sethvargo/ratchet) repo.
+
+### Commands
+
+The workflow run [ratchet.yml](.github/workflows/ratchet.yml) checks if all actions and containers are pinned,
+except `ratchet:exclude` and only runs if there are changes in the `.github/workflows` folder.
+
+#### pin
+
+To get a pin a workflow, add the `new workflow` file or `new action` to an existing workflow;
+
+```
+make pin workflow=my_workflow.yml
+```
+
+#### update
+
+Only applies when dependabot comes with major update for an action e.g. v2 too v3, you manually have to edit the
+corresponding ratchet constraint;
+
+from;
+
+```
+ratchet:actions/some-action@v2
+```
+
+too;
+
+```
+ratchet:actions/some-action@v3
+```
+
+and then run update and commit your changes;
+
+```
+make update workflow=my_workflow.yml
+```
+
+Otherwise, just approve the dependabot PR.
+
+#### check
+
+Check if workflows is pinned;
+
+```
+make check workflow=my_workflow.yml
+```
