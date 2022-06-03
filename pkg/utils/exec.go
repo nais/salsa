@@ -26,16 +26,20 @@ func NewCmd(
 	args []string,
 	workDir string,
 ) Cmd {
-	return Cmd{Name: name, SubCmd: subCmd, Flags: flags, Args: args, WorkDir: workDir, Runner: &execCmd{}}
+	return Cmd{Name: name, SubCmd: subCmd, Flags: flags, Args: args, WorkDir: workDir, Runner: &ExecCmd{}}
+}
+
+func (c *Cmd) WithRunner(runner CmdRunner) {
+	c.Runner = runner
 }
 
 type CmdRunner interface {
 	CreateCmd() CreateCmd
 }
 
-type execCmd struct{}
+type ExecCmd struct{}
 
-func (c execCmd) CreateCmd() CreateCmd {
+func (c ExecCmd) CreateCmd() CreateCmd {
 	return exec.Command
 }
 
