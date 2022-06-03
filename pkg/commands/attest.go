@@ -48,7 +48,7 @@ var attestCmd = &cobra.Command{
 		filePath := fmt.Sprintf("%s/%s.%s", workDir, PathFlags.Repo, "att")
 		// TODO: could be a subcommand e.g bin/salsa attest verify
 		if verify {
-            cmd := options.VerifyCmd(args)
+			cmd := options.verifyCmd(args)
 			raw, err := cmd.Run()
 			if err != nil {
 				return err
@@ -73,7 +73,7 @@ var attestCmd = &cobra.Command{
 				log.Infof("no attestations found from cosign verify-attest command")
 			}
 		} else {
-            cmd := options.AttestCmd(args)
+			cmd := options.attestCmd(args)
 			out, err := cmd.Run()
 			if err != nil {
 				return err
@@ -90,32 +90,30 @@ var attestCmd = &cobra.Command{
 	},
 }
 
-func (o AttestOptions) VerifyCmd(a []string) utils.ExtCmd {
-	return utils.ExtCmd{
-		Name:   "cosign",
-		SubCmd: "verify-attestation",
-		Flags: []string{
-			"--key", o.Key,
-		},
-		Args:    a,
-		WorkDir: PathFlags.WorkDir(),
-	}
+func (o AttestOptions) verifyCmd(a []string) utils.Cmd {
+	return utils.NewCmd(
+		"cosign",
+		"verify-attestation",
+		[]string{"--key", o.Key},
+		a,
+		PathFlags.WorkDir(),
+	)
 }
 
-func (o AttestOptions) AttestCmd(a []string) utils.ExtCmd {
-	return utils.ExtCmd{
-		Name:   "cosign",
-		SubCmd: "attest",
-		Flags: []string{
+func (o AttestOptions) attestCmd(a []string) utils.Cmd {
+	return utils.NewCmd(
+		"cosign",
+		"attest",
+		[]string{
 			"--key", o.Key,
 			"--predicate", o.PredicateFile,
 			"--type", o.PredicateType,
 			"--rekor-url", o.RekorURL,
 			"--no-upload", strconv.FormatBool(o.NoUpload),
 		},
-		Args:    a,
-		WorkDir: PathFlags.WorkDir(),
-	}
+		a,
+		PathFlags.WorkDir(),
+	)
 }
 
 func init() {

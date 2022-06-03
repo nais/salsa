@@ -1,11 +1,11 @@
 package utils
 
 import (
-    "encoding/base64"
-    "fmt"
-    "time"
+	"encoding/base64"
+	"fmt"
+	"time"
 
-    "github.com/briandowns/spinner"
+	"github.com/briandowns/spinner"
 )
 
 func ProvenanceFile(repoName string) string {

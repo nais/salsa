@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"os/exec"
 	"regexp"
 	"strings"
 
@@ -31,18 +30,14 @@ func (g Gradle) BuildFiles() []string {
 }
 
 func (g Gradle) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) {
-	cmd := exec.Command(
+	cmd := utils.NewCmd(
 		"gradle",
-		"-q", "dependencies", "--configuration", "runtimeClasspath", "-M", "sha256",
+		"",
+		[]string{"-q", "dependencies", "--configuration", "runtimeClasspath", "-M", "sha256"},
+		nil,
+		workDir,
 	)
-	cmd.Dir = workDir
-
-	err := utils.RequireCommand("gradle")
-	if err != nil {
-		return nil, fmt.Errorf("required: %v\n", err)
-	}
-
-	depsOutput, err := utils.Exec(cmd)
+	depsOutput, err := cmd.Run()
 	if err != nil {
 		return nil, fmt.Errorf("exec: %v\n", err)
 	}
@@ -56,7 +51,10 @@ func (g Gradle) ResolveDeps(workDir string) (*build.ArtifactDependencies, error)
 	if err != nil {
 		return nil, fmt.Errorf("could not get gradle deps: %w", err)
 	}
-	return build.ArtifactDependency(deps, cmd.Path, strings.Join(cmd.Args, " ")), nil
+	args := make([]string, 0)
+	args = append(args, cmd.Name)
+	args = append(args, cmd.Flags...)
+	return build.ArtifactDependency(deps, cmd.Name, strings.Join(args, " ")), nil
 }
 
 func GradleDeps(depsOutput string, checksumXml []byte) (map[string]build.Dependency, error) {
