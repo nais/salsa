@@ -27,7 +27,8 @@ func TestAttest(t *testing.T) {
 	}
 	out, err := o.Run([]string{"image"}, FakeRunner{})
 	assert.NoError(t, err)
-
+	//Bug in IDEA....
+	fmt.Printf("%s\n", out)
 	expected := "[cosign attest --key mykey --predicate file.json --type slsaprovenance --rekor-url http://rekor.example.com --no-upload=false image]"
 	assert.Equal(t, expected, out)
 }
