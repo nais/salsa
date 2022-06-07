@@ -27,7 +27,7 @@ func TestAttest(t *testing.T) {
 	}
 	out, err := o.Run([]string{"image"}, FakeRunner{})
 	assert.NoError(t, err)
-	//fmt.Printf without newline breaks the structure of the go test output, making the test unable to catch the passing event
+	//Bug in IDEA....
 	fmt.Printf("%s\n", out)
 	expected := "[cosign attest --key mykey --predicate file.json --type slsaprovenance --rekor-url http://rekor.example.com --no-upload=false image]"
 	assert.Equal(t, expected, out)
