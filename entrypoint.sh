@@ -55,6 +55,43 @@ logoutDocker() {
   docker logout "$DOCKER_REGISTRY"
 }
 
+scan() {
+  salsa scan \
+    --repo "$REPO_NAME" \
+    --build-context "$GITHUB" \
+    --runner-context "$RUNNER" \
+    --env-context "$ENVS" \
+    --subDir "$INPUT_REPO_SUB_DIR" \
+    --with-deps="$INPUT_DEPENDENCIES" \
+    --remote-run
+}
+
+attest() {
+  echo "create and upload attestation" &&
+    salsa attest \
+      --repo "$REPO_NAME" \
+      --subDir "$INPUT_REPO_SUB_DIR" \
+      --remote-run \
+      --key "$INPUT_KEY" \
+      "$IMAGE"
+}
+
+attestVerify() {
+  echo "verify attestation" &&
+    salsa attest \
+      --verify \
+      --repo "$REPO_NAME" \
+      --subDir "$INPUT_REPO_SUB_DIR" \
+      --remote-run \
+      --key "$INPUT_KEY" \
+      "$IMAGE"
+}
+
+runSalsa() {
+  echo "---------- Running Salsa for repository: $REPO_NAME ----------" &&
+    scan && attest && attestVerify
+}
+
 cleanUpGoogle() {
   echo "---------- Clean up Google Cloud files ----------"
   if
@@ -64,33 +101,6 @@ cleanUpGoogle() {
   then
     rm -rvf "$GOOGLE_APPLICATION_CREDENTIALS" "$CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE" "$GOOGLE_GHA_CREDS_PATH"
   fi
-}
-
-runSalsa() {
-  echo "---------- Running Salsa for repository: $REPO_NAME ----------" &&
-    salsa scan \
-      --repo "$REPO_NAME" \
-      --build-context "$GITHUB" \
-      --runner-context "$RUNNER" \
-      --env-context "$ENVS" \
-      --subDir "$INPUT_REPO_SUB_DIR" \
-      --with-deps="$INPUT_DEPENDENCIES" \
-      --remote-run &&
-    echo "create and upload attestation" &&
-    salsa attest \
-      --repo "$REPO_NAME" \
-      --subDir "$INPUT_REPO_SUB_DIR" \
-      --remote-run \
-      --key "$INPUT_KEY" \
-      "$IMAGE" &&
-    echo "verify attestation" &&
-    salsa attest \
-      --verify \
-      --repo "$REPO_NAME" \
-      --subDir "$INPUT_REPO_SUB_DIR" \
-      --remote-run \
-      --key "$INPUT_KEY" \
-      "$IMAGE"
 }
 
 setup && loginDocker && runSalsa && logoutDocker && cleanUpGoogle
