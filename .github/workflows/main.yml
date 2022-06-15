@@ -14,7 +14,7 @@ concurrency:
 env:
   VERSION: v0.1
   IMAGE_NAME: ghcr.io/${{ github.repository }}
-  COSIGN_VERSION: v1.8.0
+  COSIGN_VERSION: v1.9.0
   SYFT_VERSION: v0.44.1
   GO_RELEASER_VERSION: v1.9.1
   GRADLE_VERSION: 7.3.3
@@ -41,7 +41,7 @@ jobs:
         with:
           go-version: ${{ env.GOVERSION }}
       - name: Cache Go modules
-        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 # ratchet:actions/cache@v3
+        uses: actions/cache@c3f1317a9e7b1ef106c153ac8c0f00fed3ddbc0d # ratchet:actions/cache@v3
         id: go-mod-cache
         with:
           path: ~/go/pkg/mod
@@ -80,7 +80,7 @@ jobs:
       #          app-id: ${{ secrets.NAIS_APP_ID }}
       #          repo: nais/homebrew-tap
       - name: Install cosign
-        uses: sigstore/cosign-installer@536b37ec5d5b543420bdfd9b744c5965bd4d8730 # ratchet:sigstore/cosign-installer@v2.3.0
+        uses: sigstore/cosign-installer@7e0881f8fe90b25e305bbf0309761e9314607e25 # ratchet:sigstore/cosign-installer@v2.4.0
         with:
           cosign-release: ${{ env.COSIGN_VERSION }}
       - name: Install Syft
@@ -136,7 +136,7 @@ jobs:
       ACTION_IMAGE_TAG: "${{ needs.build.outputs.action-tag }}"
     steps:
       - name: Install cosign
-        uses: sigstore/cosign-installer@536b37ec5d5b543420bdfd9b744c5965bd4d8730 # ratchet:sigstore/cosign-installer@v2.3.0
+        uses: sigstore/cosign-installer@7e0881f8fe90b25e305bbf0309761e9314607e25 # ratchet:sigstore/cosign-installer@v2.4.0
         with:
           cosign-release: ${{ env.COSIGN_VERSION }}
       - name: Install Syft
