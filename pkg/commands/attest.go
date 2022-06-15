@@ -73,7 +73,7 @@ func (o AttestOptions) Run(args []string, runner utils.CmdRunner) (string, error
 			//remove last line which is a newline
 			docs := docs[:len(docs)-1]
 			if len(docs) == 0 {
-				return "", errors.New(fmt.Sprintf("unexpected output from cosign command: %s", out))
+				return "", fmt.Errorf("unexpected output from cosign command: %s", out)
 			}
 
 			doc := docs[len(docs)-1]
