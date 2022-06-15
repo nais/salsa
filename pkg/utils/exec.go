@@ -44,10 +44,6 @@ func (c ExecCmd) CreateCmd() CreateCmd {
 }
 
 func (c Cmd) Run() (string, error) {
-	err := requireCommand(c.Name)
-	if err != nil {
-		return "", err
-	}
 	args := make([]string, 0)
 	if c.SubCmd != "" {
 		args = append(args, c.SubCmd)
@@ -59,6 +55,11 @@ func (c Cmd) Run() (string, error) {
 		args = append(args, c.Args...)
 	}
 	cmd := c.Runner.CreateCmd()(c.Name, args...)
+
+	err := requireCommand(cmd.Path)
+	if err != nil {
+		return "", err
+	}
 	cmd.Dir = c.WorkDir
 	var stdoutBuf, stderrBuf bytes.Buffer
 	cmd.Stdout = io.MultiWriter(os.Stdout, &stdoutBuf)
