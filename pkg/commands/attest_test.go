@@ -15,7 +15,6 @@ import (
 type fakeRunner struct {
 	envVar string
 	cmd    string
-	output string
 }
 
 func TestAttestCosignCommand(t *testing.T) {
