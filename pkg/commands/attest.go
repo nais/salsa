@@ -72,6 +72,10 @@ func (o AttestOptions) Run(args []string, runner utils.CmdRunner) (string, error
 			// TODO: fix so that we dont have to make this assumption
 			//remove last line which is a newline
 			docs := docs[:len(docs)-1]
+			if len(docs) == 0 {
+				return "", errors.New(fmt.Sprintf("unexpected output from cosign command: %s", out))
+			}
+
 			doc := docs[len(docs)-1]
 
 			err = os.WriteFile(filePath, []byte(doc), os.FileMode(0755))
@@ -90,6 +94,7 @@ func (o AttestOptions) Run(args []string, runner utils.CmdRunner) (string, error
 	} else {
 		cmd := o.attestCmd(args, runner)
 		out, err := cmd.Run()
+
 		if err != nil {
 			return "", err
 		}

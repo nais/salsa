@@ -5,19 +5,23 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 	"testing"
 
 	"github.com/nais/salsa/pkg/utils"
 	"github.com/stretchr/testify/assert"
 )
 
-type FakeRunner struct{}
+type fakeRunner struct {
+	envVar string
+	cmd    string
+	output string
+}
 
-func TestAttest(t *testing.T) {
+func TestAttestCosignCommand(t *testing.T) {
 	PathFlags.Repo = "."
 	PathFlags.Remote = false
 	PathFlags.RepoDir = "."
-
 	o := AttestOptions{
 		Key:           "mykey",
 		NoUpload:      false,
@@ -25,28 +29,70 @@ func TestAttest(t *testing.T) {
 		PredicateFile: "file.json",
 		PredicateType: "slsaprovenance",
 	}
-	out, err := o.Run([]string{"image"}, FakeRunner{})
+
+	runner := fakeRunner{
+		envVar: "GO_TEST_DRYRUN",
+		cmd:    "-test.run=TestDryRunCmd",
+	}
+
+	out, err := o.Run([]string{"image"}, runner)
 	assert.NoError(t, err)
-	//Bug in IDEA....
-	fmt.Printf("%s\n", out)
-	expected := "[cosign attest --key mykey --predicate file.json --type slsaprovenance --rekor-url http://rekor.example.com --no-upload=false image]"
-	assert.Equal(t, expected, out)
+	expectedCmd := "[cosign attest --key mykey --predicate file.json --type slsaprovenance --rekor-url http://rekor.example.com --no-upload=false image]\n"
+	assert.Equal(t, expectedCmd, out)
+}
+
+func TestAttestVerifySuccess(t *testing.T) {
+	workDir, err := os.MkdirTemp("testdata", "output")
+	assert.NoError(t, err)
+	defer os.RemoveAll(workDir)
+
+	parts := strings.Split(workDir, "/")
+	PathFlags.Repo = parts[1]
+	PathFlags.Remote = false
+	PathFlags.RepoDir = parts[0]
+
+	o := AttestOptions{
+		Key: "mykey",
+	}
+	verify = true
+	runner := fakeRunner{
+		envVar: "GO_TEST_ATTEST_VERIFY_OUTPUT",
+		cmd:    "-test.run=TestAttestVerifyOutput",
+	}
+
+	_, err = o.Run([]string{"image"}, runner)
+	assert.NoError(t, err)
 }
 
 func TestDryRunCmd(t *testing.T) {
 	if os.Getenv("GO_TEST_DRYRUN") != "1" {
 		return
 	}
-	fmt.Printf("%s", flag.Args())
+	fmt.Printf("%s\n", flag.Args())
 	os.Exit(0)
 }
 
-func (r FakeRunner) CreateCmd() utils.CreateCmd {
+func TestAttestVerifyOutput(t *testing.T) {
+	if os.Getenv("GO_TEST_ATTEST_VERIFY_OUTPUT") != "1" {
+		return
+	}
+	path := "../cosign-verify-output.txt"
+	output, err := os.ReadFile(path)
+
+	if err != nil {
+		fmt.Print("fail")
+		t.Fatalf("could not read testdata file: %s", err)
+	}
+	fmt.Printf("%s", output)
+	os.Exit(0)
+}
+
+func (r fakeRunner) CreateCmd() utils.CreateCmd {
 	return func(command string, args ...string) *exec.Cmd {
-		cs := []string{"-test.run=TestDryRunCmd", "--", command}
+		cs := []string{r.cmd, "--", command}
 		cs = append(cs, args...)
 		cmd := exec.Command(os.Args[0], cs...)
-		cmd.Env = []string{"GO_TEST_DRYRUN=1"}
+		cmd.Env = []string{r.envVar + "=1"}
 		return cmd
 	}
 }
