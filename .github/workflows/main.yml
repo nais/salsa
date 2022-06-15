@@ -1,62 +1,55 @@
 name: Salsa build & release
-
 on:
   push:
-    branches:
-      - main
     paths-ignore:
       - '**.md'
-
+      - 'CODEOWNERS'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'doc/**'
+      - 'Makefile'
 concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: true
-
 env:
   VERSION: v0.1
   IMAGE_NAME: ghcr.io/${{ github.repository }}
   COSIGN_VERSION: v1.8.0
   SYFT_VERSION: v0.44.1
-
+  GO_RELEASER_VERSION: v1.9.1
+  GRADLE_VERSION: 7.3.3
 jobs:
   set-version:
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-20.04
     outputs:
       version: ${{ steps.set-version.outputs.version }}
     steps:
-      - uses: actions/checkout@v3
-
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # ratchet:actions/checkout@v3
       - name: set version
         id: set-version
         run: |
           echo Faking a Semantic Version
           echo ::set-output name=version::${{ env.VERSION }}.$(date "+%Y%m%d%H%M%S")
-
   test:
-    needs:
-      - set-version
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
-
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # ratchet:actions/checkout@v3
       - name: Extract version of Go to use
         run: echo "GOVERSION=$(cat go.mod | grep -w "go" | awk ' { print $2 } ' | grep -w "^[^v]")" >> $GITHUB_ENV
-
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@bfdd3570ce990073878bf10f6b2d79082de49492 # ratchet:actions/setup-go@v2
         with:
           go-version: ${{ env.GOVERSION }}
-
       - name: Cache Go modules
-        uses: actions/cache@v3
+        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 # ratchet:actions/cache@v3
         id: go-mod-cache
         with:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
-
       - name: Test Salsa
         run: make test
-
   build:
     outputs:
       cli-tag: ${{ steps.container-tags.outputs.cli-tag }}
@@ -67,89 +60,73 @@ jobs:
       - test
     runs-on: ubuntu-20.04
     steps:
-
       - name: Checkout latest code
-        uses: actions/checkout@v3
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # ratchet:actions/checkout@v3
         with:
           fetch-depth: 0
-
       - name: Extract version of Go to use
         run: echo "GOVERSION=$(cat go.mod | grep -w "go" | awk ' { print $2 } ' | grep -w "^[^v]")" >> $GITHUB_ENV
-
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@bfdd3570ce990073878bf10f6b2d79082de49492 # ratchet:actions/setup-go@v2
         with:
           go-version: ${{ env.GOVERSION }}
-
       - name: Create tag
         run: |
           git tag ${{ needs.set-version.outputs.version }}
-
       #      - uses: navikt/github-app-token-generator@v1
       #        id: get-homebrew-token
       #        with:
       #          private-key: ${{ secrets.NAIS_APP_PRIVATE_KEY }}
       #          app-id: ${{ secrets.NAIS_APP_ID }}
       #          repo: nais/homebrew-tap
-
       - name: Install cosign
-        uses: sigstore/cosign-installer@v2.3.0
+        uses: sigstore/cosign-installer@536b37ec5d5b543420bdfd9b744c5965bd4d8730 # ratchet:sigstore/cosign-installer@v2.3.0
         with:
           cosign-release: ${{ env.COSIGN_VERSION }}
-
       - name: Install Syft
-        uses: anchore/sbom-action/download-syft@v0.11.0
+        uses: anchore/sbom-action@bb716408e75840bbb01e839347cd213767269d4a # ratchet:anchore/sbom-action/download-syft@v0.11.0
         with:
           syft-version: ${{ env.SYFT_VERSION }}
-
       - name: Put key on file
         run: |
           echo '${{ secrets.COSIGN_PRIVATE_KEY }}' > cosign.key
-
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v2
+        uses: goreleaser/goreleaser-action@68acf3b1adf004ac9c2f0a4259e85c5f66e99bef # ratchet:goreleaser/goreleaser-action@v3
         with:
           distribution: goreleaser
-          version: v1.8.3
+          version: ${{ env.GO_RELEASER_VERSION }}
           args: release -f .goreleaser.yml --rm-dist --debug
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PUSH_TOKEN: ${{ steps.get-homebrew-token.outputs.token }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
+        uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6 # ratchet:docker/setup-buildx-action@v2
       - name: Login to Docker
-        uses: docker/login-action@v2
+        uses: docker/login-action@49ed152c8eca782a232dede0303416e8f356c37b # ratchet:docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Create tags
         id: container-tags
         run: |
           echo ::set-output name=cli-tag::${{ env.IMAGE_NAME }}:${{ needs.set-version.outputs.version }}
           echo ::set-output name=action-tag::${{ env.IMAGE_NAME }}:${{ env.VERSION }}
-
       - name: Build and push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@e551b19e49efd4e98792db7592c17c09b89db8d8 # ratchet:docker/build-push-action@v3
         with:
           push: true
           tags: ${{ steps.container-tags.outputs.cli-tag }},${{ steps.container-tags.outputs.action-tag }}
           labels: version=${{ needs.set-version.outputs.version }},revision=${{ github.sha }}
-
+          build-args: |
+            COSIGN_VERSION=${{ env.COSIGN_VERSION }}
+            GRADLE_VERSION=${{ env.GRADLE_VERSION }}
       - name: Update major/minor version tag
-        run: |
-          git tag -f ${{ env.VERSION }}
-          git push -f origin ${{ env.VERSION }} 
-
+        run: "git tag -f ${{ env.VERSION }}\ngit push -f origin ${{ env.VERSION }} \n"
       - name: Clean up
         if: ${{ always() }}
-        run: |
-          rm -f cosign.key 
-
+        run: "rm -f cosign.key \n"
   sign-attest:
     needs:
       - build
@@ -159,22 +136,19 @@ jobs:
       ACTION_IMAGE_TAG: "${{ needs.build.outputs.action-tag }}"
     steps:
       - name: Install cosign
-        uses: sigstore/cosign-installer@v2.3.0
+        uses: sigstore/cosign-installer@536b37ec5d5b543420bdfd9b744c5965bd4d8730 # ratchet:sigstore/cosign-installer@v2.3.0
         with:
           cosign-release: ${{ env.COSIGN_VERSION }}
-
       - name: Install Syft
-        uses: anchore/sbom-action/download-syft@v0.11.0
+        uses: anchore/sbom-action@bb716408e75840bbb01e839347cd213767269d4a # ratchet:anchore/sbom-action/download-syft@v0.11.0
         with:
           syft-version: ${{ env.SYFT_VERSION }}
-
       - name: Login to Docker
-        uses: docker/login-action@v2
+        uses: docker/login-action@49ed152c8eca782a232dede0303416e8f356c37b # ratchet:docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Sign Docker image
         run: |
           echo '${{ secrets.COSIGN_PRIVATE_KEY }}' > cosign.key
@@ -182,7 +156,6 @@ jobs:
           cosign sign --key cosign.key ${{ env.ACTION_IMAGE_TAG }}
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-
       - name: Verify and attach attestation
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
@@ -193,23 +166,20 @@ jobs:
           syft attest -o spdx-json ${{ env.CLI_IMAGE_TAG }} > sbom-cli.json
           cosign attach attestation --attestation sbom-cli.json ${{ env.CLI_IMAGE_TAG }}
           cosign verify-attestation --key cosign.pub ${{ env.CLI_IMAGE_TAG }}  > cosignverify-cli.json
-          
+
           cosign verify --key cosign.pub ${{ env.ACTION_IMAGE_TAG }}
           syft attest -o spdx-json ${{ env.ACTION_IMAGE_TAG }} > sbom-action.json
           cosign attach attestation --attestation sbom-action.json ${{ env.ACTION_IMAGE_TAG }}
           cosign verify-attestation --key cosign.pub ${{ env.ACTION_IMAGE_TAG }}  > cosignverify-action.json
-
       - name: Upload provenance
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # ratchet:actions/upload-artifact@v3
         with:
           path: |
             ./sbom-cli.json
             ./sbom-action.json
             ./cosignverify-cli.json
             ./cosignverify-action.json
-
       - name: Clean up
         if: ${{ always() }}
         run: |
           rm -f cosign.key
-      

@@ -75,7 +75,6 @@ changelog:
 release:
   prerelease: allow
   draft: true
-  mode: append
   github:
     owner: nais
     name: salsa

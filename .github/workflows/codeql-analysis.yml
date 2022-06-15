@@ -1,0 +1,36 @@
+name: CodeQL
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'CODEOWNERS'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'doc/**'
+      - 'Makefile'
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['go']
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # ratchet:actions/checkout@v3
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2 # ratchet:exclude
+        with:
+          languages: ${{ matrix.language }}
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2 # ratchet:exclude
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2 # ratchet:exclude

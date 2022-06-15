@@ -1,6 +1,5 @@
 #!/bin/sh -l
 
-# DIRECTORY="$1"
 REPO_NAME="${INPUT_REPO_NAME##*/}"
 # REPO_DIR="${INPUT_REPO_DIR%/*}"
 
@@ -42,5 +41,7 @@ salsa scan \
     --subDir "$INPUT_REPO_SUB_DIR" \
     --remote-run \
     --key "$INPUT_KEY" \
-    "$IMAGE" &&
-  docker logout "$DOCKER_REGISTRY"
+    "$IMAGE" && echo "clean up..." && docker logout "$DOCKER_REGISTRY" &&
+  if [ -n "$GOOGLE_APPLICATION_CREDENTIALS" ]; then
+    rm "$GOOGLE_APPLICATION_CREDENTIALS"
+  fi

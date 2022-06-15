@@ -39,7 +39,7 @@ RUN mkdir -p /usr/share/gradle /usr/share/gradle/ref \
   && ln -s /usr/share/gradle/gradle-${GRADLE_VERSION} /usr/bin/gradle
 
 # Define environmental variables required by gradle
-ENV GRADLE_VERSION 7.3.3
+ENV GRADLE_VERSION ${GRADLE_VERSION}
 ENV GRADLE_HOME /usr/bin/gradle
 ENV GRADLE_USER_HOME /cache
 ENV PATH $PATH:$GRADLE_HOME/bin
@@ -50,7 +50,7 @@ COPY --from=builder /src/salsa-sample.yaml .salsa.yaml
 RUN chmod +x /usr/local/bin/salsa
 
 # Verify and install Cosign
-ENV COSIGN_VERSION=v1.8.0
+ARG COSIGN_VERSION=v1.8.0
 ENV COSIGN_BINARY=cosign-linux-amd64
 ENV COSIGN_CHECKSUM=cosign_checksums.txt
 ENV COSIGN_PUBLIC_KEY=release-cosign.pub

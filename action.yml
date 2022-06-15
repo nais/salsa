@@ -7,49 +7,51 @@ inputs:
 
   repo_dir:
     description: |-
-      Internal value (do not set): Root of directory to look for build files.
-      Defaults to $GITHUB_WORKSPACE.
+      Internal value (do not set): root of directory to search for build files.
+      Defaults to "github.workspace".
     required: false
     default: ${{ github.workspace }}
 
   repo_sub_dir:
     description: |-
-      Specify a sub directory if build file not found in working root directory
+      Specify a subdirectory if build file not found in working root directory.
     required: false
     default: ""
 
   repo_name:
     description: |-
-      Name of the file and path to provenance. Used as an relative path under $GITHUB_WORKSPACE.
+      Name of the generated provenance. Used as an relative path under "github.workspace".
       Defaults to "github.repository".
     required: false
     default: ${{ github.repository }}
 
   key:
     description: |-
-      The key used to sign the attestation
+      The key used to sign the attestation.
     required: true
 
   docker_user:
     description: |-
-      User to login to docker. Use by default "github.actor".
+      Docker login user. 
+      Defaults to "github.actor".
     required: false
     default: ""
 
   docker_pwd:
     description: |-
-      Pwd to login to docker
+      Docker login password.
     required: true
 
   dependencies:
     description: |-
-      if the provenance should contain dependecies
+      If salsa should generate materials for the provenance containing dependencies.
+      Defaults to true.
     required: false
     default: "true"
 
   image:
     description: |-
-      docker image to sign.
+      The docker container to sign.
     required: false
     default: ""
 
