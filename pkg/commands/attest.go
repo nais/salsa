@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
+	"strconv"
 	"strings"
 
 	"github.com/nais/salsa/pkg/utils"
@@ -23,115 +23,117 @@ type AttestOptions struct {
 
 var verify bool
 
+type AttestCmd interface {
+	Run(args []string, runner utils.CmdRunner) error
+}
+
 var attestCmd = &cobra.Command{
 	Use:   "attest",
 	Short: "sign and upload in-toto attestation",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		var attest AttestOptions
-		err := viper.Unmarshal(&attest)
+		var options AttestOptions
+		err := viper.Unmarshal(&options)
 		if err != nil {
 			return err
 		}
 
-		if PathFlags.Repo == "" {
-			return errors.New("repo name must be specified")
+		_, err = options.Run(args, utils.ExecCmd{})
+		if err != nil {
+			return err
 		}
-
-		if attest.PredicateFile == "" {
-			file := utils.ProvenanceFile(PathFlags.Repo)
-			log.Infof("no predicate specified, using default pattern %s", file)
-			attest.PredicateFile = file
-		}
-
-		workDir := PathFlags.WorkDir()
-		s := utils.StartSpinner(fmt.Sprintf("finished attestation for %s\n", PathFlags.Repo))
-		filePath := fmt.Sprintf("%s/%s.%s", workDir, PathFlags.Repo, "att")
-		// TODO: could be a subcommand e.g bin/salsa attest verify
-		if verify {
-			raw, err := attest.Verify(args)
-			if err != nil {
-				return err
-			}
-			docs := strings.Split(raw, "\n")
-			if len(docs) > 0 {
-				// TODO: fix so that we dont have to make this assumption
-				//remove last line which is a newline
-				docs := docs[:len(docs)-1]
-				doc := docs[len(docs)-1]
-
-				err = os.WriteFile(filePath, []byte(doc), os.FileMode(0755))
-				if err != nil {
-					return fmt.Errorf("could not write file %s %w", filePath, err)
-				}
-
-				err := os.WriteFile(fmt.Sprintf("%s/%s.%s", workDir, PathFlags.Repo, "raw.txt"), []byte(raw), os.FileMode(0755))
-				if err != nil {
-					return fmt.Errorf("could not write file %s %w", workDir, err)
-				}
-			} else {
-				log.Infof("no attestations found from cosign verify-attest command")
-			}
-		} else {
-			out, err := attest.Exec(args)
-			if err != nil {
-				return err
-			}
-			if attest.NoUpload {
-				err = os.WriteFile(filePath, []byte(out), os.FileMode(0755))
-				if err != nil {
-					return fmt.Errorf("could not write file %s %w", filePath, err)
-				}
-			}
-		}
-		s.Stop()
 		return nil
 	},
 }
 
-func (o AttestOptions) Verify(a []string) (string, error) {
-	err := utils.RequireCommand("cosign")
-	if err != nil {
-		return "", err
+func (o AttestOptions) Run(args []string, runner utils.CmdRunner) (string, error) {
+	if PathFlags.Repo == "" {
+		return "", errors.New("repo name must be specified")
 	}
-	args := []string{
-		"verify-attestation",
-		"--key", o.Key,
+
+	if o.PredicateFile == "" {
+		file := utils.ProvenanceFile(PathFlags.Repo)
+		log.Infof("no predicate specified, using default pattern %s", file)
+		o.PredicateFile = file
 	}
-	args = append(args, a...)
 
-	cmd := exec.Command(
-		"cosign",
-		args...,
-	)
+	workDir := PathFlags.WorkDir()
+	s := utils.StartSpinner(fmt.Sprintf("finished attestation for %s\n", PathFlags.Repo))
+	defer s.Stop()
+	filePath := fmt.Sprintf("%s/%s.%s", workDir, PathFlags.Repo, "att")
+	// TODO: could be a subcommand e.g bin/salsa attest verify
+	if verify {
+		cmd := o.verifyCmd(args, runner)
+		out, err := cmd.Run()
+		if err != nil {
+			return "", err
+		}
+		docs := strings.Split(out, "\n")
+		if len(docs) > 0 {
+			// TODO: fix so that we dont have to make this assumption
+			//remove last line which is a newline
+			docs := docs[:len(docs)-1]
+			if len(docs) == 0 {
+				return "", fmt.Errorf("unexpected output from cosign command: %s", out)
+			}
 
-	cmd.Dir = PathFlags.WorkDir()
-	return utils.Exec(cmd)
+			doc := docs[len(docs)-1]
+
+			err = os.WriteFile(filePath, []byte(doc), os.FileMode(0755))
+			if err != nil {
+				return "", fmt.Errorf("could not write file %s %w", filePath, err)
+			}
+
+			err := os.WriteFile(fmt.Sprintf("%s/%s.%s", workDir, PathFlags.Repo, "raw.txt"), []byte(out), os.FileMode(0755))
+			if err != nil {
+				return "", fmt.Errorf("could not write file %s %w", workDir, err)
+			}
+		} else {
+			log.Infof("no attestations found from cosign verify-attest command")
+		}
+		return out, nil
+	} else {
+		cmd := o.attestCmd(args, runner)
+		out, err := cmd.Run()
+
+		if err != nil {
+			return "", err
+		}
+		if o.NoUpload {
+			err = os.WriteFile(filePath, []byte(out), os.FileMode(0755))
+			if err != nil {
+				return "", fmt.Errorf("could not write file %s %w", filePath, err)
+			}
+		}
+		return out, nil
+	}
 }
 
-func (o AttestOptions) Exec(a []string) (string, error) {
-	err := utils.RequireCommand("cosign")
-	if err != nil {
-		return "", err
+func (o AttestOptions) verifyCmd(a []string, runner utils.CmdRunner) utils.Cmd {
+	return utils.Cmd{
+		Name:    "cosign",
+		SubCmd:  "verify-attestation",
+		Flags:   []string{"--key", o.Key},
+		Args:    a,
+		WorkDir: PathFlags.WorkDir(),
+		Runner:  runner,
 	}
-	args := []string{
-		"attest",
-		"--type", o.PredicateType,
-		"--predicate", o.PredicateFile,
-		"--key", o.Key,
-		"--rekor-url", o.RekorURL,
-	}
-	if o.NoUpload {
-		args = append(args, "--no-upload")
-	}
-	args = append(args, a...)
+}
 
-	cmd := exec.Command(
-		"cosign",
-		args...,
-	)
-
-	cmd.Dir = PathFlags.WorkDir()
-	return utils.Exec(cmd)
+func (o AttestOptions) attestCmd(a []string, runner utils.CmdRunner) utils.Cmd {
+	return utils.Cmd{
+		Name:   "cosign",
+		SubCmd: "attest",
+		Flags: []string{
+			"--key", o.Key,
+			"--predicate", o.PredicateFile,
+			"--type", o.PredicateType,
+			"--rekor-url", o.RekorURL,
+			fmt.Sprintf("--no-upload=%s", strconv.FormatBool(o.NoUpload)),
+		},
+		Args:    a,
+		WorkDir: PathFlags.WorkDir(),
+		Runner:  runner,
+	}
 }
 
 func init() {
