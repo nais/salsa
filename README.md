@@ -1,7 +1,7 @@
 <br />
 <div align="center">
 <a href="https://github.com/nais/salsa">
-    <img src="https://slsa.dev/images/SLSA-Badge-full-level2.svg"/>
+    <img src="https://slsa.dev/images/SLSA-Badge-full-level3.svg"/>
  </a>
     <h2 align="center">nais SLSA Provenance Action</h2>
 </div>
@@ -32,8 +32,8 @@ Supply chain Levels for Software Artifacts, or [SLSA](https://slsa.dev) (pronoun
 standards, guidelines etc.) to prevent tampering, improve integrity, and secure packages and infrastructure in your
 projects, businesses or enterprises.
 
-The action implements the [level 2](https://slsa.dev/spec/v0.1/levels) requirements of
-the [SLSA Framework](https://slsa.dev)
+The action implements the [level 3](https://slsa.dev/spec/v0.1/levels) requirements of
+the [SLSA Framework](https://slsa.dev) (as long as it is run in an ephemeral environment) 
 producing a signed software [attestation](https://github.com/slsa-framework/slsa/blob/main/controls/attestations.md) of
 your build and dependencies. The attestation is signed and uploaded to your container registry
 using [cosign](https://github.com/sigstore/cosign)
