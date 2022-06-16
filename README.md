@@ -1,7 +1,7 @@
 <br />
 <div align="center">
 <a href="https://github.com/nais/salsa">
-    <img src="https://slsa.dev/images/SLSA-Badge-full-level2.svg"/>
+    <img src="https://slsa.dev/images/SLSA-Badge-full-level3.svg"/>
  </a>
     <h2 align="center">nais SLSA Provenance Action</h2>
 </div>
