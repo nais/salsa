@@ -32,9 +32,9 @@ setup() {
     exit 1
   fi
 
-  GITHUB=$(echo "${INPUT_GITHUB_CONTEXT}" | base64 -b 0) &&
-    RUNNER=$(echo "${INPUT_RUNNER_CONTEXT}" | base64 -b 0) &&
-    ENVS=$(jq -n env | base64 -b 0)
+  GITHUB=$(echo "${INPUT_GITHUB_CONTEXT}" | base64 -w 0) &&
+    RUNNER=$(echo "${INPUT_RUNNER_CONTEXT}" | base64 -w 0) &&
+    ENVS=$(jq -n env | base64 -w 0)
 
   DOCKER_REGISTRY="${IMAGE%%/*}"
   if [ -z "$DOCKER_REGISTRY" ]; then

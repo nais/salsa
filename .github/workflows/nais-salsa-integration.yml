@@ -5,7 +5,7 @@ on:
     types: [completed]
     branches: [main]
 env:
-  IMAGE: ttl.sh/nais/salsa-test:1h
+  IMAGE: ttl.sh/nais/salsa-integration-test:1h
 jobs:
   on-failure:
     runs-on: ubuntu-20.04
@@ -30,6 +30,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@e551b19e49efd4e98792db7592c17c09b89db8d8 # ratchet:docker/build-push-action@v3
         with:
+          context: integration-test
           push: true
           tags: ${{ env.IMAGE }}
       # Added to a workflow
