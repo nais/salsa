@@ -41,7 +41,7 @@ jobs:
         with:
           go-version: ${{ env.GOVERSION }}
       - name: Cache Go modules
-        uses: actions/cache@c3f1317a9e7b1ef106c153ac8c0f00fed3ddbc0d # ratchet:actions/cache@v3
+        uses: actions/cache@0865c47f36e68161719c5b124609996bb5c40129 # ratchet:actions/cache@v3
         id: go-mod-cache
         with:
           path: ~/go/pkg/mod
