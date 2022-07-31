@@ -28,7 +28,7 @@ jobs:
           credentials_json: ${{ secrets.SALSA_CREDENTIALS }}
       # For demonstration purpose
       - name: Build and push
-        uses: docker/build-push-action@e551b19e49efd4e98792db7592c17c09b89db8d8 # ratchet:docker/build-push-action@v3
+        uses: docker/build-push-action@1cb9d22b932e4832bb29793b7777ec860fc1cde0 # ratchet:docker/build-push-action@v3
         with:
           context: integration-test
           push: true
