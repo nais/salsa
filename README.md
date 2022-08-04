@@ -37,7 +37,11 @@ the [SLSA Framework](https://slsa.dev) (as long as it is run in an ephemeral env
 producing a signed software [attestation](https://github.com/slsa-framework/slsa/blob/main/controls/attestations.md) of
 your build and dependencies. The attestation is signed and uploaded to your container registry
 using [cosign](https://github.com/sigstore/cosign)
-and can be verified by the salsa cli (also provided in this repo) or using the `cosign verify-attestation` command.
+and can be verified by the salsa cli (also provided in this repo) or using the `cosign verify-attestation` command. 
+
+Verification requires access to the corresponding public keys. The keys for the [navikt](https://nais.io/slsakeys/navikt.pub) and 
+[nais](https://nais.io/slsakeys/nais.pub) organizations can be found at our website (for now), if you use this action at other 
+organizations you need to host your keys somewhere appropriate.
 
 > Disclaimer:
 This is not an official GitHub Action maintained by the SLSA team. It is created by the [nais.io](https://nais.io) team for the purpose of securing supply chains in [NAV](https://github.com/navikt). However we encourage other organizations/users to use it and even contribute as it is built with open source in mind.
