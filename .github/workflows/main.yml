@@ -114,7 +114,7 @@ jobs:
           echo ::set-output name=cli-tag::${{ env.IMAGE_NAME }}:${{ needs.set-version.outputs.version }}
           echo ::set-output name=action-tag::${{ env.IMAGE_NAME }}:${{ env.VERSION }}
       - name: Build and push
-        uses: docker/build-push-action@1cb9d22b932e4832bb29793b7777ec860fc1cde0 # ratchet:docker/build-push-action@v3
+        uses: docker/build-push-action@c84f38281176d4c9cdb1626ffafcd6b3911b5d94 # ratchet:docker/build-push-action@v3
         with:
           push: true
           tags: ${{ steps.container-tags.outputs.cli-tag }},${{ steps.container-tags.outputs.action-tag }}
