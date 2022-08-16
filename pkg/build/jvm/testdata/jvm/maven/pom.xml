@@ -11,7 +11,7 @@
     <properties>
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <google.version>2.8.6</google.version>
+        <google.version>2.9.0</google.version>
     </properties>
 
     <dependencies>
