@@ -21,7 +21,7 @@ ARG GRADLE_VERSION=7.5.1
 ARG GRADLE_BASE_URL=https://services.gradle.org/distributions
 # Define the SHA key to validate the gradle download
 # obtained from here https://gradle.org/release-checksums/
-ARG GRADLE_SHA=b586e04868a22fd817c8971330fec37e298f3242eb85c374181b12d637f80302
+ARG GRADLE_SHA=f6b8596b10cce501591e92f229816aa4046424f3b24d771751b06779d58c8ec4
 
 # Create the directories, download gradle, validate the download, install it, remove downloaded file and set links
 RUN mkdir -p /usr/share/gradle /usr/share/gradle/ref \
