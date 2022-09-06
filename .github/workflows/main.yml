@@ -18,6 +18,7 @@ env:
   SYFT_VERSION: v0.55.0
   GO_RELEASER_VERSION: v1.11.2
   GRADLE_VERSION: 7.5.1
+  PUSH: false
 jobs:
   set-version:
     if: ${{ github.ref == 'refs/heads/main' }}
@@ -54,7 +55,6 @@ jobs:
     outputs:
       cli-tag: ${{ steps.container-tags.outputs.cli-tag }}
       action-tag: ${{ steps.container-tags.outputs.action-tag }}
-    if: ${{ github.ref == 'refs/heads/main' }}
     needs:
       - set-version
       - test
@@ -113,10 +113,16 @@ jobs:
         run: |
           echo ::set-output name=cli-tag::${{ env.IMAGE_NAME }}:${{ needs.set-version.outputs.version }}
           echo ::set-output name=action-tag::${{ env.IMAGE_NAME }}:${{ env.VERSION }}
+
+      - name: Only push from main
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: |
+          echo "PUSH=true" >> $GITHUB_ENV
+
       - name: Build and push
         uses: docker/build-push-action@c84f38281176d4c9cdb1626ffafcd6b3911b5d94 # ratchet:docker/build-push-action@v3
         with:
-          push: true
+          push: ${{ env.PUSH }}
           tags: ${{ steps.container-tags.outputs.cli-tag }},${{ steps.container-tags.outputs.action-tag }}
           labels: version=${{ needs.set-version.outputs.version }},revision=${{ github.sha }}
           build-args: |
@@ -131,6 +137,7 @@ jobs:
     needs:
       - build
     runs-on: ubuntu-20.04
+    if: ${{ github.ref == 'refs/heads/main' }}
     env:
       CLI_IMAGE_TAG: "${{ needs.build.outputs.cli-tag }}"
       ACTION_IMAGE_TAG: "${{ needs.build.outputs.action-tag }}"
