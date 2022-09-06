@@ -21,7 +21,6 @@ env:
   PUSH: false
 jobs:
   set-version:
-    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-20.04
     outputs:
       version: ${{ steps.set-version.outputs.version }}
