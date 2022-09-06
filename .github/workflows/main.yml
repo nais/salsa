@@ -90,6 +90,7 @@ jobs:
         run: |
           echo '${{ secrets.COSIGN_PRIVATE_KEY }}' > cosign.key
       - name: Run GoReleaser
+        if: ${{ github.ref == 'refs/heads/main' }}
         uses: goreleaser/goreleaser-action@ff11ca24a9b39f2d36796d1fbd7a4e39c182630a # ratchet:goreleaser/goreleaser-action@v3
         with:
           distribution: goreleaser
