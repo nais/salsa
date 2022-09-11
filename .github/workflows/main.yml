@@ -15,7 +15,7 @@ env:
   VERSION: v0.1
   IMAGE_NAME: ghcr.io/${{ github.repository }}
   COSIGN_VERSION: v1.9.0
-  SYFT_VERSION: v0.55.0
+  SYFT_VERSION: v0.44.1
   GO_RELEASER_VERSION: v1.11.2
   GRADLE_VERSION: 7.5.1
   PUSH: false
@@ -169,16 +169,16 @@ jobs:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
           echo '${{ secrets.COSIGN_PUBLIC_KEY }}' > cosign.pub
-          # cosign verify --key cosign.pub ${{ env.CLI_IMAGE_TAG }}
+          cosign verify --key cosign.pub ${{ env.CLI_IMAGE_TAG }}
 
           syft attest -o spdx-json ${{ env.CLI_IMAGE_TAG }} > sbom-cli.json
           cosign attach attestation --attestation sbom-cli.json ${{ env.CLI_IMAGE_TAG }}
-          # cosign verify-attestation --key cosign.pub ${{ env.CLI_IMAGE_TAG }}  > cosignverify-cli.json
+          cosign verify-attestation --key cosign.pub ${{ env.CLI_IMAGE_TAG }}  > cosignverify-cli.json
 
           cosign verify --key cosign.pub ${{ env.ACTION_IMAGE_TAG }}
           syft attest -o spdx-json ${{ env.ACTION_IMAGE_TAG }} > sbom-action.json
           cosign attach attestation --attestation sbom-action.json ${{ env.ACTION_IMAGE_TAG }}
-          # cosign verify-attestation --key cosign.pub ${{ env.ACTION_IMAGE_TAG }}  > cosignverify-action.json
+          cosign verify-attestation --key cosign.pub ${{ env.ACTION_IMAGE_TAG }}  > cosignverify-action.json
       - name: Upload provenance
         uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # ratchet:actions/upload-artifact@v3
         with:
