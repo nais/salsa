@@ -172,12 +172,12 @@ jobs:
 
           syft attest -o spdx-json ${{ env.CLI_IMAGE_TAG }} > sbom-cli.json
           cosign attach attestation --attestation sbom-cli.json ${{ env.CLI_IMAGE_TAG }}
-          cosign verify-attestation --key cosign.pub ${{ env.CLI_IMAGE_TAG }}  > cosignverify-cli.json
+          # cosign verify-attestation --key cosign.pub ${{ env.CLI_IMAGE_TAG }}  > cosignverify-cli.json
 
           cosign verify --key cosign.pub ${{ env.ACTION_IMAGE_TAG }}
           syft attest -o spdx-json ${{ env.ACTION_IMAGE_TAG }} > sbom-action.json
           cosign attach attestation --attestation sbom-action.json ${{ env.ACTION_IMAGE_TAG }}
-          cosign verify-attestation --key cosign.pub ${{ env.ACTION_IMAGE_TAG }}  > cosignverify-action.json
+          # cosign verify-attestation --key cosign.pub ${{ env.ACTION_IMAGE_TAG }}  > cosignverify-action.json
       - name: Upload provenance
         uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # ratchet:actions/upload-artifact@v3
         with:
