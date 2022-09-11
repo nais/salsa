@@ -23,7 +23,7 @@ jobs:
       # Credentials needed to authenticate to google kms and sign image.
       - name: Authenticate to Google Cloud
         id: google
-        uses: google-github-actions/auth@ceee102ec2387dd9e844e01b530ccd4ec87ce955 # ratchet:google-github-actions/auth@v0
+        uses: google-github-actions/auth@dac4e13deb3640f22e3ffe758fd3f95e6e89f712 # ratchet:google-github-actions/auth@v0
         with:
           credentials_json: ${{ secrets.SALSA_CREDENTIALS }}
       # For demonstration purpose
