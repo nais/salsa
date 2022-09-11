@@ -14,7 +14,7 @@ concurrency:
 env:
   VERSION: v0.1
   IMAGE_NAME: ghcr.io/${{ github.repository }}
-  COSIGN_VERSION: v1.11.1
+  COSIGN_VERSION: v1.9.0
   SYFT_VERSION: v0.55.0
   GO_RELEASER_VERSION: v1.11.2
   GRADLE_VERSION: 7.5.1
