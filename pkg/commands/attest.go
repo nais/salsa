@@ -110,9 +110,12 @@ func (o AttestOptions) Run(args []string, runner utils.CmdRunner) (string, error
 
 func (o AttestOptions) verifyCmd(a []string, runner utils.CmdRunner) utils.Cmd {
 	return utils.Cmd{
-		Name:    "cosign",
-		SubCmd:  "verify-attestation",
-		Flags:   []string{"--key", o.Key},
+		Name:   "cosign",
+		SubCmd: "verify-attestation",
+		Flags: []string{
+			"--key", o.Key,
+			"--type", o.PredicateType,
+		},
 		Args:    a,
 		WorkDir: PathFlags.WorkDir(),
 		Runner:  runner,
