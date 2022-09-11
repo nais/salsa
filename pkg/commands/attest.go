@@ -15,7 +15,6 @@ import (
 
 type AttestOptions struct {
 	Key           string `mapstructure:"key"`
-	Token         string `mapstructure:"identity-token"`
 	NoUpload      bool   `mapstructure:"no-upload"`
 	RekorURL      string `mapstructure:"rekor-url"`
 	PredicateFile string `mapstructure:"predicate"`
@@ -109,22 +108,28 @@ func (o AttestOptions) Run(args []string, runner utils.CmdRunner) (string, error
 	}
 }
 
-func (o AttestOptions) verifyCmd(a []string, runner utils.CmdRunner, certPath string) utils.Cmd {
+func (o AttestOptions) verifyCmd(a []string, runner utils.CmdRunner) utils.Cmd {
 	return utils.Cmd{
 		Name:    "cosign",
 		SubCmd:  "verify-attestation",
-		Flags:   o.verifyFlags(certPath),
+		Flags:   o.verifyFlags(),
 		Args:    a,
 		WorkDir: PathFlags.WorkDir(),
 		Runner:  runner,
 	}
 }
 
-func (o AttestOptions) verifyFlags(certPath string) []string {
+func (o AttestOptions) verifyFlags() []string {
 	if o.Key == "" {
-		return []string{"--cert", certPath}
+		return []string{
+			"--type",
+			o.PredicateType,
+		}
 	}
-	return []string{"--key", o.Key}
+	return []string{
+		"--key", o.Key,
+		"--type", o.PredicateType,
+	}
 }
 
 func (o AttestOptions) attestCmd(a []string, runner utils.CmdRunner) utils.Cmd {
@@ -146,7 +151,7 @@ func (o AttestOptions) attestCmd(a []string, runner utils.CmdRunner) utils.Cmd {
 func (o AttestOptions) attestFlags() ([]string, error) {
 	var flags []string
 
-	if o.Token == "" {
+	if o.Key != "" {
 		flags = []string{
 			"--key", o.Key,
 		}
@@ -158,8 +163,13 @@ func (o AttestOptions) attestFlags() ([]string, error) {
 		return nil, err
 	}
 
+	token, err := identityToken()
+	if err != nil {
+		return nil, err
+	}
+
 	flags = []string{
-		"--identity-token", o.Token,
+		"--identity-token", token,
 	}
 
 	return append(flags, o.defaultAttestFlags()...), nil
@@ -174,12 +184,19 @@ func (o AttestOptions) defaultAttestFlags() []string {
 	}
 }
 
+func identityToken() (string, error) {
+	content, err := os.ReadFile(os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
+	if err != nil {
+		return "", err
+	}
+
+	return string(content), err
+}
+
 func init() {
 	rootCmd.AddCommand(attestCmd)
 	attestCmd.Flags().String("key", "",
 		"path to the private key file, KMS URI or Kubernetes Secret")
-	attestCmd.Flags().String("identity-token", "",
-		"token to use for authentication when configuring cosign keyless mode")
 	attestCmd.Flags().BoolVar(&verify, "verify", false, "if true, verifies attestations - default is false")
 	attestCmd.Flags().Bool("no-upload", false,
 		"do not upload the generated attestation")
