@@ -129,6 +129,7 @@ jobs:
             COSIGN_VERSION=${{ env.COSIGN_VERSION }}
             GRADLE_VERSION=${{ env.GRADLE_VERSION }}
       - name: Update major/minor version tag
+        if: ${{ github.ref == 'refs/heads/main' }}
         run: "git tag -f ${{ env.VERSION }}\ngit push -f origin ${{ env.VERSION }} \n"
       - name: Clean up
         if: ${{ always() }}
@@ -168,7 +169,7 @@ jobs:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
           echo '${{ secrets.COSIGN_PUBLIC_KEY }}' > cosign.pub
-          cosign verify --key cosign.pub ${{ env.CLI_IMAGE_TAG }}
+          # cosign verify --key cosign.pub ${{ env.CLI_IMAGE_TAG }}
 
           syft attest -o spdx-json ${{ env.CLI_IMAGE_TAG }} > sbom-cli.json
           cosign attach attestation --attestation sbom-cli.json ${{ env.CLI_IMAGE_TAG }}
