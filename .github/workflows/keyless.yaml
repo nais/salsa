@@ -5,6 +5,9 @@ env:
   IMAGE: ttl.sh/nais/salsa-keyless-test:1h
 jobs:
   keyless:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout Code
