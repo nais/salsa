@@ -14,13 +14,13 @@ concurrency:
 env:
   VERSION: v0.1
   IMAGE_NAME: ghcr.io/${{ github.repository }}
-  COSIGN_VERSION: v1.9.0
-  SYFT_VERSION: v0.44.1
-  GO_RELEASER_VERSION: v1.9.1
-  GRADLE_VERSION: 7.3.3
+  COSIGN_VERSION: v1.11.1
+  SYFT_VERSION: v0.55.0
+  GO_RELEASER_VERSION: v1.11.2
+  GRADLE_VERSION: 7.5.1
+  PUSH: false
 jobs:
   set-version:
-    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-20.04
     outputs:
       version: ${{ steps.set-version.outputs.version }}
@@ -54,7 +54,6 @@ jobs:
     outputs:
       cli-tag: ${{ steps.container-tags.outputs.cli-tag }}
       action-tag: ${{ steps.container-tags.outputs.action-tag }}
-    if: ${{ github.ref == 'refs/heads/main' }}
     needs:
       - set-version
       - test
@@ -91,6 +90,7 @@ jobs:
         run: |
           echo '${{ secrets.COSIGN_PRIVATE_KEY }}' > cosign.key
       - name: Run GoReleaser
+        if: ${{ github.ref == 'refs/heads/main' }}
         uses: goreleaser/goreleaser-action@ff11ca24a9b39f2d36796d1fbd7a4e39c182630a # ratchet:goreleaser/goreleaser-action@v3
         with:
           distribution: goreleaser
@@ -113,10 +113,16 @@ jobs:
         run: |
           echo ::set-output name=cli-tag::${{ env.IMAGE_NAME }}:${{ needs.set-version.outputs.version }}
           echo ::set-output name=action-tag::${{ env.IMAGE_NAME }}:${{ env.VERSION }}
+
+      - name: Only push from main
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: |
+          echo "PUSH=true" >> $GITHUB_ENV
+
       - name: Build and push
         uses: docker/build-push-action@c84f38281176d4c9cdb1626ffafcd6b3911b5d94 # ratchet:docker/build-push-action@v3
         with:
-          push: true
+          push: ${{ env.PUSH }}
           tags: ${{ steps.container-tags.outputs.cli-tag }},${{ steps.container-tags.outputs.action-tag }}
           labels: version=${{ needs.set-version.outputs.version }},revision=${{ github.sha }}
           build-args: |
@@ -131,6 +137,7 @@ jobs:
     needs:
       - build
     runs-on: ubuntu-20.04
+    if: ${{ github.ref == 'refs/heads/main' }}
     env:
       CLI_IMAGE_TAG: "${{ needs.build.outputs.cli-tag }}"
       ACTION_IMAGE_TAG: "${{ needs.build.outputs.action-tag }}"
