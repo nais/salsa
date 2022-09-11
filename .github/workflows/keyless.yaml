@@ -30,10 +30,12 @@ jobs:
           tags: ${{ env.IMAGE }}
 
       - name: Print token
-        run: echo ${{ steps.google.outputs.id_token }}
+        run: |
+          echo "catting file:"
+          cat ${{ env.GOOGLE_GHA_CREDS_PATH }}
+          # echo "identity token = ${{ steps.google.outputs.id_token }}"
 
       - name: Generate provenance, upload and sign image
         uses: ./
         with:
-          identity_token: ${{ steps.google.outputs.id_token }}
           docker_pwd: ${{ secrets.GITHUB_TOKEN }}

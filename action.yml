@@ -30,12 +30,6 @@ inputs:
       The key used to sign the attestation. Cloud Provider KMS key path.
     required: false
 
-  identity_token:
-    description: |-
-      Use keyless signing with cosign and ephemeral keys and certificates, 
-      which are signed automatically by the fulcio root CA.
-    required: false
-
   docker_user:
     description: |-
       Docker login user. 

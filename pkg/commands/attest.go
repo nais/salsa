@@ -158,12 +158,12 @@ func (o AttestOptions) attestFlags() ([]string, error) {
 		return append(flags, o.defaultAttestFlags()...), nil
 	}
 
-	err := os.Setenv("COSIGN_EXPERIMENTAL", "1")
+	token, err := identityToken()
 	if err != nil {
 		return nil, err
 	}
 
-	token, err := identityToken()
+	err = os.Setenv("COSIGN_EXPERIMENTAL", "1")
 	if err != nil {
 		return nil, err
 	}
@@ -185,12 +185,12 @@ func (o AttestOptions) defaultAttestFlags() []string {
 }
 
 func identityToken() (string, error) {
-	content, err := os.ReadFile(os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
+	content, err := os.ReadFile(os.Getenv("GOOGLE_GHA_CREDS_PATH"))
 	if err != nil {
 		return "", err
 	}
 
-	return string(content), err
+	return strings.TrimSpace(string(content)), err
 }
 
 func init() {

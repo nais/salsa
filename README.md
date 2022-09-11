@@ -203,8 +203,8 @@ The Following inputs can be used as `step.with` keys
 
 | Name             | Type   | Default               | Description                                                                                                                                        | Required |
 |------------------|--------|:----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|----------|
-| `key`            | String | ""                    | Private key (cosign.key) or kms provider, used for signing the attestation                                                                         | True     |
 | `docker_pwd`     | String | ""                    | Password for docker                                                                                                                                | True     |
+| `key`            | String | ""                    | Private key (cosign.key) or kms provider, used for signing the attestation                                                                         | False    |
 | `image`          | String | $IMAGE                | The container image to create a attestation for                                                                                                    | False    |
 | `docker_user`    | String | github.actor          | User to login to container registry                                                                                                                | False    |
 | `repo_name`      | String | github.repository     | The name of the repo/project                                                                                                                       | False    |
