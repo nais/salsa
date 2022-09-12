@@ -159,6 +159,7 @@ func (o AttestOptions) attestFlags() ([]string, error) {
 		return append(flags, o.defaultAttestFlags()...), nil
 	}
 
+	log.Infof("no key specified, using cosign expriemental keyless mode")
 	err := os.Setenv("COSIGN_EXPERIMENTAL", "1")
 	if err != nil {
 		return nil, err
