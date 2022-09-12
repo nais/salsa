@@ -15,6 +15,7 @@ import (
 
 type AttestOptions struct {
 	Key           string `mapstructure:"key"`
+	IdentityToken string `mapstructure:"identity-token"`
 	NoUpload      bool   `mapstructure:"no-upload"`
 	RekorURL      string `mapstructure:"rekor-url"`
 	PredicateFile string `mapstructure:"predicate"`
@@ -120,15 +121,15 @@ func (o AttestOptions) verifyCmd(a []string, runner utils.CmdRunner) utils.Cmd {
 }
 
 func (o AttestOptions) verifyFlags() []string {
-	if o.Key == "" {
+	if o.Key != "" {
 		return []string{
-			"--type",
-			o.PredicateType,
+			"--key", o.Key,
+			"--type", o.PredicateType,
 		}
 	}
 	return []string{
-		"--key", o.Key,
-		"--type", o.PredicateType,
+		"--type",
+		o.PredicateType,
 	}
 }
 
@@ -158,18 +159,13 @@ func (o AttestOptions) attestFlags() ([]string, error) {
 		return append(flags, o.defaultAttestFlags()...), nil
 	}
 
-	token, err := identityToken()
-	if err != nil {
-		return nil, err
-	}
-
-	err = os.Setenv("COSIGN_EXPERIMENTAL", "1")
+	err := os.Setenv("COSIGN_EXPERIMENTAL", "1")
 	if err != nil {
 		return nil, err
 	}
 
 	flags = []string{
-		"--identity-token", token,
+		"--identity-token", o.IdentityToken,
 	}
 
 	return append(flags, o.defaultAttestFlags()...), nil
@@ -184,19 +180,12 @@ func (o AttestOptions) defaultAttestFlags() []string {
 	}
 }
 
-func identityToken() (string, error) {
-	content, err := os.ReadFile(os.Getenv("GOOGLE_GHA_CREDS_PATH"))
-	if err != nil {
-		return "", err
-	}
-
-	return strings.TrimSpace(string(content)), err
-}
-
 func init() {
 	rootCmd.AddCommand(attestCmd)
 	attestCmd.Flags().String("key", "",
 		"path to the private key file, KMS URI or Kubernetes Secret")
+	attestCmd.Flags().String("identity-token", "",
+		"use short lived secrets for cosign keyless authentication")
 	attestCmd.Flags().BoolVar(&verify, "verify", false, "if true, verifies attestations - default is false")
 	attestCmd.Flags().Bool("no-upload", false,
 		"do not upload the generated attestation")
