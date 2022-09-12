@@ -20,7 +20,7 @@ jobs:
           workload_identity_provider: ${{ secrets.SLSA_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: cosign-kms@plattformsikkerhet-dev-496e.iam.gserviceaccount.com
           token_format: "id_token"
-          id_token_audience: https://iam.googleapis.com/projects/347635826486/locations/global/workloadIdentityPools/slsa/providers/github
+          id_token_audience: ${{ secrets.SLSA_WORKLOAD_IDENTITY_PROVIDER }}
           id_token_include_email: true
 
       - name: Build and push
@@ -33,8 +33,8 @@ jobs:
       - name: Print token
         run: |
           echo "catting file:"
-          cat ${{ env.GOOGLE_GHA_CREDS_PATH }}
-          # echo "identity token = ${{ steps.google.outputs.id_token }}"
+          cat ${{ steps.google.outputs.credentials_file_path }}
+          echo "identity token = ${{ steps.google.outputs.id_token }}"
 
       - name: Generate provenance, upload and sign image
         uses: ./
