@@ -22,6 +22,7 @@ jobs:
           token_format: "id_token"
           id_token_audience: ${{ secrets.SLSA_WORKLOAD_IDENTITY_PROVIDER }}
           id_token_include_email: true
+          audience: sigstore
 
       - name: Build and push
         uses: docker/build-push-action@c84f38281176d4c9cdb1626ffafcd6b3911b5d94 # ratchet:docker/build-push-action@v3
@@ -35,3 +36,5 @@ jobs:
         with:
           identity_token: ${{ steps.google.outputs.id_token }}
           docker_pwd: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          COSIGN_EXPERIMENTAL: "true"

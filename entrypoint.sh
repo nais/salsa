@@ -42,10 +42,6 @@ setup() {
     exit 1
   fi
 
-  if [ -z "$INPUT_KEY" ]; then
-    export COSIGN_EXPERIMENTAL=1
-  fi
-
   export JAVA_HOME=/opt/java/openjdk
 }
 
