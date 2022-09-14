@@ -81,11 +81,23 @@ transitive dependencies, using a supported build tool.
 * [How to use](#how-to-use)
     * [Requirements](#requirements)
     * [Key Management](#key-management)
-        * [Setup](#setup)
+        * [Setup](#google-kms-setup)
         * [Other KMS providers](#other-kms-providers)
         * [Workflow](#workflow-with-service-account-secrets)
     * [Keyless](#keyless)
-        * [Workflow](#workflow-with-workload-identity)
+        * [Workload identity](#workload-identity)
+        * [Workflow](#workflow-with-workload-identity-and-keyless)
+            * [Google Auth Action](#google-auth-action)
+                * [workload_identity_provider](#workload_identity_provider)
+                * [service_account](#service_account)
+                * [token_format](#token_format)
+                * [audience](#audience)
+                * [id_token_audience](#id_token_audience)
+                * [id_token_include_email](#id_token_include_email)
+            * [Salsa Action](#salsa-action)
+                * [identity_token](#identity_token)
+                * [docker_pwd](#docker_pwd)
+                * [env](#env)
 * [Customizing](#customizing)
     * [Inputs](#inputs)
         * [GitHub context](#github-context)
@@ -106,21 +118,20 @@ registry.
   `nais salsa`.
 
 * In the workflow examples we use [google-github-actions/auth](https://github.com/google-github-actions/auth)
-  to authenticate with Google KMS or workload identity for signing the attestation.
+  to authenticate with Google KMS or workload identity for signing and verifying the attestation.
 
 * [actions/checkout](https://github.com/actions/checkout) is required prior to using this action as `nais salsa`
   must have access to your [build manifest](#supported-build-tools) to digest over dependencies.
 
 ### Key Management
 
-The salsa action use [cosign](https://github.com/sigstore/cosign) with support
-for [KMS](https://github.com/sigstore/cosign/blob/main/KMS.md)
-or [keyless](https://github.com/sigstore/cosign/blob/main/KEYLESS.md) for signing and verifying the attestation. Cosign
+The salsa action use [cosign](https://github.com/sigstore/cosign) with support of [KMS](https://github.com/sigstore/cosign/blob/main/KMS.md)
+or [keyless](https://github.com/sigstore/cosign/blob/main/KEYLESS.md) to sign and verify the attestation. Cosign
 supports all the standard [key management systems](https://github.com/sigstore/cosign/blob/main/USAGE.md).  
 Feel free to submit an [issue](https://github.com/nais/salsa/issues)
 or [pull request](https://github.com/nais/salsa/pulls).
 
-#### Setup
+#### Google KMS Setup
 
 KMS with cosign requires some setup at you provider. In short for Google KMS:
 
@@ -245,6 +256,8 @@ jobs:
           COSIGN_EXPERIMENTAL: "true"
 ```
 
+##### Google Auth Action
+
 Required `with` fields to enable workload identity (with federation) and cosign keyless.
 
 ###### workload_identity_provider
@@ -286,7 +299,8 @@ The output `identity_token` from the Google Auth Action. Format: `steps.steps-id
 
 ###### docker_pwd
 
-This is used by the salsa action to authenticate with the docker registry to download the image for cosign to sign.
+This is used by the salsa action to authenticate with the docker registry to download the image for cosign to sign and
+push attestation to the registry.
 
 ###### env
 
