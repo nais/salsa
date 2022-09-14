@@ -13,9 +13,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # ratchet:actions/checkout@v3
-
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v0.8.1
+        uses: google-github-actions/auth@dac4e13deb3640f22e3ffe758fd3f95e6e89f712 # ratchet:google-github-actions/auth@v0.8.1
         id: google
         with:
           workload_identity_provider: ${{ secrets.SLSA_WORKLOAD_IDENTITY_PROVIDER }}
@@ -24,14 +23,12 @@ jobs:
           id_token_audience: ${{ secrets.SLSA_WORKLOAD_IDENTITY_PROVIDER }}
           id_token_include_email: true
           audience: sigstore
-
       - name: Build and push
         uses: docker/build-push-action@c84f38281176d4c9cdb1626ffafcd6b3911b5d94 # ratchet:docker/build-push-action@v3
         with:
           context: integration-test
           push: true
           tags: ${{ env.IMAGE }}
-
       - name: Generate provenance, upload and sign image
         uses: ./
         with:
