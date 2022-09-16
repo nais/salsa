@@ -103,10 +103,10 @@ cleanUpGoogle() {
     rm -rvf "$GOOGLE_APPLICATION_CREDENTIALS" "$CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE" "$GOOGLE_GHA_CREDS_PATH"
   fi
   if
-    [ -n "$INPUT_IDENTIY_TOKEN" ]
+    [ -n "$INPUT_IDENTITY_TOKEN" ]
   then
-    echo "unset IDENTITY_TOKEN"
-    unset "$INPUT_IDENTIY_TOKEN"
+    echo "unset INPUT_IDENTITY_TOKEN"
+    unset "$INPUT_IDENTITY_TOKEN"
   fi
 }
 
