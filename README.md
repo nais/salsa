@@ -124,24 +124,21 @@ The action supports `KMS providers` key and `Cosign Keyless` id token to sign an
 
 ### Key Management
 
-The salsa action use [cosign](https://github.com/sigstore/cosign) with support of [KMS](https://github.com/sigstore/cosign/blob/main/KMS.md)
-or [keyless](https://github.com/sigstore/cosign/blob/main/KEYLESS.md) to sign and verify the attestation. Cosign
-supports all the standard [key management systems](https://github.com/sigstore/cosign/blob/main/USAGE.md).  
-Feel free to submit an [issue](https://github.com/nais/salsa/issues)
-or [pull request](https://github.com/nais/salsa/pulls).
+The nais salsa action use [cosign](https://github.com/sigstore/cosign) with support
+of [KMS](https://github.com/sigstore/cosign/blob/main/KMS.md) to sign and verify the attestation. Cosign
+supports all the standard [key management systems](https://github.com/sigstore/cosign/blob/main/USAGE.md).
 
 #### Google KMS Setup
 
 > KMS with cosign requires some setup at the provider. 4 steps for Google KMS
 
 1. KMS is enabled in your Google project
-- create a keyring
-- create keys: `Elliptic Curve P-256 key SHA256 Digest`
-2. Service accounnt in project has roles:
-- `Cloud KMS CryptoKey signer/verifier`
-- `Cloud KMS viewer Role`
-3. Configure [GitHub](https://docs.github.com/en/actions/security-guides/encrypted-secrets) actions secret with the
-   the serviceuser json key
+   - create a keyring
+   - create key: `Elliptic Curve P-256 key SHA256 Digest`
+2. Service account in project has roles:
+   - `Cloud KMS CryptoKey signer/verifier`
+   - `Cloud KMS viewer Role`
+3. Configure [GitHub](https://docs.github.com/en/actions/security-guides/encrypted-secrets) actions secret with the service user json key
 4. Configure `with.key` to use the right [URI format](https://github.com/sigstore/cosign/blob/main/KMS.md#gcp) for
    Google: `gcpkms://projects/$PROJECT/locations/$LOCATION/keyRings/$KEYRING/cryptoKeys/$KEY/versions/$KEY_VERSION`
 
@@ -207,9 +204,6 @@ Pre-setup is required before `keyless` can be used.
    workload identity federation.
    This can be done with either the `gcloud` cli or in the browser
    with [Google Console](https://cloud.google.com/iam/docs/workload-identity-federation).
-
-3. Federation is created and prepped, the service account is added 
-- assign the service account with the correct role: `roles/iam.serviceAccountTokenCreator`
 
 #### Workflow with workload identity and keyless
 
