@@ -67,7 +67,7 @@ func (c Cmd) Run() (string, error) {
 
 	err = cmd.Run()
 	if err != nil {
-		return "", fmt.Errorf("%s failed:\n%w\n", cmd, err)
+		return "", err
 	}
 	outStr, _ := stdoutBuf.String(), stderrBuf.String()
 	return outStr, nil

@@ -3,6 +3,7 @@ package commands
 import (
 	"errors"
 	"fmt"
+	"gopkg.in/square/go-jose.v2/jwt"
 	"os"
 	"strconv"
 	"strings"
@@ -157,6 +158,15 @@ func (o AttestOptions) attestFlags() ([]string, error) {
 			"--key", o.Key,
 		}
 		return append(flags, o.defaultAttestFlags()...), nil
+	}
+
+	if o.IdentityToken == "" || os.Getenv("COSIGN_EXPERIMENTAL") == "" {
+		return nil, fmt.Errorf("identity token must be specified with 'COSIGN_EXPERIMENTAL' enabled")
+	}
+
+	_, err := jwt.ParseSigned(o.IdentityToken)
+	if err != nil {
+		return nil, fmt.Errorf("invalid identity token: %w", err)
 	}
 
 	log.Infof("no key specified, using cosign expriemental keyless mode")
