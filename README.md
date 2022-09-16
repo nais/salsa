@@ -110,10 +110,9 @@ transitive dependencies, using a supported build tool.
 
 ### Requirements
 
-We support `KMS providers` and `Cosign Keyless` for signing the attestation and for uploading the attestation to the
-registry.
+The action supports `KMS providers` key and `Cosign Keyless` id token to sign and upload the attestation to a registry.
 
-* Your workflow must set up an explicit authentication step
+* The workflow must set up an explicit authentication step
   for [KMS provider](https://docs.sigstore.dev/cosign/kms_support) or Workload Identity Federation before the
   `nais salsa`.
 
@@ -133,24 +132,24 @@ or [pull request](https://github.com/nais/salsa/pulls).
 
 #### Google KMS Setup
 
-KMS with cosign requires some setup at you provider. In short for Google KMS:
+> KMS with cosign requires some setup at the provider. 4 steps for Google KMS
 
 1. KMS is enabled in your Google project
-    1. create a keyring
-        1. create keys: `Elliptic Curve P-256 key SHA256 Digest`
+- create a keyring
+- create keys: `Elliptic Curve P-256 key SHA256 Digest`
 2. Service accounnt in project has roles:
-    1. Cloud KMS CryptoKey signer/verifier
-    2. Cloud KMS viewer Role
-3. Configure [GitHub](https://docs.github.com/en/actions/security-guides/encrypted-secrets) actions secret containing
-   the serviceuser
-4. Configure `with.key` with the right [URI format](https://github.com/sigstore/cosign/blob/main/KMS.md#gcp) for
+- `Cloud KMS CryptoKey signer/verifier`
+- `Cloud KMS viewer Role`
+3. Configure [GitHub](https://docs.github.com/en/actions/security-guides/encrypted-secrets) actions secret with the
+   the serviceuser json key
+4. Configure `with.key` to use the right [URI format](https://github.com/sigstore/cosign/blob/main/KMS.md#gcp) for
    Google: `gcpkms://projects/$PROJECT/locations/$LOCATION/keyRings/$KEYRING/cryptoKeys/$KEY/versions/$KEY_VERSION`
 
 ##### Other KMS providers
 
 It is possible to use other KMS providers (this will probably require another GitHub action to be setup).
 Read the [cosign KMS](https://github.com/sigstore/cosign/blob/main/KMS.md) documentation for more information about
-provider setup and key URI formats.
+providers and specific setup and key URI formats.
 
 ##### workflow with service account secrets
 
@@ -194,20 +193,23 @@ jobs:
 
 ### Keyless
 
+> Note: Cosign Keyless this is an experimental feature and is not recommended for production use.
+
 It is possible to use [keyless](https://github.com/sigstore/cosign/blob/main/KEYLESS.md) signing and verifying of
 attestations with cosign.
 
 #### Workload identity
 
-Pre-setup is required before `keyless` function is going to work:
+Pre-setup is required before `keyless` can be used.
 
-First create a Workload Identity Federation. Follow
-this [steps](https://github.com/google-github-actions/auth#setting-up-workload-identity-federation)
-either with the `gcloud` cli or in the
-browser: [Google Console](https://cloud.google.com/iam/docs/workload-identity-federation)
+1. Create a Workload Identity Federation.
+2. Follow [steps](https://github.com/google-github-actions/auth#setting-up-workload-identity-federation) to setup
+   workload identity federation.
+   This can be done with either the `gcloud` cli or in the browser
+   with [Google Console](https://cloud.google.com/iam/docs/workload-identity-federation).
 
-When the federation is created and the service account is added to the federation,
-you need to assign the service account with the correct roles: `roles/iam.serviceAccountTokenCreator`
+3. Federation is created and prepped, the service account is added 
+- assign the service account with the correct role: `roles/iam.serviceAccountTokenCreator`
 
 #### Workflow with workload identity and keyless
 
@@ -258,36 +260,36 @@ jobs:
 
 ##### Google Auth Action
 
-Required `with` fields to enable workload identity (with federation) and cosign keyless.
+The described `with` fields is required to enable Federation with workload identity and `Cosign` keyless.
 
 ###### workload_identity_provider
 
-The value is retrieved from the federation created either in the Google Console or gcloud cli.
+The value is retrieved from the Federation instance created.
 
 Format: `projects/$PROJECT/locations/$LOCATION/workloadIdentityPools/$POOL/providers/$PROVIDER`
 
 ###### service_account
 
-The value is retrieved from the service account created in the Google Console or gcloud cli.
+The value is retrieved from the service account created.
 
 Format: `name@project-id.iam.gserviceaccount.com`
 
 ###### token_format
 
-This is always: "id_token" for cosign and keyless.
+Cosign expects "id_token".
 
 ###### id_token_audience
 
-[Google Auth Action](https://github.com/google-github-actions/auth) requires this to be set, and it can be the same
-value as the [workload_identity_provider](#workload_identity_provider) field.
+[Google Auth Action](https://github.com/google-github-actions/auth) requires this to be set, and it should be the same
+value as for the [workload_identity_provider](#workload_identity_provider).
 
 ###### id_token_include_email
 
-Parameter of whether to include the service account email in the generated token. This should be set to `true`.
+Whether to include the service account email in the generated token. This should be set to `true`.
 
 ###### audience
 
-Additional `aud` claims for the generated `id_token`. This field must contain `sigstore`.
+Additional `aud` claims for the generated `id_token`, must contain `sigstore`.
 
 ##### Salsa Action
 
@@ -295,18 +297,18 @@ Required `with` fields for salsa action.
 
 ###### identity_token
 
-The output `identity_token` from the Google Auth Action. Format: `steps.steps-id.outputs.id_token`
+The output `identity_token` from the Google Auth Action.   
+
+Format: `steps.steps-id.outputs.id_token`
 
 ###### docker_pwd
 
-This is used by the salsa action to authenticate with the docker registry to download the image for cosign to sign and
+This is used by the `salsa action` to authenticate with the docker registry to download the image for cosign to sign and
 push attestation to the registry.
 
 ###### env
 
 Cosign expects the environment variable `COSIGN_EXPERIMENTAL=1` to be set.
-
-> Note: Cosign Keyless this is an experimental feature and is not recommended for production use.
 
 ##### Example output from the workflow
 
