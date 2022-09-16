@@ -182,7 +182,7 @@ jobs:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
       - name: Provenance, upload and sign attestation
-        uses: nais/salsa@v0.1
+        uses: nais/salsa@v0.2
         with:
           key: ${{ env.KEY }}
           docker_pwd: ${{ secrets.GITHUB_TOKEN }}
@@ -244,7 +244,7 @@ jobs:
           audience: sigstore
 
       - name: Generate provenance, upload and sign image
-        uses: ./
+        uses: nais/salsa@v0.2
         with:
           identity_token: ${{ steps.google.outputs.id_token }}
           docker_pwd: ${{ secrets.GITHUB_TOKEN }}
@@ -304,11 +304,11 @@ push attestation to the registry.
 
 Cosign expects the environment variable `COSIGN_EXPERIMENTAL=1` to be set.
 
-##### Example output from the workflow
+### Outputs from the workflow
 
 * An example of a generated [slsa provenance](pkg/dsse/testdata/salsa.provenance) with transitive dependencies
 * An example of a signed [cosign dsse attestation](pkg/dsse/testdata/cosign-dsse-attestation.json)
-    * result after an decoded [cosign attestation](pkg/dsse/testdata/cosign-attestation.json)
+* Result after decoded [cosign attestation](pkg/dsse/testdata/cosign-attestation.json)
 
 ## Customizing
 
