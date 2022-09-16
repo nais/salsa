@@ -94,13 +94,18 @@ runSalsa() {
 }
 
 cleanUpGoogle() {
-  echo "---------- Clean up Google Cloud files ----------"
+  echo "---------- Clean up Google Cloud stuff ----------"
   if
     [ -n "$GOOGLE_APPLICATION_CREDENTIALS" ] ||
       [ -n "$CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE" ] ||
       [ -n "$GOOGLE_GHA_CREDS_PATH" ]
   then
     rm -rvf "$GOOGLE_APPLICATION_CREDENTIALS" "$CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE" "$GOOGLE_GHA_CREDS_PATH"
+  fi
+  if
+    [ -n "$INPUT_IDENTIY_TOKEN" ]
+  then
+    unset "$INPUT_IDENTIY_TOKEN"
   fi
 }
 
