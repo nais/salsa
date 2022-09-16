@@ -105,6 +105,7 @@ cleanUpGoogle() {
   if
     [ -n "$INPUT_IDENTIY_TOKEN" ]
   then
+    echo "unset IDENTITY_TOKEN"
     unset "$INPUT_IDENTIY_TOKEN"
   fi
 }
