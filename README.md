@@ -98,6 +98,7 @@ transitive dependencies, using a supported build tool.
                 * [identity_token](#identity_token)
                 * [docker_pwd](#docker_pwd)
                 * [env](#env)
+    * [Signature repository](#signature-repository)
 * [Customizing](#customizing)
     * [Inputs](#inputs)
         * [GitHub context](#github-context)
@@ -303,6 +304,13 @@ push attestation to the registry.
 ###### env
 
 Cosign expects the environment variable `COSIGN_EXPERIMENTAL=1` to be set.
+
+### Signature repository
+
+Cosign defaults to store signatures in the same repo as the image it is signing.
+It is possible to specify a different repo for signatures, you can set the `COSIGN_REPOSITORY` environment variable to
+store the cosign signatures and attestations, see more specification in
+the [cosign docs](https://github.com/sigstore/cosign#specifying-registry)
 
 ### Outputs from the workflow
 
