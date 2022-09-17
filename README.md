@@ -312,6 +312,16 @@ It is possible to specify a different repo for signatures, you can set the `COSI
 store the cosign signatures and attestations, see more specification in
 the [cosign docs](https://github.com/sigstore/cosign#specifying-registry)
 
+```yaml
+    - name: Generate provenance, upload and sign image
+      uses: nais/salsa@v0.2
+      with:
+        key: ${{ secrets.SALSA_KMS_KEY }}
+        docker_pwd: ${{ secrets.GITHUB_TOKEN }}
+      env:
+        COSIGN_REPOSITORY: "registry.io/signatures"
+```
+
 ### Outputs from the workflow
 
 * An example of a generated [slsa provenance](pkg/dsse/testdata/salsa.provenance) with transitive dependencies
