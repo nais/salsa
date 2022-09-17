@@ -185,6 +185,23 @@ jobs:
 * An example of a signed [cosign dsse attestation](pkg/dsse/testdata/cosign-dsse-attestation.json)
     * result after an decoded [cosign attestation](pkg/dsse/testdata/cosign-attestation.json)
 
+### Signature repository
+
+Cosign defaults to store signatures in the same repo as the image it is signing.
+It is possible to specify a different repo for signatures, you can set the `COSIGN_REPOSITORY` environment variable to
+store the cosign signatures and attestations, see more specification in
+the [cosign docs](https://github.com/sigstore/cosign#specifying-registry)
+
+```yaml
+    - name: Generate provenance, upload and sign image
+      uses: nais/salsa@v0.2
+      with:
+        key: ${{ secrets.SALSA_KMS_KEY }}
+        docker_pwd: ${{ secrets.GITHUB_TOKEN }}
+      env:
+        COSIGN_REPOSITORY: "registry.io/signatures"
+```
+
 ## Customizing
 
 ### inputs
