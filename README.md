@@ -189,12 +189,24 @@ jobs:
 
 ### inputs
 
+#### Maven Cli Options
+
+`with.maven_opts` - (optional) additional maven cli options.
+
+Useful when your project depends on a custom maven settings file or use dependencies from a private repository.
+
+Actor need to be sure that the `with.docker_pwd` is set to a valid token with access to the private repository.
+
 #### Github context
+
+`with.github_context` - (optional) default to `true` to include the github context in the provenance.
 
 The github context contains information about the workflow run and the event that triggered the run. By default, this
 action uses the [Github context](https://docs.github.com/en/actions/learn-github-actions/contexts#github-context).
 
 #### Runner Context
+
+'with.runner_context' - (optional) default to `true` to include the runner context in the provenance.
 
 The runner context contains information about the runner that is executing the current job. By default, this action uses
 the [Runner context](https://docs.github.com/en/actions/learn-github-actions/contexts#runner-context).
@@ -210,6 +222,7 @@ The Following inputs can be used as `step.with` keys
 | `repo_name`      | String | github.repository     | The name of the repo/project                                                                                                                       | False    |
 | `repo_sub_dir`   | String | ""                    | Specify a subdirectory if build file not found in working root directory                                                                           | False    |
 | `dependencies`   | Bool   | true                  | Set to false if action should not create materials for dependencies (e.g. if build tool is unsupported or repo uses internal/private dependencies) | False    |
+| `maven_opts`     | String | ""                    | Space seperated string with additional maven cli options for the dependence build                                                                  | False    |
 | `repo_dir`       | String | $GITHUB_WORKSPACE     | **Internal value (do not set):** Root of directory to look for build files                                                                         | False    |
 | `github_context` | String | ${{ toJSON(github) }} | **Internal value (do not set):** the [github context](#git-context) object in json                                                                 | False    |
 | `runner_context` | String | ${{ toJSON(runner) }} | **Internal value (do not set):** the [runner context](#runner-context) object in json                                                              | False    |

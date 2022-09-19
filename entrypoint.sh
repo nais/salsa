@@ -63,6 +63,7 @@ scan() {
     --env-context "$ENVS" \
     --subDir "$INPUT_REPO_SUB_DIR" \
     --with-deps="$INPUT_DEPENDENCIES" \
+    --maven_opts "$INPUT_MAVEN_OPTS" \
     --remote-run
 }
 

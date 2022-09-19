@@ -55,6 +55,12 @@ inputs:
     required: false
     default: ""
 
+  maven_opts:
+    description: |-
+      Space seperated string with additional maven cli options.
+    required: false
+    default: ""
+
   github_context:
     description: |-
       Internal value (do not set): the "github" context object in json.

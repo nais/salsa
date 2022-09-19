@@ -3,7 +3,6 @@ package jvm
 import (
 	"crypto/sha256"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -18,12 +17,16 @@ const mavenBuildFileName = "pom.xml"
 
 type Maven struct {
 	BuildFilePatterns []string
+	CmdLineOpts       string
 }
 
-func BuildMaven() build.Tool {
-	return &Maven{
+func BuildMaven(cmdLineOpts string) build.Tool {
+	m := &Maven{
 		BuildFilePatterns: []string{mavenBuildFileName},
+		CmdLineOpts:       cmdLineOpts,
 	}
+
+	return m
 }
 
 func (m Maven) BuildFiles() []string {
@@ -34,11 +37,8 @@ func (m Maven) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) 
 	cmd := utils.NewCmd(
 		"mvn",
 		"dependency:copy-dependencies",
-		[]string{
-			"-DincludeScope=runtime",
-			"-Dmdep.useRepositoryLayout=true",
-		},
-		nil,
+		defaultMavenOpts(),
+		m.parseCmdLineOpts(),
 		workDir,
 	)
 
@@ -56,7 +56,33 @@ func (m Maven) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) 
 	args = append(args, cmd.Name)
 	args = append(args, cmd.SubCmd)
 	args = append(args, cmd.Flags...)
+	args = append(args, cmd.Args...)
 	return build.ArtifactDependency(deps, cmd.Name, strings.Join(args, " ")), nil
+}
+
+func defaultMavenOpts() []string {
+	return []string{
+		"-DincludeScope=runtime",
+		"-Dmdep.useRepositoryLayout=true",
+	}
+}
+
+func (m Maven) parseCmdLineOpts() []string {
+	if m.CmdLineOpts == "" {
+		return nil
+	}
+
+	after := strings.SplitAfter(m.CmdLineOpts, " ")
+	for i, s := range after {
+		if strings.HasPrefix(s, "-") {
+			after[i] = strings.TrimSpace(s)
+		} else {
+			after[i] = after[i-1] + " " + strings.TrimSpace(s)
+			after = append(after[:i-1], after[i:]...)
+		}
+	}
+
+	return after
 }
 
 func MavenCompileAndRuntimeTimeDeps(rootPath string) (map[string]build.Dependency, error) {
@@ -86,7 +112,7 @@ func MavenCompileAndRuntimeTimeDeps(rootPath string) (map[string]build.Dependenc
 }
 
 func buildChecksum(file string) (build.CheckSum, error) {
-	content, err := ioutil.ReadFile(file)
+	content, err := os.ReadFile(file)
 	if err != nil {
 		return build.CheckSum{}, err
 	}
