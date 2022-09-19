@@ -195,7 +195,7 @@ jobs:
 
 Useful when your project depends on a custom maven settings file or use dependencies from a private repository.
 
-Actor need to be sure that the `with.docker_pwd` is set to a valid token with access to the private repository.
+Actor need to make sure that the `with.docker_pwd` is set to a valid token with access to the private repository.
 
 #### Github context
 
