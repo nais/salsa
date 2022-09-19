@@ -17,13 +17,13 @@ const mavenBuildFileName = "pom.xml"
 
 type Maven struct {
 	BuildFilePatterns []string
-	CmdLineOpts       string
+	CmdOptions        string
 }
 
-func BuildMaven(cmdLineOpts string) build.Tool {
+func BuildMaven(cmdOpts string) build.Tool {
 	m := &Maven{
 		BuildFilePatterns: []string{mavenBuildFileName},
-		CmdLineOpts:       cmdLineOpts,
+		CmdOptions:        cmdOpts,
 	}
 
 	return m
@@ -38,7 +38,7 @@ func (m Maven) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) 
 		"mvn",
 		"dependency:copy-dependencies",
 		defaultMavenOpts(),
-		m.parseCmdLineOpts(),
+		m.parsedCmdOpts(),
 		workDir,
 	)
 
@@ -67,12 +67,12 @@ func defaultMavenOpts() []string {
 	}
 }
 
-func (m Maven) parseCmdLineOpts() []string {
-	if m.CmdLineOpts == "" {
+func (m Maven) parsedCmdOpts() []string {
+	if m.CmdOptions == "" {
 		return nil
 	}
 
-	after := strings.SplitAfter(m.CmdLineOpts, " ")
+	after := strings.SplitAfter(m.CmdOptions, " ")
 	for i, s := range after {
 		if strings.HasPrefix(s, "-") {
 			after[i] = strings.TrimSpace(s)
