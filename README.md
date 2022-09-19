@@ -202,6 +202,8 @@ the [cosign docs](https://github.com/sigstore/cosign#specifying-registry)
         COSIGN_REPOSITORY: "registry.io/signatures"
 ```
 
+Actor must make sure that `with.docker_pwd` has access to the signature repository.
+
 ## Customizing
 
 ### inputs
