@@ -256,33 +256,27 @@ jobs:
 
 The described `with` fields is required to enable Federation with workload identity and `Cosign` keyless.
 
-* `with.workload_identity_provider` is the workload identity provider. The value is retrieved from the Federation
-  instance
-  created.
+`with.workload_identity_provider` is the workload identity provider. The value is retrieved from the Federation
+instance created. Format: `projects/$PROJECT/locations/$LOCATION/workloadIdentityPools/$POOL/providers/$PROVIDER`
 
-Format: `projects/$PROJECT/locations/$LOCATION/workloadIdentityPools/$POOL/providers/$PROVIDER`
+`with.service_account` is the service account to use for the workload identity. The value is retrieved from the
+service account created. Format: `name@project-id.iam.gserviceaccount.com`
 
-* `with.service_account` is the service account to use for the workload identity. The value is retrieved from the
-  service account created.
+`with.token_format` is the token format to use. Cosign expects "id_token".
 
-Format: `name@project-id.iam.gserviceaccount.com`
+`with.id_token_audience` [Google Auth Action](https://github.com/google-github-actions/auth) requires this to be set,
+and it should be the same value as for the [workload_identity_provider](#workload-identity).
 
-* `with.token_format` is the token format to use. Cosign expects "id_token".
+`with.id_token_include_email` is required to be set to `true` to include the email in the token.
 
-* `with.id_token_audience` [Google Auth Action](https://github.com/google-github-actions/auth) requires this to be set,
-  and it should be the same
-  value as for the [workload_identity_provider](#workload-identity).
-
-* `with.id_token_include_email` is required to be set to `true` to include the email in the token.
-
-* `with.audience` is the audience to use for the `id_token`. Cosign expects `sigstore`.
+`with.audience` is the audience to use for the `id_token`. Cosign expects `sigstore`.
 
 ##### Salsa Action
 
 Required `with` fields for salsa action.
 
-* `with.identity_token` is The output `identity_token` from the Google Auth Action.
-  Format: `steps.steps-id.outputs.id_token`
+`with.identity_token` is The output `identity_token` from the Google Auth Action.
+Format: `steps.steps-id.outputs.id_token`
 
 `with.docker_pwd` is the GitHub token to authenticate with the registry. Pwd is used by the `salsa action` to
 authenticate with the docker registry to download the image for cosign to sign and
@@ -292,9 +286,9 @@ push attestation to the registry.
 
 ### Outputs from the workflow
 
-* An example of a generated [slsa provenance](pkg/dsse/testdata/salsa.provenance) with transitive dependencies
-* An example of a signed [cosign dsse attestation](pkg/dsse/testdata/cosign-dsse-attestation.json)
-* Result after decoded [cosign attestation](pkg/dsse/testdata/cosign-attestation.json)
+[SLSA provenance](pkg/dsse/testdata/salsa.provenance) with transitive dependencies  
+[Signed Cosign dsse attestation](pkg/dsse/testdata/cosign-dsse-attestation.json)   
+[Decoded Cosign attestation](pkg/dsse/testdata/cosign-attestation.json)
 
 ## Customizing
 
