@@ -87,17 +87,6 @@ transitive dependencies, using a supported build tool.
     * [Keyless](#keyless)
         * [Workload identity](#workload-identity)
         * [Workflow](#workflow-with-workload-identity-and-keyless)
-            * [Google Auth Action](#google-auth-action)
-                * [workload_identity_provider](#workload_identity_provider)
-                * [service_account](#service_account)
-                * [token_format](#token_format)
-                * [audience](#audience)
-                * [id_token_audience](#id_token_audience)
-                * [id_token_include_email](#id_token_include_email)
-            * [Salsa Action](#salsa-action)
-                * [identity_token](#identity_token)
-                * [docker_pwd](#docker_pwd)
-                * [env](#env)
 * [Customizing](#customizing)
     * [Inputs](#inputs)
         * [GitHub context](#github-context)
@@ -124,7 +113,7 @@ The action supports `KMS providers` key and `Cosign Keyless` id token to sign an
 
 ### Key Management
 
-The nais salsa action use [cosign](https://github.com/sigstore/cosign) with support
+The `nais salsa` action use [cosign](https://github.com/sigstore/cosign) with support
 of [KMS](https://github.com/sigstore/cosign/blob/main/KMS.md) to sign and verify the attestation. Cosign
 supports all the standard [key management systems](https://github.com/sigstore/cosign/blob/main/USAGE.md).
 
@@ -133,19 +122,20 @@ supports all the standard [key management systems](https://github.com/sigstore/c
 > KMS with cosign requires some setup at the provider. 4 steps for Google KMS
 
 1. KMS is enabled in your Google project
-   - create a keyring
-   - create key: `Elliptic Curve P-256 key SHA256 Digest`
+    - create a keyring
+    - create key: `Elliptic Curve P-256 key SHA256 Digest`
 2. Service account in project has roles:
-   - `Cloud KMS CryptoKey signer/verifier`
-   - `Cloud KMS viewer Role`
-3. Configure [GitHub](https://docs.github.com/en/actions/security-guides/encrypted-secrets) actions secret with the service user json key
+    - `Cloud KMS CryptoKey signer/verifier`
+    - `Cloud KMS viewer Role`
+3. Configure [GitHub](https://docs.github.com/en/actions/security-guides/encrypted-secrets) actions secret with the
+   service user json key
 4. Configure `with.key` to use the right [URI format](https://github.com/sigstore/cosign/blob/main/KMS.md#gcp) for
    Google: `gcpkms://projects/$PROJECT/locations/$LOCATION/keyRings/$KEYRING/cryptoKeys/$KEY/versions/$KEY_VERSION`
 
 ##### Other KMS providers
 
-It is possible to use other KMS providers (this will probably require another GitHub action to be setup).
-Read the [cosign KMS](https://github.com/sigstore/cosign/blob/main/KMS.md) documentation for more information about
+It is possible to use other KMS providers (this will probably require another GitHub action to setup).
+Read the [Cosign KMS](https://github.com/sigstore/cosign/blob/main/KMS.md) documentation for more information about
 providers and specific setup and key URI formats.
 
 ##### workflow with service account secrets
@@ -187,6 +177,16 @@ jobs:
           key: ${{ env.KEY }}
           docker_pwd: ${{ secrets.GITHUB_TOKEN }}
 ```
+
+##### Google Auth Action
+
+`with.credentials_json` is the service account json key.
+
+##### Salsa Action
+
+`with.key` is the key URI for Google KMS.
+
+`with.docker_pwd` is the GitHub token to authenticate with the registry.
 
 ### Keyless
 
@@ -256,53 +256,39 @@ jobs:
 
 The described `with` fields is required to enable Federation with workload identity and `Cosign` keyless.
 
-###### workload_identity_provider
-
-The value is retrieved from the Federation instance created.
+* `with.workload_identity_provider` is the workload identity provider. The value is retrieved from the Federation
+  instance
+  created.
 
 Format: `projects/$PROJECT/locations/$LOCATION/workloadIdentityPools/$POOL/providers/$PROVIDER`
 
-###### service_account
-
-The value is retrieved from the service account created.
+* `with.service_account` is the service account to use for the workload identity. The value is retrieved from the
+  service account created.
 
 Format: `name@project-id.iam.gserviceaccount.com`
 
-###### token_format
+* `with.token_format` is the token format to use. Cosign expects "id_token".
 
-Cosign expects "id_token".
+* `with.id_token_audience` [Google Auth Action](https://github.com/google-github-actions/auth) requires this to be set,
+  and it should be the same
+  value as for the [workload_identity_provider](#workload-identity).
 
-###### id_token_audience
+* `with.id_token_include_email` is required to be set to `true` to include the email in the token.
 
-[Google Auth Action](https://github.com/google-github-actions/auth) requires this to be set, and it should be the same
-value as for the [workload_identity_provider](#workload_identity_provider).
-
-###### id_token_include_email
-
-Whether to include the service account email in the generated token. This should be set to `true`.
-
-###### audience
-
-Additional `aud` claims for the generated `id_token`, must contain `sigstore`.
+* `with.audience` is the audience to use for the `id_token`. Cosign expects `sigstore`.
 
 ##### Salsa Action
 
 Required `with` fields for salsa action.
 
-###### identity_token
+* `with.identity_token` is The output `identity_token` from the Google Auth Action.
+  Format: `steps.steps-id.outputs.id_token`
 
-The output `identity_token` from the Google Auth Action.   
-
-Format: `steps.steps-id.outputs.id_token`
-
-###### docker_pwd
-
-This is used by the `salsa action` to authenticate with the docker registry to download the image for cosign to sign and
+`with.docker_pwd` is the GitHub token to authenticate with the registry. Pwd is used by the `salsa action` to
+authenticate with the docker registry to download the image for cosign to sign and
 push attestation to the registry.
 
-###### env
-
-Cosign expects the environment variable `COSIGN_EXPERIMENTAL=1` to be set.
+`with.env.COSIGN_EXPERIMENTAL` is required to be set to `true` for Cosign to enable keyless.
 
 ### Outputs from the workflow
 
