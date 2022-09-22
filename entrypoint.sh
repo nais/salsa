@@ -105,9 +105,8 @@ cleanUpGoogle() {
   if
     [ -n "$INPUT_IDENTITY_TOKEN" ]
   then
-    echo "unset INPUT_IDENTITY_TOKEN"
-    unset "$INPUT_IDENTITY_TOKEN"
+    unset "$INPUT_IDENTITY_TOKEN" && echo "unset INPUT_IDENTITY_TOKEN"
   fi
 }
 
-setup && loginDocker && runSalsa && logoutDocker && cleanUpGoogle
+setup && loginDocker && runSalsa && logoutDocker ; cleanUpGoogle
