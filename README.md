@@ -52,7 +52,7 @@ cosign verify-attestation --type=slsaprovenance image:tag
 ```
 
 > Disclaimer:
-> This is not an official GitHub Action maintained by the SLSA team. It is created by the [nais.io](https://nais.io) team for the purpose of securing supply chains in [NAV](https://github.com/navikt). However we encourage other organizations/users to use it and even contribute as it is built with open source in mind.
+> This is not an official GitHub Action maintained by the SLSA team. It is created by the [nais.io](https://nais.io) team for the purpose of securing supply chains in [NAV](https://github.com/navikt). However, we encourage other organizations/users to use it and even contribute as it is built with open source in mind.
 
 ### Built with
 
@@ -146,12 +146,6 @@ Service account in project has roles:
 * `Cloud KMS CryptoKey signer/verifier`
 * `Cloud KMS viewer Role`
 
-Configure [GitHub](https://docs.github.com/en/actions/security-guides/encrypted-secrets) actions secret with the service
-user json key.  
-
-Configure `with.key` to use the right [URI format](https://github.com/sigstore/cosign/blob/main/KMS.md#gcp) for
-Format: `gcpkms://projects/$PROJECT/locations/$LOCATION/keyRings/$KEYRING/cryptoKeys/$KEY/versions/$KEY_VERSION`
-
 ##### Other KMS providers
 
 It is possible to use other KMS providers (this will probably require another GitHub action to be configured).
@@ -198,13 +192,15 @@ jobs:
           docker_pwd: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-##### Google Auth Action
+##### Google Authentication
 
-`with.credentials_json` is the service account json key.
+`with.credentials_json` is the [GitHub](https://docs.github.com/en/actions/security-guides/encrypted-secrets) service
+account json key.
 
-##### Salsa Action
+##### Nais Salsa
 
-`with.key` is the key URI for Google KMS.
+`with.key` is the key [URI format](https://github.com/sigstore/cosign/blob/main/KMS.md#gcp) for Google KMS.
+Format: `gcpkms://projects/$PROJECT/locations/$LOCATION/keyRings/$KEYRING/cryptoKeys/$KEY/versions/$KEY_VERSION`
 
 `with.docker_pwd` is the GitHub token to authenticate with the registry.
 
@@ -271,7 +267,7 @@ jobs:
           COSIGN_EXPERIMENTAL: "true"
 ```
 
-##### Google Auth Action
+##### Google Authentication
 
 The described `with` fields is required to enable Federation with workload identity and `Cosign` keyless signatures.
 
@@ -290,7 +286,7 @@ and it should be the same value as for the [workload_identity_provider](#workloa
 
 `with.audience` is the audience to use for the `id_token`. Cosign expects `sigstore`.
 
-##### Salsa Action
+##### Nais Salsa
 
 The described `with` fields is required for `nais salsa`.
 
