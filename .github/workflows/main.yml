@@ -97,7 +97,7 @@ jobs:
           PUSH_TOKEN: ${{ steps.get-homebrew-token.outputs.token }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
           GORELEASER_CURRENT_TAG: ${{ env.VERSION }}
-          RELEASE_DRAFT: !startsWith(github.ref, 'refs/tags/')
+          RELEASE_DRAFT: ${{ !startsWith(github.ref, 'refs/tags/') }}
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6 # ratchet:docker/setup-buildx-action@v2
       - name: Login to Docker
