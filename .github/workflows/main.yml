@@ -86,7 +86,8 @@ jobs:
         run: |
           echo ::set-output name=cli-tag::${{ env.IMAGE_NAME }}:${{ needs.set-version.outputs.version }}
           echo ::set-output name=action-tag::${{ env.IMAGE_NAME }}:${{ env.VERSION }}
-      - name: Run GoReleaser
+          RELEASE_DRAFT=${{ !startsWith(github.ref, 'refs/tags/') }} >> $GITHUB_ENV
+      - name: GoReleaser Draft ${{ env.RELEASE_DRAFT }}
         uses: goreleaser/goreleaser-action@ff11ca24a9b39f2d36796d1fbd7a4e39c182630a # ratchet:goreleaser/goreleaser-action@v3
         with:
           distribution: goreleaser
@@ -97,7 +98,7 @@ jobs:
           PUSH_TOKEN: ${{ steps.get-homebrew-token.outputs.token }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
           GORELEASER_CURRENT_TAG: ${{ env.VERSION }}
-          RELEASE_DRAFT: ${{ !startsWith(github.ref, 'refs/tags/') }}
+          RELEASE_DRAFT: ${{ env.RELEASE_DRAFT }}
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6 # ratchet:docker/setup-buildx-action@v2
       - name: Login to Docker
@@ -106,8 +107,8 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Only push from main
-        if: ${{ github.ref == 'refs/heads/main' }}
+      - name: Only push with tag
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
         run: |
           echo "PUSH=true" >> $GITHUB_ENV
       - name: Build and push
@@ -120,7 +121,7 @@ jobs:
             COSIGN_VERSION=${{ env.COSIGN_VERSION }}
             GRADLE_VERSION=${{ env.GRADLE_VERSION }}
       - name: Update major/minor version tag
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
         run: "git tag -f ${{ env.VERSION }}\ngit push -f origin ${{ env.VERSION }} \n"
       - name: Clean up
         if: ${{ always() }}
@@ -129,7 +130,7 @@ jobs:
     needs:
       - build
     runs-on: ubuntu-20.04
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
     env:
       CLI_IMAGE_TAG: "${{ needs.build.outputs.cli-tag }}"
       ACTION_IMAGE_TAG: "${{ needs.build.outputs.action-tag }}"
