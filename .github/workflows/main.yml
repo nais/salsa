@@ -89,6 +89,8 @@ jobs:
           RELEASE_DRAFT=${{ fromJSON(!startsWith(github.ref, 'refs/tags/')) }} >> $GITHUB_ENV
       - name: yq - portable yaml processor
         uses: mikefarah/yq@v4.27.5
+
+      - name: Setup release
         run: |
           echo "Release: ${{ env.RELEASE_DRAFT }}"
           yq e -i ".release.draft = ${{ env.RELEASE_DRAFT }}" .goreleaser.yml
