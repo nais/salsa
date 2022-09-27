@@ -45,10 +45,9 @@ signs:
   - id: sign checksum.txt
     cmd: cosign
     stdin: '{{ .Env.COSIGN_PASSWORD }}'
-    args: [ "sign-blob", "--key=cosign.key", "--output=${signature}", "${artifact}" ]
+    args: ["sign-blob", "--key=cosign.key", "--output=${signature}", "${artifact}"]
     signature: "${artifact}.sig"
     artifacts: checksum
-
 changelog:
   sort: asc
   use: github
@@ -75,7 +74,7 @@ changelog:
 
 release:
   prerelease: auto
-  draft: "{{ .Env.RELEASE_DRAFT }}"
+  draft: true
   github:
     owner: nais
     name: salsa
