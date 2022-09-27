@@ -86,15 +86,13 @@ jobs:
         run: |
           echo ::set-output name=cli-tag::${{ env.IMAGE_NAME }}:${{ needs.set-version.outputs.version }}
           echo ::set-output name=action-tag::${{ env.IMAGE_NAME }}:${{ env.VERSION }}
-          RELEASE_DRAFT=${{ fromJSON(!startsWith(github.ref, 'refs/tags/')) }} >> $GITHUB_ENV
+          RELEASE_DRAFT=${{ !startsWith(github.ref, 'refs/tags/') || '' }} >> $GITHUB_ENV
       - name: yq - portable yaml processor
-        uses: mikefarah/yq@v4.27.5
-
+        uses: mikefarah/yq@9b6961875e10b058aeb482f263f26ca0f6b18eb8 # ratchet:mikefarah/yq@v4.27.5
       - name: Setup release
         run: |
           echo "Release: ${{ env.RELEASE_DRAFT }}"
           yq e -i ".release.draft = ${{ env.RELEASE_DRAFT }}" .goreleaser.yml
-
       - name: GoReleaser Draft ${{ env.RELEASE_DRAFT }}
         uses: goreleaser/goreleaser-action@ff11ca24a9b39f2d36796d1fbd7a4e39c182630a # ratchet:goreleaser/goreleaser-action@v3
         with:
