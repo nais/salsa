@@ -75,7 +75,7 @@ changelog:
 
 release:
   prerelease: auto
-  draft: {{ .Env.RELEASE_DRAFT }}
+  draft: "{{ .Env.RELEASE_DRAFT }}"
   github:
     owner: nais
     name: salsa
