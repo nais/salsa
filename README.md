@@ -313,11 +313,11 @@ Useful when your project depends on a custom maven settings file or use dependen
 
 Actor need to make sure that the `with.docker_pwd` is set to a valid token with access to the private repository.
 
-Example:
-
 ```yaml
-with:
-  maven_opts: "-s /github/workspace/settings.xml, -Dmaven.repo.local=/path/to/local/repo"
+    - name: Generate provenance, upload and sign image
+      uses: nais/salsa@v0.2
+      with:
+        maven_opts: "-s /github/workspace/settings.xml, -Dmaven.repo.local=/path/to/local/repo"
 ```
 
 #### GitHub context
