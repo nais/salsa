@@ -50,7 +50,7 @@ signs:
     artifacts: checksum
 changelog:
   sort: asc
-  use: github
+  # use: github
   filters:
     exclude:
       - '^docs:'
