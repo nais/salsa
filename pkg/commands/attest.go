@@ -3,6 +3,7 @@ package commands
 import (
 	"errors"
 	"fmt"
+	"gopkg.in/square/go-jose.v2/jwt"
 	"os"
 	"strconv"
 	"strings"
@@ -15,6 +16,7 @@ import (
 
 type AttestOptions struct {
 	Key           string `mapstructure:"key"`
+	IdentityToken string `mapstructure:"identity-token"`
 	NoUpload      bool   `mapstructure:"no-upload"`
 	RekorURL      string `mapstructure:"rekor-url"`
 	PredicateFile string `mapstructure:"predicate"`
@@ -110,32 +112,77 @@ func (o AttestOptions) Run(args []string, runner utils.CmdRunner) (string, error
 
 func (o AttestOptions) verifyCmd(a []string, runner utils.CmdRunner) utils.Cmd {
 	return utils.Cmd{
-		Name:   "cosign",
-		SubCmd: "verify-attestation",
-		Flags: []string{
-			"--key", o.Key,
-			"--type", o.PredicateType,
-		},
+		Name:    "cosign",
+		SubCmd:  "verify-attestation",
+		Flags:   o.verifyFlags(),
 		Args:    a,
 		WorkDir: PathFlags.WorkDir(),
 		Runner:  runner,
 	}
 }
 
-func (o AttestOptions) attestCmd(a []string, runner utils.CmdRunner) utils.Cmd {
-	return utils.Cmd{
-		Name:   "cosign",
-		SubCmd: "attest",
-		Flags: []string{
+func (o AttestOptions) verifyFlags() []string {
+	if o.Key != "" {
+		return []string{
 			"--key", o.Key,
-			"--predicate", o.PredicateFile,
 			"--type", o.PredicateType,
-			"--rekor-url", o.RekorURL,
-			fmt.Sprintf("--no-upload=%s", strconv.FormatBool(o.NoUpload)),
-		},
+		}
+	}
+	return []string{
+		"--type",
+		o.PredicateType,
+	}
+}
+
+func (o AttestOptions) attestCmd(a []string, runner utils.CmdRunner) utils.Cmd {
+	flags, err := o.attestFlags()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return utils.Cmd{
+		Name:    "cosign",
+		SubCmd:  "attest",
+		Flags:   flags,
 		Args:    a,
 		WorkDir: PathFlags.WorkDir(),
 		Runner:  runner,
+	}
+}
+
+func (o AttestOptions) attestFlags() ([]string, error) {
+	var flags []string
+
+	if o.Key != "" {
+		flags = []string{
+			"--key", o.Key,
+		}
+		return append(flags, o.defaultAttestFlags()...), nil
+	}
+
+	if o.IdentityToken == "" || os.Getenv("COSIGN_EXPERIMENTAL") == "" {
+		return nil, fmt.Errorf("identity token must be specified with 'COSIGN_EXPERIMENTAL' enabled")
+	}
+
+	_, err := jwt.ParseSigned(o.IdentityToken)
+	if err != nil {
+		return nil, fmt.Errorf("invalid identity token: %w", err)
+	}
+
+	log.Infof("no key specified, using cosign expriemental keyless mode")
+	flags = []string{
+		"--identity-token", o.IdentityToken,
+	}
+
+	return append(flags, o.defaultAttestFlags()...), nil
+}
+
+func (o AttestOptions) defaultAttestFlags() []string {
+	return []string{
+		"--predicate", o.PredicateFile,
+		"--type", o.PredicateType,
+		"--rekor-url", o.RekorURL,
+		fmt.Sprintf("--no-upload=%s", strconv.FormatBool(o.NoUpload)),
 	}
 }
 
@@ -143,6 +190,8 @@ func init() {
 	rootCmd.AddCommand(attestCmd)
 	attestCmd.Flags().String("key", "",
 		"path to the private key file, KMS URI or Kubernetes Secret")
+	attestCmd.Flags().String("identity-token", "",
+		"use short lived secrets for cosign keyless authentication")
 	attestCmd.Flags().BoolVar(&verify, "verify", false, "if true, verifies attestations - default is false")
 	attestCmd.Flags().Bool("no-upload", false,
 		"do not upload the generated attestation")

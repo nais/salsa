@@ -24,7 +24,7 @@
 
 ## About
 
-This is a Github Action for generating signed [provenance](https://slsa.dev/provenance/v0.2) about a build and its
+This is a GitHub Action for generating signed [provenance](https://slsa.dev/provenance/v0.2) about a build and its
 related artifacts. Provenance is an attestation (a "software bill of materials") about a software artifact or collection
 of artifacts, documenting how an artifact was produced - all in a common format.
 
@@ -33,30 +33,38 @@ standards, guidelines etc.) to prevent tampering, improve integrity, and secure 
 projects, businesses or enterprises.
 
 The action implements the [level 3](https://slsa.dev/spec/v0.1/levels) requirements of
-the [SLSA Framework](https://slsa.dev) (as long as it is run in an ephemeral environment) 
+the [SLSA Framework](https://slsa.dev) (as long as it is run in an ephemeral environment)
 producing a signed software [attestation](https://github.com/slsa-framework/slsa/blob/main/controls/attestations.md) of
 your build and dependencies. The attestation is signed and uploaded to your container registry
-using [cosign](https://github.com/sigstore/cosign)
-and can be verified by the salsa cli (also provided in this repo) or using the `cosign verify-attestation` command. 
+using [Cosign](https://github.com/sigstore/cosign)
+and can be verified by the salsa cli (also provided in this repo) or using the `cosign verify-attestation` command.
 
-Verification requires access to the corresponding public keys. The keys for the [navikt](https://nais.io/slsakeys/navikt.pub) and 
-[nais](https://nais.io/slsakeys/nais.pub) organizations can be found at our website (for now), if you use this action at other 
-organizations you need to host your keys somewhere appropriate.
+> Signing attestation with KMS (Key Management Service), verification requires access to the corresponding public keys.
+
+- The keys for the [navikt](https://nais.io/slsakeys/navikt.pub) and [nais](https://nais.io/slsakeys/nais.pub)
+  organizations can be found at our website (for now), if you use this action at other
+  organizations you need to host your keys somewhere appropriate.
+
+> Signing attestation with Cosign Keyless, verification do not require access to the corresponding public keys.
+
+```bash
+cosign verify-attestation --type=slsaprovenance image:tag
+```
 
 > Disclaimer:
-This is not an official GitHub Action maintained by the SLSA team. It is created by the [nais.io](https://nais.io) team for the purpose of securing supply chains in [NAV](https://github.com/navikt). However we encourage other organizations/users to use it and even contribute as it is built with open source in mind.
+> This is not an official GitHub Action maintained by the SLSA team. It is created by the [nais.io](https://nais.io) team for the purpose of securing supply chains in [NAV](https://github.com/navikt). However, we encourage other organizations/users to use it and even contribute as it is built with open source in mind.
 
 ### Built with
 
-* [golang](https://golang.org)
-* [cosign](https://github.com/sigstore/cosign)
-* [Github Actions](https://github.com/features/actions)
+[golang](https://golang.org)  
+[Cosign](https://github.com/sigstore/cosign)  
+[GitHub Actions](https://github.com/features/actions)
 
 ### Formats/Standards implemented
 
-* Statement type: [in-toto v0.1](https://github.com/in-toto/attestation/)
-* Signing envelope: [DSSE](https://github.com/secure-systems-lab/dsse/)
-* Predicate type: [Provenance v0.2](https://slsa.dev/provenance/v0.2)
+Statement type: [in-toto v0.1](https://github.com/in-toto/attestation/)  
+Signing envelope: [DSSE](https://github.com/secure-systems-lab/dsse/)  
+Predicate type: [Provenance v0.2](https://slsa.dev/provenance/v0.2)
 
 ### Materials
 
@@ -65,30 +73,37 @@ transitive dependencies, using a supported build tool.
 
 #### Supported build tools
 
-* jvm
-    * [gradle](https://gradle.org/)
-    * [maven](https://maven.apache.org/)
-* js
-    * [yarn](https://yarnpkg.com/)
-    * [npm](https://www.npmjs.com/)
-* [golang](https://go.dev/)
-* [php](https://www.php.net/) (with
-  known [limitation](https://github.com/composer/composer/issues/2540#issuecomment-850206846): there is no digest over
-  dependencies)
+##### JVM
+
+[gradle](https://gradle.org/)  
+[maven](https://maven.apache.org/)
+
+##### JS
+
+[yarn](https://yarnpkg.com/)  
+[npm](https://www.npmjs.com/)
+
+##### Other
+
+[golang](https://go.dev/)  
+[php](https://www.php.net/) (with
+known [limitation](https://github.com/composer/composer/issues/2540#issuecomment-850206846): there is no digest over
+dependencies)
 
 ## Getting started
 
 * [How to use](#how-to-use)
     * [Requirements](#requirements)
-    * [Key Management](#key-management)
-        * [Setup](#setup)
+    * [Key Management](#kms---key-management-service)
+        * [Setup](#google-kms-setup)
         * [Other KMS providers](#other-kms-providers)
-    * [Example](#example)
-        * [Workflows](#workflows)
-        * [Attestation](#attestation)
+        * [Workflow](#workflow-with-service-account-secrets)
+    * [Keyless](#keyless-signatures)
+        * [Workload identity](#workload-identity)
+        * [Workflow](#workflow-with-workload-identity-and-keyless)
 * [Customizing](#customizing)
     * [Inputs](#inputs)
-        * [Github context](#git-context)
+        * [GitHub context](#github-context)
         * [Runner context](#runner-context)
 * [Release](#release)
     * [Checksums](#checksums)
@@ -98,49 +113,46 @@ transitive dependencies, using a supported build tool.
 
 ### Requirements
 
-* Currently we only support signing keys from a KMS provider -
-  see [cosign documentation](https://docs.sigstore.dev/cosign/kms_support)
-  for more details. Your workflow must set up an explicit authentication step for your KMS provider before the nais
-  salsa action.
-    * In the [example](#example) action we
-      use [google-github-actions/auth](https://github.com/google-github-actions/auth)
-      to authenticate with Google KMS for signing the attestation. See also customizing
-      for [other providers](#other-kms-providers)
+The `nais salsa` action supports `KMS providers` or `Cosign Keyless` for signing and/or upload of the attestation to the
+registry.  
 
-* [actions/checkout](https://github.com/actions/checkout) is required prior to using this action as `nais salsa`
-  must have access to your [build manifest](#supported-build-tools) to digest over dependencies.
+An authentication step in the Workflow must be set up explicit before the `nais salsa` action. Configure
+a [KMS provider](https://docs.sigstore.dev/cosign/kms_support) or a Workload Identity Federation before the
+`nais salsa` is run.  
 
-### Key Management
+In the workflow examples we use [google-github-actions/auth](https://github.com/google-github-actions/auth)
+to authenticate with Google KMS or with a Workload identity.  
 
-The salsa action use [cosign](https://github.com/sigstore/cosign)
-and [KMS](https://github.com/sigstore/cosign/blob/main/KMS.md) for signing and verifying the attestation. Cosign
-supports all the standard [key management systems](https://github.com/sigstore/cosign/blob/main/USAGE.md). If your
-project requires other providers please feel free to submit an [issue](https://github.com/nais/salsa/issues)
-or [pull request](https://github.com/nais/salsa/pulls).
+[actions/checkout](https://github.com/actions/checkout) is required prior to using this action as `nais salsa`
+must have access to your [build manifest](#supported-build-tools) to digest over dependencies.  
 
-#### Setup
+### KMS - Key Management Service
 
-KMS with cosign requires some setup at you provider. In short for Google KMS:
+The `nais salsa` action use [Cosign](https://github.com/sigstore/cosign) with support
+of [KMS](https://github.com/sigstore/cosign/blob/main/KMS.md) to sign and verify the attestation. Cosign
+supports all the standard [key management systems](https://github.com/sigstore/cosign/blob/main/USAGE.md).
 
-1. KMS is enabled in your Google project
-    1. create a keyring
-        1. create keys: `Elliptic Curve P-256 key SHA256 Digest`
-2. Service accounnt in project has roles:
-    1. Cloud KMS CryptoKey signer/verifier
-    2. Cloud KMS viewer Role
-3. Configure [Github](https://docs.github.com/en/actions/security-guides/encrypted-secrets) actions secret containing
-   the serviceuser
-4. Configure `with.key` with the right [URI format](https://github.com/sigstore/cosign/blob/main/KMS.md#gcp) for
-   Google: `gcpkms://projects/$PROJECT/locations/$LOCATION/keyRings/$KEYRING/cryptoKeys/$KEY/versions/$KEY_VERSION`
+#### Google KMS Setup
+
+> KMS with Cosign requires some setup at the provider.
+
+KMS is enabled in your Google project:  
+
+* create a keyring
+* create key: `Elliptic Curve P-256 key SHA256 Digest`
+
+Service account in project has roles:  
+
+* `Cloud KMS CryptoKey signer/verifier`
+* `Cloud KMS viewer Role`
 
 ##### Other KMS providers
 
-It is possible to use other KMS providers, see the [cosign KMS](https://github.com/sigstore/cosign/blob/main/KMS.md)
-documentation for more information about provider setup and key URI formats.
+It is possible to use other KMS providers (this will probably require another GitHub action to be configured).
+Read the [Cosign KMS](https://github.com/sigstore/cosign/blob/main/KMS.md) documentation for more information about
+providers, their specific setup and key URI formats.
 
-### Example
-
-#### Workflows
+##### workflow with service account secrets
 
 ```yaml
 name: ci
@@ -163,50 +175,161 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           push: true
           tags: ${{ env.IMAGE }}
 
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v0
+        uses: google-github-actions/auth@v0.8.1
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
       - name: Provenance, upload and sign attestation
-        uses: nais/salsa@v0.1
+        uses: nais/salsa@v0.2
         with:
           key: ${{ env.KEY }}
           docker_pwd: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-* Example of a Github action [nais-salsa-integration.yml](.github/workflows/nais-salsa-integration.yml)
-* An example of a generated [slsa provenance](pkg/dsse/testdata/salsa.provenance) with transitive dependencies
-* An example of a signed [cosign dsse attestation](pkg/dsse/testdata/cosign-dsse-attestation.json)
-    * result after an decoded [cosign attestation](pkg/dsse/testdata/cosign-attestation.json)
+##### Google Authentication
+
+`with.credentials_json` is the [GitHub](https://docs.github.com/en/actions/security-guides/encrypted-secrets) service
+account json key.
+
+##### Nais Salsa
+
+`with.key` is the key [URI format](https://github.com/sigstore/cosign/blob/main/KMS.md#gcp) for Google KMS.
+Format: `gcpkms://projects/$PROJECT/locations/$LOCATION/keyRings/$KEYRING/cryptoKeys/$KEY/versions/$KEY_VERSION`
+
+`with.docker_pwd` is the GitHub token to authenticate with the registry.
+
+### Keyless Signatures
+
+`nais salsa` supports [Cosign Keyless Signatures](https://github.com/sigstore/cosign/blob/main/KEYLESS.md) signing and
+verification of attestations.
+
+> Note: Cosign Keyless this is an experimental feature and is not recommended for production use.
+
+#### Workload identity
+
+Pre-requisites before using Keyless Signatures:
+
+Create a Workload Identity Federation and
+follow [steps](https://github.com/google-github-actions/auth#setting-up-workload-identity-federation) to configure
+workload identity federation. This can be done with commands using the Google `gcloud` cli or in the
+browser [Google Console](https://cloud.google.com/iam/docs/workload-identity-federation).
+
+#### Workflow with workload identity and keyless
+
+```yaml
+name: slsa keyless signatures
+on:
+  push:
+    branches:
+      - 'main'
+env:
+  IMAGE: ttl.sh/nais/salsa-keyless-test:1h
+jobs:
+  keyless:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: integration-test
+          push: true
+          tags: ${{ env.IMAGE }}
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v0.8.1
+        id: google
+        with:
+          workload_identity_provider: ${{ secrets.SLSA_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: name@project-id.iam.gserviceaccount.com
+          token_format: "id_token"
+          id_token_audience: sigstore
+          id_token_include_email: true
+
+      - name: Generate provenance, upload and sign image
+        uses: nais/salsa@v0.2
+        with:
+          identity_token: ${{ steps.google.outputs.id_token }}
+          docker_pwd: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+```
+
+##### Google Authentication
+
+The described `with` fields is required to enable Federation with workload identity and `Cosign` keyless signatures.
+
+`with.workload_identity_provider` is the workload identity provider. The value is retrieved from the Federation
+instance created. Format: `projects/$PROJECT/locations/$LOCATION/workloadIdentityPools/$POOL/providers/$PROVIDER`
+
+`with.service_account` is the service account to use for the workload identity. The value is retrieved from the
+service account created. Format: `name@project-id.iam.gserviceaccount.com`
+
+`with.token_format` is the token format to use. Cosign expects "id_token".
+
+`with.id_token_audience` is the audience to use for the `id_token`. Cosign expects `sigstore`. `sigstore` audience
+must be added to the workload identity provider as an allowed audience.
+
+`with.id_token_include_email` Cosign expects the email to be included in the token.
+
+##### Nais Salsa
+
+The described `with` fields is required for `nais salsa`.
+
+`with.identity_token` is The output `identity_token` from the Google Auth Action.
+Format: `steps.steps-id.outputs.id_token`
+
+`with.docker_pwd` is the GitHub token to authenticate with the registry. The password is used by `nais salsa` to
+authenticate with the registry to download the image for Cosign to sign and push attestation to the registry.
+
+`with.env.COSIGN_EXPERIMENTAL` is required to be set to `true` for Cosign to enable keyless signatures.
+
+### Outputs from the workflow
+
+[SLSA provenance](pkg/dsse/testdata/salsa.provenance) with transitive dependencies  
+[Signed Cosign dsse attestation](pkg/dsse/testdata/cosign-dsse-attestation.json)   
+[Decoded Cosign attestation](pkg/dsse/testdata/cosign-attestation.json)
 
 ## Customizing
 
 ### inputs
 
-#### Maven Cli Options
+#### Maven Options
 
-`with.maven_opts` - (optional) additional maven cli options.
+`with.maven_opts` - (optional) additional maven options in a comma seperated string.
 
 Useful when your project depends on a custom maven settings file or use dependencies from a private repository.
 
 Actor need to make sure that the `with.docker_pwd` is set to a valid token with access to the private repository.
 
-#### Github context
+Example:
 
-`with.github_context` - (optional) default to `true` to include the github context in the provenance.
+```yaml
+with:
+  maven_opts: "-s /github/workspace/settings.xml, -Dmaven.repo.local=/path/to/local/repo"
+```
+
+#### GitHub context
+
+`with.github_context` - (required) default to `true` to include the github context in the provenance.
 
 The github context contains information about the workflow run and the event that triggered the run. By default, this
-action uses the [Github context](https://docs.github.com/en/actions/learn-github-actions/contexts#github-context).
+action uses the [GitHub context](https://docs.github.com/en/actions/learn-github-actions/contexts#github-context).
 
 #### Runner Context
 
-'with.runner_context' - (optional) default to `true` to include the runner context in the provenance.
+`with.runner_context` - (required) default to `true` to include the runner context in the provenance.
 
 The runner context contains information about the runner that is executing the current job. By default, this action uses
 the [Runner context](https://docs.github.com/en/actions/learn-github-actions/contexts#runner-context).
@@ -215,18 +338,18 @@ The Following inputs can be used as `step.with` keys
 
 | Name             | Type   | Default               | Description                                                                                                                                        | Required |
 |------------------|--------|:----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|----------|
-| `key`            | String | ""                    | Private key (cosign.key) or kms provider, used for signing the attestation                                                                         | True     |
 | `docker_pwd`     | String | ""                    | Password for docker                                                                                                                                | True     |
+| `key`            | String | ""                    | Private key (cosign.key) or kms provider, used for signing the attestation                                                                         | False    |
+| `identity_token` | String | ""                    | Identity token used for Cosign keyless authentication                                                                                              | False    |
 | `image`          | String | $IMAGE                | The container image to create a attestation for                                                                                                    | False    |
 | `docker_user`    | String | github.actor          | User to login to container registry                                                                                                                | False    |
 | `repo_name`      | String | github.repository     | The name of the repo/project                                                                                                                       | False    |
 | `repo_sub_dir`   | String | ""                    | Specify a subdirectory if build file not found in working root directory                                                                           | False    |
 | `dependencies`   | Bool   | true                  | Set to false if action should not create materials for dependencies (e.g. if build tool is unsupported or repo uses internal/private dependencies) | False    |
-| `maven_opts`     | String | ""                    | Space seperated string with additional maven cli options for the dependence build                                                                  | False    |
+| `maven_opts`     | String | ""                    | A comma seperated string with additional maven cli options for the dependence build                                                                | False    |
 | `repo_dir`       | String | $GITHUB_WORKSPACE     | **Internal value (do not set):** Root of directory to look for build files                                                                         | False    |
-| `github_context` | String | ${{ toJSON(github) }} | **Internal value (do not set):** the [github context](#git-context) object in json                                                                 | False    |
+| `github_context` | String | ${{ toJSON(github) }} | **Internal value (do not set):** the [github context](#github-context) object in json                                                              | False    |
 | `runner_context` | String | ${{ toJSON(runner) }} | **Internal value (do not set):** the [runner context](#runner-context) object in json                                                              | False    |
-
 
 ## Release
 
@@ -237,7 +360,7 @@ correct. All files are by default digested with algorithm `sha256`.
 
 ### Verify signature
 
-The release [artifacts](https://github.com/nais/salsa/releases) are signed with cosign
+The release [artifacts](https://github.com/nais/salsa/releases) are signed with Cosign
 and can be verified by using the [public signing key](https://github.com/nais/salsa/blob/main/cosign.pub).
 
 ```shell

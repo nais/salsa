@@ -6,32 +6,23 @@ on:
 jobs:
   ratchet:
     runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        asset: [
+          main.yml,
+          keyless-salsa-integration.yaml,
+          service-account-salsa-integration.yml,
+          golangci-lint.yml,
+          ratchet.yml,
+          codeql-analysis.yml
+        ]
     steps:
       - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-      - name: Check if main.yml is pinned
+      - name: Check if ${{matrix.asset}} is pinned
         uses: 'docker://ghcr.io/sethvargo/ratchet@sha256:e5b2409be0d1c82c71a6e60c49027e539f4c90636529e4f8b5c25a68b68a36d4' # ratchet:docker://ghcr.io/sethvargo/ratchet:0.3.0
         with:
-          args: 'check .github/workflows/main.yml'
-          entrypoint: /ratchet
-      - name: Check if nais-salsa-integration.yml is pinned
-        uses: 'docker://ghcr.io/sethvargo/ratchet@sha256:e5b2409be0d1c82c71a6e60c49027e539f4c90636529e4f8b5c25a68b68a36d4' # ratchet:docker://ghcr.io/sethvargo/ratchet:0.3.0
-        with:
-          args: 'check .github/workflows/nais-salsa-integration.yml'
-          entrypoint: /ratchet
-      - name: Check if golangci-lint.yml is pinned
-        uses: 'docker://ghcr.io/sethvargo/ratchet@sha256:e5b2409be0d1c82c71a6e60c49027e539f4c90636529e4f8b5c25a68b68a36d4' # ratchet:docker://ghcr.io/sethvargo/ratchet:0.3.0
-        with:
-          args: 'check .github/workflows/golangci-lint.yml'
-          entrypoint: /ratchet
-      - name: Check if ratchet.yml is pinned
-        uses: 'docker://ghcr.io/sethvargo/ratchet@sha256:e5b2409be0d1c82c71a6e60c49027e539f4c90636529e4f8b5c25a68b68a36d4' # ratchet:docker://ghcr.io/sethvargo/ratchet:0.3.0
-        with:
-          args: 'check .github/workflows/ratchet.yml'
-          entrypoint: /ratchet
-      - name: Check if codeql-analysis.yml is pinned
-        uses: 'docker://ghcr.io/sethvargo/ratchet@sha256:e5b2409be0d1c82c71a6e60c49027e539f4c90636529e4f8b5c25a68b68a36d4' # ratchet:docker://ghcr.io/sethvargo/ratchet:0.3.0
-        with:
-          args: 'check .github/workflows/codeql-analysis.yml'
+          args: 'check .github/workflows/${{matrix.asset}}'
           entrypoint: /ratchet
       - name: Checks failed
         if: ${{ failure() }}

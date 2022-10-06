@@ -8,11 +8,9 @@ on:
       - '.gitignore'
       - 'doc/**'
       - 'Makefile'
-concurrency:
-  group: ${{ github.ref }}
-  cancel-in-progress: true
+
 env:
-  VERSION: v0.1
+  VERSION: v0.2
   IMAGE_NAME: ghcr.io/${{ github.repository }}
   COSIGN_VERSION: v1.10.1
   SYFT_VERSION: v0.44.1
@@ -35,19 +33,11 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # ratchet:actions/checkout@v3
-      - name: Extract version of Go to use
-        run: echo "GOVERSION=$(cat go.mod | grep -w "go" | awk ' { print $2 } ' | grep -w "^[^v]")" >> $GITHUB_ENV
       - uses: actions/setup-go@268d8c0ca0432bb2cf416faae41297df9d262d7f # ratchet:actions/setup-go@v3
         with:
-          go-version: ${{ env.GOVERSION }}
-      - name: Cache Go modules
-        uses: actions/cache@fd5de65bc895cf536527842281bea11763fefd77 # ratchet:actions/cache@v3
-        id: go-mod-cache
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
+          go-version-file: ./go.mod
+          check-latest: true
+          cache: true
       - name: Test Salsa
         run: make test
   build:
@@ -63,12 +53,12 @@ jobs:
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # ratchet:actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Extract version of Go to use
-        run: echo "GOVERSION=$(cat go.mod | grep -w "go" | awk ' { print $2 } ' | grep -w "^[^v]")" >> $GITHUB_ENV
       - name: Set up Go
         uses: actions/setup-go@268d8c0ca0432bb2cf416faae41297df9d262d7f # ratchet:actions/setup-go@v3
         with:
-          go-version: ${{ env.GOVERSION }}
+          go-version-file: ./go.mod
+          check-latest: true
+          cache: true
       - name: Create tag
         run: |
           git tag ${{ needs.set-version.outputs.version }}

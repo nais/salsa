@@ -72,17 +72,12 @@ func (m Maven) parsedCmdOpts() []string {
 		return nil
 	}
 
-	after := strings.SplitAfter(m.CmdOptions, " ")
-	for i, s := range after {
-		if strings.HasPrefix(s, "-") {
-			after[i] = strings.TrimSpace(s)
-		} else {
-			after[i] = after[i-1] + " " + strings.TrimSpace(s)
-			after = append(after[:i-1], after[i:]...)
-		}
+	split := strings.Split(m.CmdOptions, ",")
+	for i, s := range split {
+		split[i] = strings.TrimSpace(s)
 	}
 
-	return after
+	return split
 }
 
 func MavenCompileAndRuntimeTimeDeps(rootPath string) (map[string]build.Dependency, error) {
