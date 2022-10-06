@@ -10,10 +10,10 @@ var info bool
 var versionCmd = &cobra.Command{
 	Use:   "version [flags]",
 	Short: "Show 'salsa' client version",
-	RunE: func(command *cobra.Command, args []string) error {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		if info {
 			log.Infof("%s: %s commit: %s date: %s builtBy: %s",
-				command.CommandPath(),
+				cmd.CommandPath(),
 				Client.Version,
 				Client.Commit,
 				Client.Date,
@@ -21,7 +21,7 @@ var versionCmd = &cobra.Command{
 			)
 			return nil
 		}
-		log.Infof("%s: %s", command.CommandPath(), Client.Version)
+		log.Infof("%s: %s", cmd.CommandPath(), Client.Version)
 		return nil
 	},
 }

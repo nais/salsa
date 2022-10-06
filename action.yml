@@ -27,8 +27,13 @@ inputs:
 
   key:
     description: |-
-      The key used to sign the attestation.
-    required: true
+      The key used to sign the attestation. Cloud Provider KMS key path.
+    required: false
+
+  identity_token:
+    description: |-
+      Use keyless function for cosign with short lived secrets.
+    required: false
 
   docker_user:
     description: |-

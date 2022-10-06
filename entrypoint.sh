@@ -72,6 +72,7 @@ attest() {
       --repo "$REPO_NAME" \
       --subDir "$INPUT_REPO_SUB_DIR" \
       --remote-run \
+      --identity-token "$INPUT_IDENTIY_TOKEN" \
       --key "$INPUT_KEY" \
       "$IMAGE"
 }
@@ -93,7 +94,7 @@ runSalsa() {
 }
 
 cleanUpGoogle() {
-  echo "---------- Clean up Google Cloud files ----------"
+  echo "---------- Clean up Google Cloud stuff ----------"
   if
     [ -n "$GOOGLE_APPLICATION_CREDENTIALS" ] ||
       [ -n "$CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE" ] ||
@@ -101,6 +102,11 @@ cleanUpGoogle() {
   then
     rm -rvf "$GOOGLE_APPLICATION_CREDENTIALS" "$CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE" "$GOOGLE_GHA_CREDS_PATH"
   fi
+  if
+    [ -n "$INPUT_IDENTITY_TOKEN" ]
+  then
+    unset "$INPUT_IDENTITY_TOKEN" && echo "unset INPUT_IDENTITY_TOKEN"
+  fi
 }
 
-setup && loginDocker && runSalsa && logoutDocker && cleanUpGoogle
+setup && loginDocker && runSalsa && logoutDocker ; cleanUpGoogle
