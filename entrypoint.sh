@@ -72,7 +72,7 @@ attest() {
       --repo "$REPO_NAME" \
       --subDir "$INPUT_REPO_SUB_DIR" \
       --remote-run \
-      --identity-token "$INPUT_IDENTIY_TOKEN" \
+      --identity-token "$INPUT_IDENTITY_TOKEN" \
       --key "$INPUT_KEY" \
       "$IMAGE"
 }

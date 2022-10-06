@@ -86,6 +86,7 @@ runs:
     - ${{ inputs.env_context }}
     - ${{ inputs.repo_sub_dir }}
     - ${{ inputs.key }}
+    - ${{ inputs.identity_token }}
     - ${{ inputs.docker_user }}
     - ${{ inputs.docker_pwd }}
     - ${{ inputs.dependencies }}
