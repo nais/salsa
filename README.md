@@ -254,9 +254,8 @@ jobs:
           workload_identity_provider: ${{ secrets.SLSA_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: name@project-id.iam.gserviceaccount.com
           token_format: "id_token"
-          id_token_audience: ${{ secrets.SLSA_WORKLOAD_IDENTITY_PROVIDER }}
+          id_token_audience: sigstore
           id_token_include_email: true
-          audience: sigstore
 
       - name: Generate provenance, upload and sign image
         uses: nais/salsa@v0.2
@@ -279,12 +278,10 @@ service account created. Format: `name@project-id.iam.gserviceaccount.com`
 
 `with.token_format` is the token format to use. Cosign expects "id_token".
 
-`with.id_token_audience` [Google Auth Action](https://github.com/google-github-actions/auth) requires this to be set,
-and it should be the same value as for the [workload_identity_provider](#workload-identity).
+`with.id_token_audience` is the audience to use for the `id_token`. Cosign expects `sigstore`. `sigstore` audience
+must be added to the workload identity provider as an allowed audience.
 
 `with.id_token_include_email` Cosign expects the email to be included in the token.
-
-`with.audience` is the audience to use for the `id_token`. Cosign expects `sigstore`.
 
 ##### Nais Salsa
 
