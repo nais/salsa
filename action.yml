@@ -93,6 +93,7 @@ runs:
     - ${{ inputs.repo_sub_dir }}
     - ${{ inputs.key }}
     - ${{ inputs.identity_token }}
+    - ${{ inputs.maven_opts }}
     - ${{ inputs.docker_user }}
     - ${{ inputs.docker_pwd }}
     - ${{ inputs.dependencies }}
