@@ -42,6 +42,10 @@ setup() {
     exit 1
   fi
 
+  if [ -n "$COSIGN_EXPERIMENTAL" ]; then
+    export COSIGN_EXPERIMENTAL
+  fi
+
   export JAVA_HOME=/opt/java/openjdk
 }
 
@@ -102,11 +106,7 @@ cleanUpGoogle() {
   then
     rm -rvf "$GOOGLE_APPLICATION_CREDENTIALS" "$CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE" "$GOOGLE_GHA_CREDS_PATH"
   fi
-  if
-    [ -n "$INPUT_IDENTITY_TOKEN" ]
-  then
-    unset "$INPUT_IDENTITY_TOKEN" && echo "unset INPUT_IDENTITY_TOKEN"
-  fi
 }
 
-setup && loginDocker && runSalsa && logoutDocker ; cleanUpGoogle
+setup && loginDocker && runSalsa && logoutDocker
+cleanUpGoogle
