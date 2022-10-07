@@ -45,12 +45,12 @@ signs:
   - id: sign checksum.txt
     cmd: cosign
     stdin: '{{ .Env.COSIGN_PASSWORD }}'
-    args: [ "sign-blob", "--key=cosign.key", "--output=${signature}", "${artifact}" ]
+    args: ["sign-blob", "--key=cosign.key", "--output=${signature}", "${artifact}"]
     signature: "${artifact}.sig"
     artifacts: checksum
-
 changelog:
   sort: asc
+  # use: github
   filters:
     exclude:
       - '^docs:'
@@ -73,7 +73,7 @@ changelog:
       order: 999
 
 release:
-  prerelease: allow
+  prerelease: auto
   draft: true
   github:
     owner: nais
@@ -82,7 +82,7 @@ release:
     ## {{.ProjectName}} ({{ .Version }})
   footer: |
     ## Enjoy some {{.ProjectName}} verde
-
+    _Changelog_: https://github.com/nais/salsa/compare/{{ .PreviousTag }}...{{ .Tag }}
     Those were the changes on {{ .Tag }}!
   extra_files:
     - glob: "cosign.pub"

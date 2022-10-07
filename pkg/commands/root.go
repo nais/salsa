@@ -118,6 +118,9 @@ func initConfig(cmd *cobra.Command) error {
 	v.AutomaticEnv() // read in environment variables that match
 	bindFlags(cmd, v)
 
+	cmd.SilenceUsage = true
+	cmd.SilenceErrors = true
+
 	return nil
 }
 

@@ -42,6 +42,10 @@ setup() {
     exit 1
   fi
 
+  if [ -n "$COSIGN_EXPERIMENTAL" ]; then
+    export COSIGN_EXPERIMENTAL
+  fi
+
   export JAVA_HOME=/opt/java/openjdk
 }
 
@@ -72,6 +76,7 @@ attest() {
       --repo "$REPO_NAME" \
       --subDir "$INPUT_REPO_SUB_DIR" \
       --remote-run \
+      --identity-token "$INPUT_IDENTITY_TOKEN" \
       --key "$INPUT_KEY" \
       "$IMAGE"
 }
@@ -93,7 +98,7 @@ runSalsa() {
 }
 
 cleanUpGoogle() {
-  echo "---------- Clean up Google Cloud files ----------"
+  echo "---------- Clean up Google Cloud stuff ----------"
   if
     [ -n "$GOOGLE_APPLICATION_CREDENTIALS" ] ||
       [ -n "$CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE" ] ||
@@ -103,4 +108,5 @@ cleanUpGoogle() {
   fi
 }
 
-setup && loginDocker && runSalsa && logoutDocker && cleanUpGoogle
+setup && loginDocker && runSalsa && logoutDocker
+cleanUpGoogle
