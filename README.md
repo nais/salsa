@@ -326,17 +326,20 @@ Actor must be sure that `with.docker_pwd` has access to the signature repository
 
 #### Maven Options
 
-`with.maven_opts` - (optional) additional maven options in a comma seperated string.
+`with.mvn_opts` - (optional) additional maven options in a comma-delimited string.
 
 Useful when your project depends on a custom maven settings file or use dependencies from a private repository.
 
-Actor need to make sure that the `with.docker_pwd` is set to a valid token with access to the private repository.
+Actor need to set `with.github_token` with access to the private repository.
+
+`with.github_token` - (optional) GitHub token to authenticate with the private repository.
 
 ```yaml
     - name: Generate provenance, upload and sign image
       uses: nais/salsa@v0.2
       with:
-        maven_opts: "-s /github/workspace/settings.xml, -Dmaven.repo.local=/path/to/local/repo"
+        mvn_opts: "--settings ./.mvn/settings.xml, -Dmaven.repo.local=/path/to/local/repo"
+        github_token: ${{ secrets.PAT }}
 ```
 
 #### GitHub context
@@ -365,7 +368,8 @@ The Following inputs can be used as `step.with` keys
 | `repo_name`      | String | github.repository     | The name of the repo/project                                                                                                                       | False    |
 | `repo_sub_dir`   | String | ""                    | Specify a subdirectory if build file not found in working root directory                                                                           | False    |
 | `dependencies`   | Bool   | true                  | Set to false if action should not create materials for dependencies (e.g. if build tool is unsupported or repo uses internal/private dependencies) | False    |
-| `maven_opts`     | String | ""                    | A comma seperated string with additional maven cli options for the dependence build                                                                | False    |
+| `mvn_opts`       | String | ""                    | A comma-delimited string with additional maven cli options for the dependence build                                                                | False    |
+| `github_token`   | String | ""                    | GitHub token to authenticate with the private repository                                                                                           | False    |
 | `repo_dir`       | String | $GITHUB_WORKSPACE     | **Internal value (do not set):** Root of directory to look for build files                                                                         | False    |
 | `github_context` | String | ${{ toJSON(github) }} | **Internal value (do not set):** the [github context](#github-context) object in json                                                              | False    |
 | `runner_context` | String | ${{ toJSON(runner) }} | **Internal value (do not set):** the [runner context](#runner-context) object in json                                                              | False    |

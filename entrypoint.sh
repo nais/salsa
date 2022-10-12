@@ -49,6 +49,16 @@ setup() {
   export JAVA_HOME=/opt/java/openjdk
 }
 
+mvnOpts() {
+  if [ -n "$INPUT_MVN_OPTS" ]; then
+    export GITHUB_USERNAME=$GITHUB_ACTOR
+  fi
+
+  if [ -n "$INPUT_GITHUB_TOKEN" ]; then
+    export GITHUB_TOKEN=$INPUT_GITHUB_TOKEN
+  fi
+}
+
 loginDocker() {
   echo "---------- Logging in to Docker registry: $DOCKER_REGISTRY ----------"
   echo "$INPUT_DOCKER_PWD" | docker login "$DOCKER_REGISTRY" -u "$GITHUB_ACTOR" --password-stdin
@@ -67,7 +77,7 @@ scan() {
     --env-context "$ENVS" \
     --subDir "$INPUT_REPO_SUB_DIR" \
     --with-deps="$INPUT_DEPENDENCIES" \
-    --maven-opts "$INPUT_MAVEN_OPTS" \
+    --mvn-opts "$INPUT_MVN_OPTS" \
     --remote-run
 }
 
@@ -109,5 +119,5 @@ cleanUpGoogle() {
   fi
 }
 
-setup && loginDocker && runSalsa && logoutDocker
+setup && mvnOpts && loginDocker && runSalsa && logoutDocker
 cleanUpGoogle

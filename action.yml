@@ -60,11 +60,16 @@ inputs:
     required: false
     default: ""
 
-  maven_opts:
+  mvn_opts:
     description: |-
-      Space seperated string with additional maven cli options.
+      A comma-delimited string with additional maven options.
     required: false
     default: ""
+
+  github_token:
+    description: |-
+      PAT with at least packages:read scope to install packages associated with other private repositories (which GITHUB_TOKEN can't access).
+    required: false
 
   github_context:
     description: |-
@@ -93,7 +98,8 @@ runs:
     - ${{ inputs.repo_sub_dir }}
     - ${{ inputs.key }}
     - ${{ inputs.identity_token }}
-    - ${{ inputs.maven_opts }}
+    - ${{ inputs.mvn_opts }}
+    - ${{ inputs.github_token }}
     - ${{ inputs.docker_user }}
     - ${{ inputs.docker_pwd }}
     - ${{ inputs.dependencies }}
