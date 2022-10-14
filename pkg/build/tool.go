@@ -3,7 +3,7 @@ package build
 import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
-	"io/ioutil"
+	"os"
 )
 
 const (
@@ -23,13 +23,13 @@ type Tools struct {
 func (t Tools) DetectDeps(workDir string) (*ArtifactDependencies, error) {
 	log.Info("search for build files\n")
 	for _, tool := range t.Tools {
-		foundMatch, err := match(tool, workDir)
+		foundMatch, buildFile, err := match(tool, workDir)
 		if err != nil {
 			return nil, fmt.Errorf("could not find match, %v", err)
 		}
 
 		if foundMatch {
-			log.Infof("found build type '%s'\n", tool.BuildFiles())
+			log.Infof("found build type '%s'\n", buildFile)
 			deps, err := tool.ResolveDeps(workDir)
 			if err != nil {
 				return nil, fmt.Errorf("could not resolve deps: %v", err)
@@ -41,24 +41,24 @@ func (t Tools) DetectDeps(workDir string) (*ArtifactDependencies, error) {
 	return nil, fmt.Errorf(fmt.Sprintf("no supported build files found: %s", workDir))
 }
 
-func match(t Tool, workDir string) (bool, error) {
+func match(t Tool, workDir string) (bool, string, error) {
 	for _, file := range t.BuildFiles() {
 		buildFile, err := findBuildFile(workDir, file)
 
 		if err != nil {
-			return false, err
+			return false, "", err
 		}
 
 		if file == buildFile && len(buildFile) != 0 {
-			return true, nil
+			return true, buildFile, nil
 		}
 	}
-	return false, nil
+	return false, "", nil
 }
 
 func findBuildFile(root, pattern string) (string, error) {
 	var result = ""
-	files, err := ioutil.ReadDir(root)
+	files, err := os.ReadDir(root)
 	if err != nil {
 		return "", fmt.Errorf("reading dir %v", err)
 	}
