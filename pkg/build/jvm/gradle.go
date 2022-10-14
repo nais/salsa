@@ -13,15 +13,16 @@ import (
 	"github.com/nais/salsa/pkg/utils"
 )
 
-const gradleBuildFileName = "build.gradle.kts"
-
 type Gradle struct {
 	BuildFilePatterns []string
 }
 
 func BuildGradle() build.Tool {
 	return &Gradle{
-		BuildFilePatterns: []string{gradleBuildFileName},
+		BuildFilePatterns: []string{
+			"build.gradle.kts",
+			"build.gradle",
+		},
 	}
 }
 
