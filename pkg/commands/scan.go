@@ -16,6 +16,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
+	"time"
 )
 
 var (
@@ -27,6 +28,7 @@ var (
 
 type ProvenanceConfig struct {
 	WithDependencies bool
+	BuildStartedOn   string
 }
 
 var scanCmd = &cobra.Command{
@@ -61,7 +63,13 @@ var scanCmd = &cobra.Command{
 			return err
 		}
 
+		buildStartedOn, err := time.Parse(time.RFC3339, Config.BuildStartedOn)
+		if err != nil {
+			return fmt.Errorf("parsing build started on: %v", err)
+		}
+
 		scanConfiguration := &config.ScanConfiguration{
+			BuildStartedOn:     buildStartedOn,
 			WorkDir:            workDir,
 			RepoName:           PathFlags.Repo,
 			Dependencies:       deps,
@@ -116,4 +124,5 @@ func init() {
 	scanCmd.Flags().StringVar(&runnerContext, "runner-context", "", "context of runner")
 	scanCmd.Flags().StringVar(&envContext, "env-context", "", "environmental variables of current context")
 	scanCmd.Flags().BoolVar(&Config.WithDependencies, "with-deps", true, "specify if the cli should generate dependencies for a provenance")
+	scanCmd.Flags().StringVar(&Config.BuildStartedOn, "build-started-on", time.Now().UTC().Format(time.RFC3339), "the start time of the build")
 }

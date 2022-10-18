@@ -13,7 +13,7 @@ func GenerateSlsaPredicate(opts *ProvenanceOptions) *slsa.ProvenancePredicate {
 		},
 		BuildType:   opts.BuildType,
 		BuildConfig: opts.BuildConfig,
-		Metadata:    withMetadata(opts, time.Now().UTC()),
+		Metadata:    withMetadata(opts, time.Now().UTC().Round(time.Second)),
 		Materials:   withMaterials(opts),
 	}
 
