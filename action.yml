@@ -76,7 +76,7 @@ inputs:
 
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/nais/salsa:v0.2'
+  image: 'docker://ghcr.io/nais/salsa:v0.3'
   args:
     - ${{ inputs.repo_dir }}
     - ${{ inputs.repo_name }}
