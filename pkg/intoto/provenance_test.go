@@ -1,6 +1,7 @@
 package intoto
 
 import (
+	"fmt"
 	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/config"
 	"github.com/nais/salsa/pkg/vcs"
@@ -62,7 +63,7 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 				env := Environment()
 
 				scanCfg := &config.ScanConfiguration{
-					BuildStartedOn:     time.Now().UTC().Round(time.Second),
+					BuildStartedOn:     time.Now().UTC().Round(time.Second).Add(-1 * time.Minute),
 					WorkDir:            "",
 					RepoName:           "artifact",
 					Dependencies:       artDeps,
@@ -89,9 +90,13 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 				assert.Equal(t, test.builderId, slsaPredicate.Builder.ID)
 
 				// metadata
+				fmt.Println(*slsaPredicate.Metadata.BuildStartedOn)
+				fmt.Println(slsaPredicate.Metadata.BuildStartedOn)
+				fmt.Println(*slsaPredicate.Metadata.BuildFinishedOn)
+				fmt.Println(slsaPredicate.Metadata.BuildFinishedOn)
 				assert.Equal(t, test.buildInvocationId, slsaPredicate.Metadata.BuildInvocationID)
-				assert.Equal(t, test.buildTimerIsSet, time.Now().UTC().After(*slsaPredicate.Metadata.BuildStartedOn))
-				assert.Equal(t, test.buildTimerFinishedIsSet, time.Now().UTC().After(*slsaPredicate.Metadata.BuildFinishedOn))
+				assert.Equal(t, test.buildTimerIsSet, *slsaPredicate.Metadata.BuildStartedOn != time.Time{})
+				assert.Equal(t, test.buildTimerFinishedIsSet, *slsaPredicate.Metadata.BuildFinishedOn != time.Time{})
 				assert.Equal(t, true, slsaPredicate.Metadata.Reproducible)
 
 				// completeness
@@ -127,7 +132,7 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 				// metadata
 				assert.Equal(t, test.buildInvocationId, slsaPredicate.Metadata.BuildInvocationID)
 				assert.Equal(t, test.buildTimerIsSet, time.Now().UTC().After(*slsaPredicate.Metadata.BuildStartedOn))
-				assert.Equal(t, test.buildTimerFinishedIsSet, time.Now().UTC().After(*slsaPredicate.Metadata.BuildFinishedOn))
+				assert.Equal(t, test.buildTimerFinishedIsSet, slsaPredicate.Metadata.BuildFinishedOn.After(*slsaPredicate.Metadata.BuildStartedOn))
 				assert.Equal(t, false, slsaPredicate.Metadata.Reproducible)
 
 				// completeness

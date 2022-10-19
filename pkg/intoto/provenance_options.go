@@ -20,6 +20,7 @@ type ProvenanceOptions struct {
 	BuilderId         string
 	BuilderRepoDigest *slsa.ProvenanceMaterial
 	BuildInvocationId string
+	BuildFinishedOn   *time.Time
 	BuildStartedOn    time.Time
 	BuildType         string
 	Dependencies      *build.ArtifactDependencies
@@ -123,4 +124,11 @@ func (in *ProvenanceOptions) Materials() bool {
 
 func (in *ProvenanceOptions) Reproducible() bool {
 	return in.Environment() && in.Materials() && in.Parameters()
+}
+
+func (in *ProvenanceOptions) GetBuildFinishedOn() time.Time {
+	if in.BuildFinishedOn == nil {
+		return time.Now().UTC().Round(time.Second)
+	}
+	return *in.BuildFinishedOn
 }
