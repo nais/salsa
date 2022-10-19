@@ -47,6 +47,10 @@ setup() {
     export COSIGN_EXPERIMENTAL
   fi
 
+  if [ -n "$COSIGN_REPOSITORY" ]; then
+    export COSIGN_REPOSITORY
+  fi
+
   export JAVA_HOME=/opt/java/openjdk
 }
 

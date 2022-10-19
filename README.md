@@ -187,7 +187,7 @@ jobs:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
       - name: Provenance, upload and sign attestation
-        uses: nais/salsa@v0.2
+        uses: nais/salsa@v0.3
         with:
           key: ${{ env.KEY }}
           docker_pwd: ${{ secrets.GITHUB_TOKEN }}
@@ -259,7 +259,7 @@ jobs:
           id_token_include_email: true
 
       - name: Generate provenance, upload and sign image
-        uses: nais/salsa@v0.2
+        uses: nais/salsa@v0.3
         with:
           identity_token: ${{ steps.google.outputs.id_token }}
           docker_pwd: ${{ secrets.GITHUB_TOKEN }}
@@ -288,7 +288,7 @@ must be added to the workload identity provider as an allowed audience.
 
 The described `with` fields is required for `nais salsa`.
 
-`with.identity_token` is The output `identity_token` from the Google Auth Action.
+`with.identity_token` is the output `identity_token` from the Google Auth Action.
 Format: `steps.steps-id.outputs.id_token`
 
 `with.docker_pwd` is the GitHub token to authenticate with the registry. The password is used by `nais salsa` to
@@ -310,13 +310,13 @@ store the cosign signatures and attestations, see more specification in
 the [cosign docs](https://github.com/sigstore/cosign#specifying-registry)
 
 ```yaml
-    - name: Generate provenance, upload and sign image
-      uses: nais/salsa@v0.2
-      with:
-        key: ${{ secrets.SALSA_KMS_KEY }}
-        docker_pwd: ${{ secrets.GITHUB_TOKEN }}
-      env:
-        COSIGN_REPOSITORY: "registry.io/signatures"
+  - name: Generate provenance, upload and sign image
+    uses: nais/salsa@v0.3
+    with:
+      key: ${{ secrets.SALSA_KMS_KEY }}
+      docker_pwd: ${{ secrets.GITHUB_TOKEN }}
+    env:
+      COSIGN_REPOSITORY: "registry.io/signatures"
 ```
 
 Actor must be sure that `with.docker_pwd` has access to the signature repository.
