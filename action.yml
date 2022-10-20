@@ -25,6 +25,12 @@ inputs:
     required: false
     default: ${{ github.repository }}
 
+  build_started_on:
+    description: |-
+        Timestamp of when the build started. Defaults to "github.event.workflow_run.created_at".
+    required: false
+    default: ${{ github.event.workflow_run.created_at }}
+
   key:
     description: |-
       The key used to sign the attestation. Cloud Provider KMS key path.
@@ -90,3 +96,4 @@ runs:
     - ${{ inputs.docker_user }}
     - ${{ inputs.docker_pwd }}
     - ${{ inputs.dependencies }}
+    - ${{ inputs.build_started_on }}

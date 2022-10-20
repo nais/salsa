@@ -2,7 +2,6 @@
 
 setup() {
   echo "---------- Preparing pico-de-galo SLSA ----------"
-  buildStartedOn="$(date +%FT%TZ)"
 
   REPO_NAME="${INPUT_REPO_NAME##*/}"
   if [ -z "$REPO_NAME" ]; then
@@ -72,7 +71,7 @@ scan() {
     --env-context "$ENVS" \
     --subDir "$INPUT_REPO_SUB_DIR" \
     --with-deps="$INPUT_DEPENDENCIES" \
-    --build-started-on "$buildStartedOn" \
+    --build-started-on "$INPUT_BUILD_STARTED_ON" \
     --remote-run
 }
 
