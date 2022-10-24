@@ -63,7 +63,7 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 				env := Environment()
 
 				scanCfg := &config.ScanConfiguration{
-					BuildStartedOn:     time.Now().UTC().Round(time.Second).Add(-1 * time.Minute),
+					BuildStartedOn:     time.Now().UTC().Round(time.Second).Add(-10 * time.Minute).Format(time.RFC3339),
 					WorkDir:            "",
 					RepoName:           "artifact",
 					Dependencies:       artDeps,
@@ -111,6 +111,7 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 			} else {
 
 				scanCfg := &config.ScanConfiguration{
+					BuildStartedOn:     time.Now().UTC().Round(time.Second).Add(-10 * time.Minute).Format(time.RFC3339),
 					WorkDir:            "",
 					RepoName:           "artifact",
 					Dependencies:       artDeps,

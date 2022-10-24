@@ -63,6 +63,7 @@ func TestCreateProvenanceOptions(t *testing.T) {
 				assert.NoError(t, err)
 				env := Environment()
 				scanCfg := &config.ScanConfiguration{
+					BuildStartedOn:     time.Now().UTC().Round(time.Second).Add(-10 * time.Minute).Format(time.RFC3339),
 					WorkDir:            "",
 					RepoName:           "artifact",
 					Dependencies:       artDeps,

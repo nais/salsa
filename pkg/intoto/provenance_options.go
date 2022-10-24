@@ -4,6 +4,7 @@ import (
 	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/config"
 	"github.com/nais/salsa/pkg/vcs"
+	log "github.com/sirupsen/logrus"
 	"time"
 
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
@@ -30,14 +31,17 @@ type ProvenanceOptions struct {
 
 func CreateProvenanceOptions(scanCfg *config.ScanConfiguration) *ProvenanceOptions {
 	opts := &ProvenanceOptions{
-		BuildStartedOn: scanCfg.BuildStartedOn,
-		BuilderId:      DefaultBuildId,
-		BuildType:      AdHocBuildType,
-		Dependencies:   scanCfg.Dependencies,
-		Name:           scanCfg.RepoName,
+		// BuildStartedOn: scanCfg.BuildStartedOn,
+		BuilderId:    DefaultBuildId,
+		BuildType:    AdHocBuildType,
+		Dependencies: scanCfg.Dependencies,
+		Name:         scanCfg.RepoName,
 	}
 
 	context := scanCfg.ContextEnvironment
+
+	opts.BuildStartedOn = buildStartedOn(context, scanCfg.BuildStartedOn)
+
 	if context != nil {
 		opts.BuildType = context.BuildType()
 		opts.BuildInvocationId = context.BuildInvocationId()
@@ -131,4 +135,33 @@ func (in *ProvenanceOptions) GetBuildFinishedOn() time.Time {
 		return time.Now().UTC().Round(time.Second)
 	}
 	return *in.BuildFinishedOn
+}
+
+func buildStartedOn(context vcs.ContextEnvironment, inputBuildTime string) time.Time {
+	if inputBuildTime != "" {
+		return buildStarted(inputBuildTime)
+	}
+
+	if context == nil {
+		return time.Now().UTC().Round(time.Second)
+	}
+
+	lastCommitTime := context.GetLastCommitTime()
+	if lastCommitTime == "" {
+		log.Info("failed to find last commit time, using default start time")
+		return time.Now().UTC().Round(time.Second)
+	}
+
+	return buildStarted(lastCommitTime)
+
+}
+
+func buildStarted(buildTime string) time.Time {
+	started, err := time.Parse(time.RFC3339, buildTime)
+	if err != nil {
+		log.Warnf("Failed to parse build time: %v, using default start time", err)
+		return time.Now().UTC().Round(time.Second)
+	}
+
+	return started
 }

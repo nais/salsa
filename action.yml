@@ -27,9 +27,11 @@ inputs:
 
   build_started_on:
     description: |-
-        Timestamp of when the build started. Defaults to "github.event.workflow_run.created_at".
+      Timestamp of when the build started. Defaults to last commit before workflow run,
+      if provided as input, the timestamp is added to salsa cli flag --build-started-on.
+      format: YYYY-MM-DDTHH:MM:SSZ (RFC3339)
     required: false
-    default: ${{ github.event.workflow_run.created_at }}
+    default: ""
 
   key:
     description: |-

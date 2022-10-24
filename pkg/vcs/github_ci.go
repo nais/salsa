@@ -117,3 +117,22 @@ func (in *GithubCIEnvironment) NonReproducibleMetadata() *Metadata {
 		},
 	}
 }
+
+func (in *GithubCIEnvironment) GetLastCommitTime() string {
+	if in.Event == nil {
+		return ""
+	}
+
+	commits, err := in.Event.GetCommits()
+	if err != nil || len(commits) == 0 {
+		return ""
+	}
+
+	for _, commit := range commits {
+		if commit.After == in.Sha() {
+			return commit.Timestamp
+		}
+	}
+
+	return ""
+}

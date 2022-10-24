@@ -16,7 +16,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
-	"time"
 )
 
 var (
@@ -63,13 +62,8 @@ var scanCmd = &cobra.Command{
 			return err
 		}
 
-		buildStartedOn, err := time.Parse(time.RFC3339, Config.BuildStartedOn)
-		if err != nil {
-			return fmt.Errorf("parsing build started on: %v", err)
-		}
-
 		scanConfiguration := &config.ScanConfiguration{
-			BuildStartedOn:     buildStartedOn,
+			BuildStartedOn:     Config.BuildStartedOn,
 			WorkDir:            workDir,
 			RepoName:           PathFlags.Repo,
 			Dependencies:       deps,
@@ -124,5 +118,5 @@ func init() {
 	scanCmd.Flags().StringVar(&runnerContext, "runner-context", "", "context of runner")
 	scanCmd.Flags().StringVar(&envContext, "env-context", "", "environmental variables of current context")
 	scanCmd.Flags().BoolVar(&Config.WithDependencies, "with-deps", true, "specify if the cli should generate dependencies for a provenance")
-	scanCmd.Flags().StringVar(&Config.BuildStartedOn, "build-started-on", time.Now().UTC().Format(time.RFC3339), "the start time of the build")
+	scanCmd.Flags().StringVar(&Config.BuildStartedOn, "build-started-on", "", "the start time of the build")
 }
