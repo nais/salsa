@@ -42,6 +42,23 @@ setup() {
     exit 1
   fi
 
+  exportCosignEnvironment
+  exportGithubToken
+
+  export JAVA_HOME=/opt/java/openjdk
+}
+
+exportGithubToken() {
+  if [ -n "$INPUT_GITHUB_TOKEN" ]; then
+    if [ -n "$INPUT_TOKEN_KEY_PATTERN" ]; then
+      export "$INPUT_TOKEN_KEY_PATTERN"="$INPUT_GITHUB_TOKEN"
+    else
+      export GITHUB_TOKEN="$INPUT_GITHUB_TOKEN"
+    fi
+  fi
+}
+
+exportCosignEnvironment() {
   if [ -n "$COSIGN_EXPERIMENTAL" ]; then
     export COSIGN_EXPERIMENTAL
   fi
@@ -49,8 +66,6 @@ setup() {
   if [ -n "$COSIGN_REPOSITORY" ]; then
     export COSIGN_REPOSITORY
   fi
-
-  export JAVA_HOME=/opt/java/openjdk
 }
 
 loginDocker() {

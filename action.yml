@@ -60,6 +60,19 @@ inputs:
     required: false
     default: ""
 
+  github_token:
+    description: |-
+      Token to authenticate private packages repository.
+    required: false
+    default: ""
+
+  token_key_pattern:
+    description: |-
+      When input github_token is provided but the build tool configurations uses a key pattern 
+      different from the default "GITHUB_TOKEN".
+    required: false
+    default: ""
+
   github_context:
     description: |-
       Internal value (do not set): the "github" context object in json.
@@ -88,5 +101,7 @@ runs:
     - ${{ inputs.key }}
     - ${{ inputs.identity_token }}
     - ${{ inputs.docker_user }}
+    - ${{ inputs.github_token }}
+    - ${{ inputs.token_key_pattern }}
     - ${{ inputs.docker_pwd }}
     - ${{ inputs.dependencies }}
