@@ -1,7 +1,6 @@
 package intoto
 
 import (
-	"fmt"
 	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/config"
 	"github.com/nais/salsa/pkg/vcs"
@@ -90,10 +89,6 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 				assert.Equal(t, test.builderId, slsaPredicate.Builder.ID)
 
 				// metadata
-				fmt.Println(*slsaPredicate.Metadata.BuildStartedOn)
-				fmt.Println(slsaPredicate.Metadata.BuildStartedOn)
-				fmt.Println(*slsaPredicate.Metadata.BuildFinishedOn)
-				fmt.Println(slsaPredicate.Metadata.BuildFinishedOn)
 				assert.Equal(t, test.buildInvocationId, slsaPredicate.Metadata.BuildInvocationID)
 				assert.Equal(t, test.buildTimerIsSet, *slsaPredicate.Metadata.BuildStartedOn != time.Time{})
 				assert.Equal(t, test.buildTimerFinishedIsSet, *slsaPredicate.Metadata.BuildFinishedOn != time.Time{})

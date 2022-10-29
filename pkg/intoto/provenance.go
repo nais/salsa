@@ -24,11 +24,11 @@ func GenerateSlsaPredicate(opts *ProvenanceOptions) *slsa.ProvenancePredicate {
 }
 
 func withMetadata(opts *ProvenanceOptions) *slsa.ProvenanceMetadata {
-	finishedTime := opts.GetBuildFinishedOn()
+	timeFinished := opts.GetBuildFinishedOn()
 	return &slsa.ProvenanceMetadata{
 		BuildInvocationID: opts.BuildInvocationId,
 		BuildStartedOn:    &opts.BuildStartedOn,
-		BuildFinishedOn:   &finishedTime,
+		BuildFinishedOn:   &timeFinished,
 		Completeness:      withCompleteness(opts),
 		Reproducible:      opts.Reproducible(),
 	}

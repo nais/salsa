@@ -31,7 +31,6 @@ type ProvenanceOptions struct {
 
 func CreateProvenanceOptions(scanCfg *config.ScanConfiguration) *ProvenanceOptions {
 	opts := &ProvenanceOptions{
-		// BuildStartedOn: scanCfg.BuildStartedOn,
 		BuilderId:    DefaultBuildId,
 		BuildType:    AdHocBuildType,
 		Dependencies: scanCfg.Dependencies,
@@ -39,7 +38,6 @@ func CreateProvenanceOptions(scanCfg *config.ScanConfiguration) *ProvenanceOptio
 	}
 
 	context := scanCfg.ContextEnvironment
-
 	opts.BuildStartedOn = buildStartedOn(context, scanCfg.BuildStartedOn)
 
 	if context != nil {
@@ -146,13 +144,13 @@ func buildStartedOn(context vcs.ContextEnvironment, inputBuildTime string) time.
 		return time.Now().UTC().Round(time.Second)
 	}
 
-	lastCommitTime := context.GetHeadCommitTime()
-	if lastCommitTime == "" {
+	headCommitTime := context.GetHeadCommitTime()
+	if headCommitTime == "" {
 		log.Info("failed to find last commit time, using default start time")
 		return time.Now().UTC().Round(time.Second)
 	}
 
-	return buildStarted(lastCommitTime)
+	return buildStarted(headCommitTime)
 
 }
 
