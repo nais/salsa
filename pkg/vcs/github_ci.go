@@ -11,7 +11,7 @@ const (
 
 type GithubCIEnvironment struct {
 	BuildContext     *github.Context
-	Event            *Event
+	Event            *EventInput
 	RunnerContext    *github.RunnerContext
 	BuildEnvironment *github.CurrentBuildEnvironment
 	Actions          *github.Actions
@@ -44,10 +44,8 @@ func CreateGithubCIEnvironment(githubContext []byte, runnerContext, envsContext 
 
 func BuildEnvironment(context *github.Context, runner *github.RunnerContext, current *github.CurrentBuildEnvironment) ContextEnvironment {
 	return &GithubCIEnvironment{
-		BuildContext: context,
-		Event: &Event{
-			Inputs: context.Event,
-		},
+		BuildContext:     context,
+		Event:            NewEvent(context.Event),
 		RunnerContext:    runner,
 		BuildEnvironment: current,
 		Actions:          github.BuildId(GithubActionsBuildIdVersion),
@@ -81,7 +79,7 @@ func (in *GithubCIEnvironment) BuilderId() string {
 	return in.RepoUri() + in.Actions.SelfHostedIdSuffix
 }
 
-func (in *GithubCIEnvironment) UserDefinedParameters() *Event {
+func (in *GithubCIEnvironment) UserDefinedParameters() *EventInput {
 	// Only possible user-defined parameters
 	// This is unset/null for all other events.
 	if in.BuildContext.EventName != "workflow_dispatch" {
@@ -118,20 +116,18 @@ func (in *GithubCIEnvironment) NonReproducibleMetadata() *Metadata {
 	}
 }
 
-func (in *GithubCIEnvironment) GetLastCommitTime() string {
+func (in *GithubCIEnvironment) GetHeadCommitTime() string {
 	if in.Event == nil {
 		return ""
 	}
 
-	commits, err := in.Event.GetCommits()
-	if err != nil || len(commits) == 0 {
+	metadata, err := in.Event.ParseEvent()
+	if err != nil {
 		return ""
 	}
 
-	for _, commit := range commits {
-		if commit.After == in.Sha() {
-			return commit.Timestamp
-		}
+	if metadata.GetHeadCommitId() == in.Sha() {
+		return metadata.GetHeadCommitTimestamp()
 	}
 
 	return ""

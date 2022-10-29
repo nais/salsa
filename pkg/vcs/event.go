@@ -1,25 +1,46 @@
 package vcs
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
-type Event struct {
+type EventInput struct {
 	Inputs json.RawMessage `json:"inputs"`
 }
 
-type Commits struct {
-	Commits []Commit `json:"commits"`
+type Event struct {
+	Event eventMetadata `json:"event"`
 }
 
-type Commit struct {
+type eventMetadata struct {
+	HeadCommit headCommit `json:"head_commit"`
+}
+
+type headCommit struct {
+	Id        string `json:"id"`
 	Timestamp string `json:"timestamp"`
-	After     string `json:"after"`
 }
 
-func (in *Event) GetCommits() ([]Commit, error) {
-	var commits []Commit
-	err := json.Unmarshal(in.Inputs, &commits)
+func NewEvent(metadata []byte) *EventInput {
+	return &EventInput{
+		Inputs: metadata,
+	}
+}
+
+func (in *EventInput) ParseEvent() (*Event, error) {
+	var event Event
+	err := json.Unmarshal(in.Inputs, &event)
 	if err != nil {
 		return nil, err
 	}
-	return commits, nil
+
+	return &event, nil
+}
+
+func (in *Event) GetHeadCommitId() string {
+	return in.Event.HeadCommit.Id
+}
+
+func (in *Event) GetHeadCommitTimestamp() string {
+	return in.Event.HeadCommit.Timestamp
 }

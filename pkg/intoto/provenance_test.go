@@ -79,7 +79,7 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 				// VCS Context
 				assert.Equal(t, test.buildType, slsaPredicate.BuildType)
 				assert.NotEmpty(t, slsaPredicate.Invocation)
-				i, err := slsaPredicate.Invocation.Parameters.(*vcs.Event).Inputs.MarshalJSON()
+				i, err := slsaPredicate.Invocation.Parameters.(*vcs.EventInput).Inputs.MarshalJSON()
 				assert.NoError(t, err)
 				assert.Equal(t, "some user inputs", string(i))
 				e := slsaPredicate.Invocation.Environment.(*vcs.Metadata)

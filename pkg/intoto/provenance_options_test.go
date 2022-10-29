@@ -150,7 +150,7 @@ func Environment() *vcs.GithubCIEnvironment {
 			ServerUrl:  "https://github.com",
 			EventName:  "workflow_dispatch",
 		},
-		Event: &vcs.Event{
+		Event: &vcs.EventInput{
 			Inputs: []byte("some user inputs"),
 		},
 		RunnerContext: &github.RunnerContext{
