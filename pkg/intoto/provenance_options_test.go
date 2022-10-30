@@ -5,7 +5,6 @@ import (
 	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/config"
 	"github.com/nais/salsa/pkg/vcs"
-	"github.com/nais/salsa/pkg/vcs/github"
 	"github.com/spf13/cobra"
 	"os"
 	"testing"
@@ -142,7 +141,7 @@ func ExpectedArtDeps(deps map[string]build.Dependency) *build.ArtifactDependenci
 
 func Environment() *vcs.GithubCIEnvironment {
 	return &vcs.GithubCIEnvironment{
-		BuildContext: &github.Context{
+		BuildContext: &vcs.GithubContext{
 			Repository: "nais/salsa",
 			RunId:      "1234",
 			SHA:        "4321",
@@ -150,15 +149,20 @@ func Environment() *vcs.GithubCIEnvironment {
 			ServerUrl:  "https://github.com",
 			EventName:  "workflow_dispatch",
 		},
-		Event: &vcs.EventInput{
-			Inputs: []byte("some user inputs"),
+		Event: &vcs.Event{
+			EventMetadata: &vcs.EventMetadata{
+				HeadCommit: &vcs.HeadCommit{
+					Id:        "yolo",
+					Timestamp: "bolo",
+				},
+			},
 		},
-		RunnerContext: &github.RunnerContext{
+		RunnerContext: &vcs.RunnerContext{
 			OS:        "Linux",
 			Temp:      "/home/runner/work/_temp",
 			ToolCache: "/opt/hostedtoolcache",
 		},
-		Actions: github.BuildId("v1"),
+		Actions: vcs.BuildId("v1"),
 	}
 }
 

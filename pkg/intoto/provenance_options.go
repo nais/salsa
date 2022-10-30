@@ -105,11 +105,11 @@ func (in *ProvenanceOptions) Parameters() bool {
 		return false
 	}
 
-	if in.Invocation.Parameters.(*vcs.EventInput) == nil {
+	if in.Invocation.Parameters.(*vcs.Event) == nil {
 		return false
 	}
 
-	return in.Invocation.Parameters.(*vcs.EventInput).Inputs != nil
+	return in.Invocation.Parameters.(*vcs.Event).EventMetadata != nil
 }
 
 func (in *ProvenanceOptions) Environment() bool {
@@ -144,9 +144,13 @@ func buildStartedOn(context vcs.ContextEnvironment, inputBuildTime string) time.
 		return time.Now().UTC().Round(time.Second)
 	}
 
+	if context.GetEventMetadata() == nil {
+		return time.Now().UTC().Round(time.Second)
+	}
+
 	headCommitTime := context.GetHeadCommitTime()
 	if headCommitTime == "" {
-		log.Info("failed to find last commit time, using default start time")
+		log.Warn("failed to find last commit time, using default start time")
 		return time.Now().UTC().Round(time.Second)
 	}
 

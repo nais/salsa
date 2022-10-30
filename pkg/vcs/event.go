@@ -4,43 +4,32 @@ import (
 	"encoding/json"
 )
 
-type EventInput struct {
-	Inputs json.RawMessage `json:"inputs"`
-}
-
 type Event struct {
-	Event eventMetadata `json:"event"`
+	EventMetadata *EventMetadata `json:"event"`
 }
 
-type eventMetadata struct {
-	HeadCommit headCommit `json:"head_commit"`
+type EventMetadata struct {
+	HeadCommit *HeadCommit `json:"head_commit"`
 }
 
-type headCommit struct {
+type HeadCommit struct {
 	Id        string `json:"id"`
 	Timestamp string `json:"timestamp"`
 }
 
-func NewEvent(metadata []byte) *EventInput {
-	return &EventInput{
-		Inputs: metadata,
-	}
-}
-
-func (in *EventInput) ParseEvent() (*Event, error) {
+func ParseEvent(inputs []byte) (*Event, error) {
 	var event Event
-	err := json.Unmarshal(in.Inputs, &event)
+	err := json.Unmarshal(inputs, &event.EventMetadata)
 	if err != nil {
 		return nil, err
 	}
-
 	return &event, nil
 }
 
 func (in *Event) GetHeadCommitId() string {
-	return in.Event.HeadCommit.Id
+	return in.EventMetadata.HeadCommit.Id
 }
 
 func (in *Event) GetHeadCommitTimestamp() string {
-	return in.Event.HeadCommit.Timestamp
+	return in.EventMetadata.HeadCommit.Timestamp
 }

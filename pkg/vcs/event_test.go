@@ -7,10 +7,10 @@ import (
 	"time"
 )
 
-func TestEvenCommit(t *testing.T) {
+func TestEvenHeadCommit(t *testing.T) {
 	metadata := commitMetadata(t)
-	event := NewEvent(metadata)
-	parsedEvent, err := event.ParseEvent()
+	context, err := ParseContext(metadata)
+	parsedEvent, err := ParseEvent(context.Event)
 	assert.NoError(t, err)
 	assert.NotNil(t, parsedEvent)
 	assert.Equal(t, "d4cd018b2fe54d8308b78f2bb88db94ac57173ea", parsedEvent.GetHeadCommitId())
@@ -20,7 +20,7 @@ func TestEvenCommit(t *testing.T) {
 }
 
 func commitMetadata(t *testing.T) []byte {
-	metadata, err := os.ReadFile("testdata/event-commit.json")
+	metadata, err := os.ReadFile("testdata/event-head-commit.json")
 	assert.NoError(t, err)
 	return metadata
 }

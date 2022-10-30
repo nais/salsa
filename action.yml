@@ -27,9 +27,9 @@ inputs:
 
   build_started_on:
     description: |-
-      Timestamp of when the build started. Defaults to last commit before workflow run,
+      Timestamp of when the build started. Defaults to head commit of workflow,
       if provided as input, the timestamp is added to salsa cli flag --build-started-on.
-      format: YYYY-MM-DDTHH:MM:SSZ (RFC3339)
+      Time format: YYYY-MM-DDTHH:MM:SSZ (RFC3339)
     required: false
     default: ""
 

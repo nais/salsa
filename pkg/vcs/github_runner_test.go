@@ -1,4 +1,4 @@
-package github
+package vcs
 
 import (
 	"encoding/base64"
@@ -31,11 +31,11 @@ func TestParseRunnerFailContext(t *testing.T) {
 	assert.EqualError(t, err, "unmarshal runner context json: invalid character 'Ê' looking for beginning of value")
 }
 
-var RunnerTestContext = `{
-		"os": "Linux",
-		"arch": "X64",
-		"name": "Hosted Agent",
-		"tool_cache": "/opt/hostedtoolcache",
-		"temp": "/home/runner/work/_temp",
-		"workspace": "/home/runner/work/nais-salsa-action"
-	  }`
+//var RunnerTestContext = `{
+//		"os": "Linux",
+//		"arch": "X64",
+//		"name": "Hosted Agent",
+//		"tool_cache": "/opt/hostedtoolcache",
+//		"temp": "/home/runner/work/_temp",
+//		"workspace": "/home/runner/work/nais-salsa-action"
+//	  }`

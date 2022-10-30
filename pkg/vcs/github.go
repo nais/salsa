@@ -1,11 +1,11 @@
-package github
+package vcs
 
 import (
 	"encoding/json"
 	"fmt"
 )
 
-type Context struct {
+type GithubContext struct {
 	Action          string          `json:"action"`
 	Actor           string          `json:"actor"`
 	Event           json.RawMessage `json:"event"`
@@ -24,8 +24,8 @@ type Context struct {
 	Workspace       string          `json:"workspace"`
 }
 
-func ParseContext(github []byte) (*Context, error) {
-	context := Context{}
+func ParseContext(github []byte) (*GithubContext, error) {
+	context := GithubContext{}
 	if len(github) == 0 {
 		return nil, nil
 	}

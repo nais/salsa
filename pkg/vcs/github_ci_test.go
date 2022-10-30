@@ -43,18 +43,28 @@ func TestCreateCIEnvironment(t *testing.T) {
 	}
 	assert.Equal(t, current, ci.CurrentFilteredEnvironment())
 
-	result, err := ci.UserDefinedParameters().Inputs.MarshalJSON()
-	assert.NoError(t, err)
+	result := ci.UserDefinedParameters()
 	assert.NotNil(t, result)
 	assert.NotEmpty(t, "%s", result)
 	assert.Equal(t, "Salsa CI", ci.Context())
 
 }
 
-func githubContext(t *testing.T) []byte {
-	githubContext, err := os.ReadFile("testdata/github-context.json")
+func TestGetHeadCommitTime(t *testing.T) {
+	err := os.Setenv("GITHUB_ACTIONS", "true")
 	assert.NoError(t, err)
-	return githubContext
+	context := githubContext(t)
+	runner := runnerContext()
+	env := envC()
+	ci, err := CreateGithubCIEnvironment(context, &runner, &env)
+	assert.NoError(t, err)
+	assert.Equal(t, "2022-02-14T09:38:16+01:00", ci.GetHeadCommitTime())
+}
+
+func githubContext(t *testing.T) []byte {
+	context, err := os.ReadFile("testdata/github-context.json")
+	assert.NoError(t, err)
+	return context
 }
 
 func runnerContext() string {

@@ -355,6 +355,7 @@ The Following inputs can be used as `step.with` keys
 | `dependencies`      | Bool   | true                  | Set to false if action should not create materials for dependencies (e.g. if build tool is unsupported or repo uses internal/private dependencies) | False    |
 | `github_token`      | String | ""                    | Token to authenticate and read private packages, the token must have read:packages scope                                                           | False    |
 | `token_key_pattern` | String | ""                    | If a token is provided but the the key pattern is different from the default key pattern "GITHUB_TOKEN"                                            | False    |
+| `build_started_on`  | String | ""                    | Specify a workflow build start time                                                                                                                | False    |
 | `repo_dir`          | String | $GITHUB_WORKSPACE     | **Internal value (do not set):** Root of directory to look for build files                                                                         | False    |
 | `github_context`    | String | ${{ toJSON(github) }} | **Internal value (do not set):** the [github context](#github-context) object in json                                                              | False    |
 | `runner_context`    | String | ${{ toJSON(runner) }} | **Internal value (do not set):** the [runner context](#runner-context) object in json                                                              | False    |

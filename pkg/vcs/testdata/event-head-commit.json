@@ -1,4 +1,8 @@
 {
+  "actor": "jdoe",
+  "workflow": "Salsa CI",
+  "head_ref": "",
+  "base_ref": "",
   "event": {
     "after": "d4cd018b2fe54d8308b78f2bb88db94ac57173ea",
     "base_ref": null,

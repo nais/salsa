@@ -70,17 +70,16 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 					Cmd:                nil,
 				}
 
-				opts := CreateProvenanceOptions(scanCfg)
-				slsaPredicate := GenerateSlsaPredicate(opts)
 				err := os.Setenv("GITHUB_ACTIONS", "true")
 				assert.NoError(t, err)
+				opts := CreateProvenanceOptions(scanCfg)
+				slsaPredicate := GenerateSlsaPredicate(opts)
 
-				// VCS Context
+				// VCS GithubContext
 				assert.Equal(t, test.buildType, slsaPredicate.BuildType)
 				assert.NotEmpty(t, slsaPredicate.Invocation)
-				i, err := slsaPredicate.Invocation.Parameters.(*vcs.EventInput).Inputs.MarshalJSON()
-				assert.NoError(t, err)
-				assert.Equal(t, "some user inputs", string(i))
+				assert.Equal(t, "yolo", slsaPredicate.Invocation.Parameters.(*vcs.Event).GetHeadCommitId())
+				assert.Equal(t, "bolo", slsaPredicate.Invocation.Parameters.(*vcs.Event).GetHeadCommitTimestamp())
 				e := slsaPredicate.Invocation.Environment.(*vcs.Metadata)
 				assert.NoError(t, err)
 				assert.Equal(t, expectedMetadata(), e)

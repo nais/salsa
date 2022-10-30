@@ -7,8 +7,9 @@ type ContextEnvironment interface {
 	Context() string
 	CurrentFilteredEnvironment() map[string]string
 	NonReproducibleMetadata() *Metadata
-	UserDefinedParameters() *EventInput
+	UserDefinedParameters() *Event
 	RepoUri() string
 	Sha() string
 	GetHeadCommitTime() string
+	GetEventMetadata() *Event
 }
