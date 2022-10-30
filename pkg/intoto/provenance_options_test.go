@@ -62,7 +62,7 @@ func TestCreateProvenanceOptions(t *testing.T) {
 				assert.NoError(t, err)
 				env := Environment()
 				scanCfg := &config.ScanConfiguration{
-					BuildStartedOn:     time.Now().UTC().Round(time.Second).Add(-10 * time.Minute).Format(time.RFC3339),
+					BuildStartedOn:     "",
 					WorkDir:            "",
 					RepoName:           "artifact",
 					Dependencies:       artDeps,
@@ -73,7 +73,7 @@ func TestCreateProvenanceOptions(t *testing.T) {
 				assert.Equal(t, "artifact", provenanceArtifact.Name)
 				assert.Equal(t, test.buildType, provenanceArtifact.BuildType)
 				assert.Equal(t, deps, provenanceArtifact.Dependencies.RuntimeDeps)
-				assert.Equal(t, test.buildTimerIsSet, time.Now().UTC().After(provenanceArtifact.BuildStartedOn))
+				assert.Equal(t, "2022-02-14T09:38:16+01:00", provenanceArtifact.BuildStartedOn.Format(time.RFC3339))
 				assert.Equal(t, test.buildInvocationId, provenanceArtifact.BuildInvocationId)
 				assert.Equal(t, test.buildConfig, provenanceArtifact.BuildConfig)
 				assert.NotEmpty(t, provenanceArtifact.Invocation)
@@ -153,7 +153,7 @@ func Environment() *vcs.GithubCIEnvironment {
 			EventMetadata: &vcs.EventMetadata{
 				HeadCommit: &vcs.HeadCommit{
 					Id:        "yolo",
-					Timestamp: "bolo",
+					Timestamp: "2022-02-14T09:38:16+01:00",
 				},
 			},
 		},

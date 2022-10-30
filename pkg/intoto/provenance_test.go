@@ -79,7 +79,7 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 				assert.Equal(t, test.buildType, slsaPredicate.BuildType)
 				assert.NotEmpty(t, slsaPredicate.Invocation)
 				assert.Equal(t, "yolo", slsaPredicate.Invocation.Parameters.(*vcs.Event).GetHeadCommitId())
-				assert.Equal(t, "bolo", slsaPredicate.Invocation.Parameters.(*vcs.Event).GetHeadCommitTimestamp())
+				assert.Equal(t, "2022-02-14T09:38:16+01:00", slsaPredicate.Invocation.Parameters.(*vcs.Event).GetHeadCommitTimestamp())
 				e := slsaPredicate.Invocation.Environment.(*vcs.Metadata)
 				assert.NoError(t, err)
 				assert.Equal(t, expectedMetadata(), e)

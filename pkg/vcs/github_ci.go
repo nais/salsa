@@ -121,18 +121,6 @@ func (in *GithubCIEnvironment) NonReproducibleMetadata() *Metadata {
 	}
 }
 
-func (in *GithubCIEnvironment) GetHeadCommitTime() string {
-	if in.Event == nil {
-		return ""
-	}
-
-	if in.Event.GetHeadCommitId() == in.Sha() {
-		return in.Event.GetHeadCommitTimestamp()
-	}
-
-	return ""
-}
-
-func (in *GithubCIEnvironment) GetEventMetadata() *Event {
+func (in *GithubCIEnvironment) GetEvent() *Event {
 	return in.Event
 }

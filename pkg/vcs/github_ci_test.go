@@ -58,7 +58,7 @@ func TestGetHeadCommitTime(t *testing.T) {
 	env := envC()
 	ci, err := CreateGithubCIEnvironment(context, &runner, &env)
 	assert.NoError(t, err)
-	assert.Equal(t, "2022-02-14T09:38:16+01:00", ci.GetHeadCommitTime())
+	assert.Equal(t, "2022-02-14T09:38:16+01:00", ci.GetEvent().GetHeadCommitTimestamp())
 }
 
 func githubContext(t *testing.T) []byte {

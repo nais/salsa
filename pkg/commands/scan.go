@@ -118,5 +118,5 @@ func init() {
 	scanCmd.Flags().StringVar(&runnerContext, "runner-context", "", "context of runner")
 	scanCmd.Flags().StringVar(&envContext, "env-context", "", "environmental variables of current context")
 	scanCmd.Flags().BoolVar(&Config.WithDependencies, "with-deps", true, "specify if the cli should generate dependencies for a provenance")
-	scanCmd.Flags().StringVar(&Config.BuildStartedOn, "build-started-on", "", "the actual start time of the build")
+	scanCmd.Flags().StringVar(&Config.BuildStartedOn, "build-started-on", "", "set start time for the build")
 }

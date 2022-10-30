@@ -144,17 +144,13 @@ func buildStartedOn(context vcs.ContextEnvironment, inputBuildTime string) time.
 		return time.Now().UTC().Round(time.Second)
 	}
 
-	if context.GetEventMetadata() == nil {
+	event := context.GetEvent()
+
+	if event == nil {
 		return time.Now().UTC().Round(time.Second)
 	}
 
-	headCommitTime := context.GetHeadCommitTime()
-	if headCommitTime == "" {
-		log.Warn("failed to find last commit time, using default start time")
-		return time.Now().UTC().Round(time.Second)
-	}
-
-	return buildStarted(headCommitTime)
+	return buildStarted(event.GetHeadCommitTimestamp())
 
 }
 

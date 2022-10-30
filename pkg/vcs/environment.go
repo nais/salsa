@@ -10,6 +10,5 @@ type ContextEnvironment interface {
 	UserDefinedParameters() *Event
 	RepoUri() string
 	Sha() string
-	GetHeadCommitTime() string
-	GetEventMetadata() *Event
+	GetEvent() *Event
 }
