@@ -10,6 +10,7 @@ import (
 func TestEvenHeadCommit(t *testing.T) {
 	metadata := commitMetadata(t)
 	context, err := ParseContext(metadata)
+	assert.NoError(t, err)
 	parsedEvent, err := ParseEvent(context.Event)
 	assert.NoError(t, err)
 	assert.NotNil(t, parsedEvent)

@@ -4,7 +4,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"regexp"
 	"strings"
 
@@ -43,7 +43,7 @@ func (g Gradle) ResolveDeps(workDir string) (*build.ArtifactDependencies, error)
 		return nil, fmt.Errorf("exec: %v\n", err)
 	}
 
-	xmlData, err := ioutil.ReadFile(workDir + "/gradle/verification-metadata.xml")
+	xmlData, err := os.ReadFile(workDir + "/gradle/verification-metadata.xml")
 	if err != nil {
 		return nil, fmt.Errorf("readfile: %v\n", err)
 	}
