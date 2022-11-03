@@ -11,7 +11,7 @@ RUN go mod download
 COPY . /src
 RUN make salsa
 
-FROM maven:3.8.6-eclipse-temurin-17-alpine
+FROM maven:3-openjdk-18-slim
 
 RUN apk add --no-cache ca-certificates docker jq httpie
 
