@@ -9,6 +9,11 @@ type Event struct {
 }
 
 type EventMetadata struct {
+	WorkFlowRun *WorkFlow   `json:"workflow_run"`
+	HeadCommit  *HeadCommit `json:"head_commit"`
+}
+
+type WorkFlow struct {
 	HeadCommit *HeadCommit `json:"head_commit"`
 }
 
@@ -27,9 +32,17 @@ func ParseEvent(inputs []byte) (*Event, error) {
 }
 
 func (in *Event) GetHeadCommitId() string {
+	if in.EventMetadata.WorkFlowRun != nil {
+		return in.EventMetadata.WorkFlowRun.HeadCommit.Id
+	}
+
 	return in.EventMetadata.HeadCommit.Id
 }
 
 func (in *Event) GetHeadCommitTimestamp() string {
+	if in.EventMetadata.WorkFlowRun != nil {
+		return in.EventMetadata.WorkFlowRun.HeadCommit.Timestamp
+	}
+
 	return in.EventMetadata.HeadCommit.Timestamp
 }
