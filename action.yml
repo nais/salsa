@@ -25,6 +25,14 @@ inputs:
     required: false
     default: ${{ github.repository }}
 
+  build_started_on:
+    description: |-
+      Timestamp of when the build started. Defaults to head commit of workflow,
+      if provided as input, the timestamp is added to salsa cli flag --build-started-on.
+      Time format: YYYY-MM-DDTHH:MM:SSZ (RFC3339)
+    required: false
+    default: ""
+
   key:
     description: |-
       The key used to sign the attestation. Cloud Provider KMS key path.
@@ -89,7 +97,7 @@ inputs:
 
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/nais/salsa:v0.3'
+  image: 'docker://ghcr.io/nais/salsa:v0.4'
   args:
     - ${{ inputs.repo_dir }}
     - ${{ inputs.repo_name }}
@@ -105,3 +113,4 @@ runs:
     - ${{ inputs.token_key_pattern }}
     - ${{ inputs.docker_pwd }}
     - ${{ inputs.dependencies }}
+    - ${{ inputs.build_started_on }}

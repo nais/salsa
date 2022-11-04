@@ -10,4 +10,5 @@ type ContextEnvironment interface {
 	UserDefinedParameters() *Event
 	RepoUri() string
 	Sha() string
+	GetEvent() *Event
 }

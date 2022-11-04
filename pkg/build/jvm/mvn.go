@@ -3,7 +3,6 @@ package jvm
 import (
 	"crypto/sha256"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -86,7 +85,7 @@ func MavenCompileAndRuntimeTimeDeps(rootPath string) (map[string]build.Dependenc
 }
 
 func buildChecksum(file string) (build.CheckSum, error) {
-	content, err := ioutil.ReadFile(file)
+	content, err := os.ReadFile(file)
 	if err != nil {
 		return build.CheckSum{}, err
 	}

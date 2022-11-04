@@ -1,0 +1,65 @@
+{
+  "actor": "jdoe",
+  "workflow": "Salsa CI",
+  "head_ref": "",
+  "base_ref": "",
+  "event": {
+    "after": "d4cd018b2fe54d8308b78f2bb88db94ac57173ea",
+    "base_ref": null,
+    "before": "a88fd9ea948a6ea1278ebcfd4b238283a72e12b0",
+    "commits": [
+      {
+        "author": {
+          "email": "john.doe@emal.com",
+          "name": "jDoe",
+          "username": "jDoe"
+        },
+        "committer": {
+          "email": "john.doe@emal.com",
+          "name": "jDoe",
+          "username": "jDoe"
+        },
+        "distinct": true,
+        "id": "d4cd018b2fe54d8308b78f2bb88db94ac57173ea",
+        "message": "master commit",
+        "timestamp": "2022-10-21T11:26:55+02:00",
+        "tree_id": "1eb5ac4d731daeb199755932a5a2e126e10c80cc",
+        "url": "https://github.com/navikt"
+      }
+    ],
+    "compare": "https://github.com/navikt/gandalf/compare/a88fd9ea948a...d4cd018b2fe5",
+    "created": false,
+    "deleted": false,
+    "enterprise": {
+      "avatar_url": "https://avatars.githubusercontent.com/b/371?v=4",
+      "created_at": "2019-06-26T11:17:54Z",
+      "description": "",
+      "html_url": "https://github.com/enterprises/nav",
+      "id": 371,
+      "name": "NAV",
+      "node_id": "MDEwOkVudGVycHJpc2UzNzE=",
+      "slug": "nav",
+      "updated_at": "2022-08-25T17:53:40Z",
+      "website_url": "https://nav.no"
+    },
+    "forced": false,
+    "head_commit": {
+      "author": {
+        "email": "john.doe@emal.com",
+        "name": "jDoe",
+        "username": "jDoe"
+      },
+      "committer": {
+        "email": "john.doe@emal.com",
+        "name": "jDoe",
+        "username": "jDoe"
+      },
+      "distinct": true,
+      "id": "d4cd018b2fe54d8308b78f2bb88db94ac57173ea",
+      "message": "master commit",
+      "timestamp": "2022-10-21T11:26:55+02:00",
+      "tree_id": "1eb5ac4d731daeb199755932a5a2e126e10c80cc",
+      "url": "https://github.com/navikt"
+    }
+  }
+}

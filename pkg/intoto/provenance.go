@@ -1,8 +1,6 @@
 package intoto
 
 import (
-	"time"
-
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
 )
 
@@ -13,7 +11,7 @@ func GenerateSlsaPredicate(opts *ProvenanceOptions) *slsa.ProvenancePredicate {
 		},
 		BuildType:   opts.BuildType,
 		BuildConfig: opts.BuildConfig,
-		Metadata:    withMetadata(opts, time.Now().UTC()),
+		Metadata:    withMetadata(opts),
 		Materials:   withMaterials(opts),
 	}
 
@@ -25,11 +23,12 @@ func GenerateSlsaPredicate(opts *ProvenanceOptions) *slsa.ProvenancePredicate {
 	return predicate
 }
 
-func withMetadata(opts *ProvenanceOptions, buildFinished time.Time) *slsa.ProvenanceMetadata {
+func withMetadata(opts *ProvenanceOptions) *slsa.ProvenanceMetadata {
+	timeFinished := opts.GetBuildFinishedOn()
 	return &slsa.ProvenanceMetadata{
 		BuildInvocationID: opts.BuildInvocationId,
 		BuildStartedOn:    &opts.BuildStartedOn,
-		BuildFinishedOn:   &buildFinished,
+		BuildFinishedOn:   &timeFinished,
 		Completeness:      withCompleteness(opts),
 		Reproducible:      opts.Reproducible(),
 	}

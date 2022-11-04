@@ -3,15 +3,15 @@ package jvm
 import (
 	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/build/test"
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGradleDeps(t *testing.T) {
-	gradleOutput, _ := ioutil.ReadFile("testdata/gradle_output.txt")
-	checksumXml, _ := ioutil.ReadFile("testdata/verification-metadata.xml")
+	gradleOutput, _ := os.ReadFile("testdata/gradle_output.txt")
+	checksumXml, _ := os.ReadFile("testdata/verification-metadata.xml")
 	got, err := GradleDeps(string(gradleOutput), checksumXml)
 	assert.NoError(t, err)
 	want := map[string]build.Dependency{}

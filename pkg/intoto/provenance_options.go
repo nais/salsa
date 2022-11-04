@@ -4,6 +4,7 @@ import (
 	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/config"
 	"github.com/nais/salsa/pkg/vcs"
+	log "github.com/sirupsen/logrus"
 	"time"
 
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
@@ -20,6 +21,7 @@ type ProvenanceOptions struct {
 	BuilderId         string
 	BuilderRepoDigest *slsa.ProvenanceMaterial
 	BuildInvocationId string
+	BuildFinishedOn   *time.Time
 	BuildStartedOn    time.Time
 	BuildType         string
 	Dependencies      *build.ArtifactDependencies
@@ -29,14 +31,15 @@ type ProvenanceOptions struct {
 
 func CreateProvenanceOptions(scanCfg *config.ScanConfiguration) *ProvenanceOptions {
 	opts := &ProvenanceOptions{
-		BuildStartedOn: time.Now().UTC(),
-		BuilderId:      DefaultBuildId,
-		BuildType:      AdHocBuildType,
-		Dependencies:   scanCfg.Dependencies,
-		Name:           scanCfg.RepoName,
+		BuilderId:    DefaultBuildId,
+		BuildType:    AdHocBuildType,
+		Dependencies: scanCfg.Dependencies,
+		Name:         scanCfg.RepoName,
 	}
 
 	context := scanCfg.ContextEnvironment
+	opts.BuildStartedOn = buildStartedOn(context, scanCfg.BuildStartedOn)
+
 	if context != nil {
 		opts.BuildType = context.BuildType()
 		opts.BuildInvocationId = context.BuildInvocationId()
@@ -106,7 +109,7 @@ func (in *ProvenanceOptions) Parameters() bool {
 		return false
 	}
 
-	return in.Invocation.Parameters.(*vcs.Event).Inputs != nil
+	return in.Invocation.Parameters.(*vcs.Event).EventMetadata != nil
 }
 
 func (in *ProvenanceOptions) Environment() bool {
@@ -123,4 +126,40 @@ func (in *ProvenanceOptions) Materials() bool {
 
 func (in *ProvenanceOptions) Reproducible() bool {
 	return in.Environment() && in.Materials() && in.Parameters()
+}
+
+func (in *ProvenanceOptions) GetBuildFinishedOn() time.Time {
+	if in.BuildFinishedOn == nil {
+		return time.Now().UTC().Round(time.Second)
+	}
+	return *in.BuildFinishedOn
+}
+
+func buildStartedOn(context vcs.ContextEnvironment, inputBuildTime string) time.Time {
+	if inputBuildTime != "" {
+		return buildStarted(inputBuildTime)
+	}
+
+	if context == nil {
+		return time.Now().UTC().Round(time.Second)
+	}
+
+	event := context.GetEvent()
+
+	if event == nil {
+		return time.Now().UTC().Round(time.Second)
+	}
+
+	return buildStarted(event.GetHeadCommitTimestamp())
+
+}
+
+func buildStarted(buildTime string) time.Time {
+	started, err := time.Parse(time.RFC3339, buildTime)
+	if err != nil {
+		log.Warnf("Failed to parse build time: %v, using default start time", err)
+		return time.Now().UTC().Round(time.Second)
+	}
+
+	return started
 }

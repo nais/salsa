@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/nais/salsa/pkg/dsse"
 	"github.com/nais/salsa/pkg/intoto"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -29,13 +28,13 @@ var findCmd = &cobra.Command{
 		}
 
 		path := PathFlags.RepoDir
-		dirs, err := ioutil.ReadDir(path)
+		dirs, err := os.ReadDir(path)
 		if err != nil {
 			return fmt.Errorf("could not read dir %w", err)
 		}
 
 		for _, dir := range dirs {
-			files, err := ioutil.ReadDir(fmt.Sprintf("./%s/%s", path, dir.Name()))
+			files, err := os.ReadDir(fmt.Sprintf("./%s/%s", path, dir.Name()))
 			if err != nil {
 				return fmt.Errorf("could not read dir %w", err)
 			}
