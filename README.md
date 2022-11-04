@@ -343,22 +343,22 @@ the [Runner context](https://docs.github.com/en/actions/learn-github-actions/con
 
 The Following inputs can be used as `step.with` keys
 
-| Name                | Type   | Default               | Description                                                                                                                                        | Required |
-|---------------------|--------|:----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|----------|
-| `docker_pwd`        | String | ""                    | Password for docker                                                                                                                                | True     |
-| `key`               | String | ""                    | Private key (cosign.key) or kms provider, used for signing the attestation                                                                         | False    |
-| `identity_token`    | String | ""                    | Identity token used for Cosign keyless authentication                                                                                              | False    |
-| `image`             | String | $IMAGE                | The container image to create a attestation for                                                                                                    | False    |
-| `docker_user`       | String | github.actor          | User to login to container registry                                                                                                                | False    |
-| `repo_name`         | String | github.repository     | The name of the repo/project                                                                                                                       | False    |
-| `repo_sub_dir`      | String | ""                    | Specify a subdirectory if build file not found in working root directory                                                                           | False    |
-| `dependencies`      | Bool   | true                  | Set to false if action should not create materials for dependencies (e.g. if build tool is unsupported or repo uses internal/private dependencies) | False    |
-| `github_token`      | String | ""                    | Token to authenticate and read private packages, the token must have read:packages scope                                                           | False    |
-| `token_key_pattern` | String | ""                    | If a token is provided but the the key pattern is different from the default key pattern "GITHUB_TOKEN"                                            | False    |
-| `build_started_on`  | String | ""                    | Specify a workflow build start time                                                                                                                | False    |
-| `repo_dir`          | String | $GITHUB_WORKSPACE     | **Internal value (do not set):** Root of directory to look for build files                                                                         | False    |
-| `github_context`    | String | ${{ toJSON(github) }} | **Internal value (do not set):** the [github context](#github-context) object in json                                                              | False    |
-| `runner_context`    | String | ${{ toJSON(runner) }} | **Internal value (do not set):** the [runner context](#runner-context) object in json                                                              | False    |
+| Name                | Type   | Default               | Description                                                                                                                                               | Required |
+|---------------------|--------|:----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|----------|
+| `docker_pwd`        | String | ""                    | Password for docker                                                                                                                                       | True     |
+| `key`               | String | ""                    | Private key (cosign.key) or kms provider, used for signing the attestation                                                                                | False    |
+| `identity_token`    | String | ""                    | Identity token used for Cosign keyless authentication                                                                                                     | False    |
+| `image`             | String | $IMAGE                | The container image to create a attestation for                                                                                                           | False    |
+| `docker_user`       | String | github.actor          | User to login to container registry                                                                                                                       | False    |
+| `repo_name`         | String | github.repository     | The name of the repo/project                                                                                                                              | False    |
+| `repo_sub_dir`      | String | ""                    | Specify a subdirectory if build file not found in working root directory                                                                                  | False    |
+| `dependencies`      | Bool   | true                  | Set to false if action should not create materials for dependencies (e.g. if build tool is unsupported or repo uses internal/private dependencies)        | False    |
+| `github_token`      | String | ""                    | Token to authenticate and read private packages, the token must have read:packages scope                                                                  | False    |
+| `token_key_pattern` | String | ""                    | If a token is provided but the the key pattern is different from the default key pattern "GITHUB_TOKEN"                                                   | False    |
+| `build_started_on`  | String | ""                    | Specify a workflow build start time. Default is set to github_context `event.head_commit` or `event.workflow_run.head_commit` depending on workflow usage | False    |
+| `repo_dir`          | String | $GITHUB_WORKSPACE     | **Internal value (do not set):** Root of directory to look for build files                                                                                | False    |
+| `github_context`    | String | ${{ toJSON(github) }} | **Internal value (do not set):** the [github context](#github-context) object in json                                                                     | False    |
+| `runner_context`    | String | ${{ toJSON(runner) }} | **Internal value (do not set):** the [runner context](#runner-context) object in json                                                                     | False    |
 
 ### Outputs from the workflow
 
