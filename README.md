@@ -107,7 +107,7 @@ dependencies)
         * [Access Private Repositories](#access-private-repositories)
         * [GitHub context](#github-context)
         * [Runner context](#runner-context)
-    * [Outputs](#outputs-from-the-workflow)
+    * [Outputs](#outputs)
 * [Release](#release)
     * [Checksums](#checksums)
     * [Verify signature](#verify-signature)
@@ -360,11 +360,10 @@ The Following inputs can be used as `step.with` keys
 | `github_context`    | String | ${{ toJSON(github) }} | **Internal value (do not set):** the [github context](#github-context) object in json                                                                     | False    |
 | `runner_context`    | String | ${{ toJSON(runner) }} | **Internal value (do not set):** the [runner context](#runner-context) object in json                                                                     | False    |
 
-### Outputs from the workflow
+### Outputs
 
-[SLSA provenance](pkg/dsse/testdata/salsa.provenance) with transitive dependencies  
-[Signed Cosign dsse attestation](pkg/dsse/testdata/cosign-dsse-attestation.json)   
-[Decoded Cosign attestation](pkg/dsse/testdata/cosign-attestation.json)
+* `provenance_file_path` [SLSA provenance](pkg/dsse/testdata/salsa.provenance)
+* `raw_file_path` [Signed Cosign dsse attestation](pkg/dsse/testdata/cosign-dsse-attestation.json)
 
 ## Release
 

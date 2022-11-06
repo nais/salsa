@@ -128,5 +128,13 @@ cleanUpGoogle() {
   fi
 }
 
-setup && loginDocker && runSalsa && logoutDocker
+setOutput() {
+  echo "---------- Setting output ----------"
+  {
+    echo "provenance_file_path=$REPO_NAME.provenance"
+    echo "raw_file_path=$REPO_NAME.raw.txt"
+  } >>"$GITHUB_OUTPUT"
+}
+
+setup && loginDocker && runSalsa && logoutDocker && setOutput
 cleanUpGoogle
