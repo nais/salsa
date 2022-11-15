@@ -95,3 +95,24 @@ func (r fakeRunner) CreateCmd() utils.CreateCmd {
 		return cmd
 	}
 }
+
+func TestAttestCmd(t *testing.T) {
+	PathFlags.Repo = "testdata"
+	PathFlags.Remote = false
+	PathFlags.RepoDir = "."
+	o := AttestOptions{
+		Key:           "mykey",
+		NoUpload:      true,
+		RekorURL:      "http://rekor.example.com",
+		PredicateFile: "../testdata/cosgintest.provenance",
+		PredicateType: "slsaprovenance",
+		AllowInsecure: true,
+		SkipVerify:    true,
+	}
+
+	args := []string{
+		"ttl.image:1h",
+	}
+	_, err := o.Run(args, utils.ExecCmd{})
+	assert.NoError(t, err)
+}

@@ -21,6 +21,8 @@ type AttestOptions struct {
 	RekorURL      string `mapstructure:"rekor-url"`
 	PredicateFile string `mapstructure:"predicate"`
 	PredicateType string `mapstructure:"type"`
+	AllowInsecure bool   `mapstructure:"allow-insecure-registry"`
+	SkipVerify    bool   `mapstructure:"insecure-skip-verify"`
 }
 
 var verify bool
@@ -136,6 +138,7 @@ func (o AttestOptions) verifyFlags() []string {
 
 func (o AttestOptions) attestCmd(a []string, runner utils.CmdRunner) utils.Cmd {
 	flags, err := o.attestFlags()
+	fmt.Print(flags)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -178,12 +181,22 @@ func (o AttestOptions) attestFlags() ([]string, error) {
 }
 
 func (o AttestOptions) defaultAttestFlags() []string {
-	return []string{
+	flags := []string{
 		"--predicate", o.PredicateFile,
 		"--type", o.PredicateType,
 		"--rekor-url", o.RekorURL,
 		fmt.Sprintf("--no-upload=%s", strconv.FormatBool(o.NoUpload)),
 	}
+
+	if o.AllowInsecure {
+		flags = append(flags, "--allow-insecure-registry")
+	}
+
+	if o.SkipVerify {
+		flags = append(flags, "--insecure-skip-verify")
+	}
+
+	return flags
 }
 
 func init() {
@@ -201,6 +214,10 @@ func init() {
 		"the predicate file used for attestation")
 	attestCmd.Flags().String("type", "slsaprovenance",
 		"specify a predicate type (slsaprovenance|link|spdx|custom) or an URI (default \"slsaprovenance\")\n")
+	attestCmd.Flags().Bool("allow-insecure-registry", false,
+		"allow insecure registry, should only be used for testing")
+	attestCmd.Flags().Bool("insecure-skip-verify", false,
+		"a flag to skip certificate verification for the registry, should only be used for testing")
 	err := viper.BindPFlags(attestCmd.Flags())
 	if err != nil {
 		log.Errorf("setting viper flag: %v", err)
