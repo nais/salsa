@@ -50,11 +50,6 @@ inputs:
     required: false
     default: ""
 
-  docker_pwd:
-    description: |-
-      Docker login password.
-    required: true
-
   dependencies:
     description: |-
       If salsa should generate materials for the provenance containing dependencies.
@@ -76,8 +71,10 @@ inputs:
 
   github_token:
     description: |-
-      PAT with at least packages:read scope to install packages associated with other private repositories (which GITHUB_TOKEN can't access).
-    required: false
+      Normal use is "GITHUB_TOKEN". To fetch from private repository use
+      PAT with at least packages:read scope to install packages associated with other private repositories 
+      (which GITHUB_TOKEN can't access).
+    required: true
     default: ""
 
   token_key_pattern:
@@ -103,7 +100,7 @@ inputs:
 
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/nais/salsa:v0.5'
+  image: 'docker://ghcr.io/nais/salsa:v0.6'
   args:
     - ${{ inputs.repo_dir }}
     - ${{ inputs.repo_name }}
@@ -119,6 +116,5 @@ runs:
     - ${{ inputs.docker_user }}
     - ${{ inputs.github_token }}
     - ${{ inputs.token_key_pattern }}
-    - ${{ inputs.docker_pwd }}
     - ${{ inputs.dependencies }}
     - ${{ inputs.build_started_on }}

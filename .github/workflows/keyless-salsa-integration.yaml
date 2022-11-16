@@ -39,6 +39,6 @@ jobs:
         uses: ./
         with:
           identity_token: ${{ steps.google.outputs.id_token }}
-          docker_pwd: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
         env:
           COSIGN_EXPERIMENTAL: "true"
