@@ -50,11 +50,6 @@ inputs:
     required: false
     default: ""
 
-  docker_pwd:
-    description: |-
-      Docker login password.
-    required: true
-
   dependencies:
     description: |-
       If salsa should generate materials for the provenance containing dependencies.
@@ -119,6 +114,5 @@ runs:
     - ${{ inputs.docker_user }}
     - ${{ inputs.github_token }}
     - ${{ inputs.token_key_pattern }}
-    - ${{ inputs.docker_pwd }}
     - ${{ inputs.dependencies }}
     - ${{ inputs.build_started_on }}
