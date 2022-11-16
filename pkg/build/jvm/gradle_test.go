@@ -76,7 +76,7 @@ func TestBuildGradle(t *testing.T) {
 		},
 		{
 			Name:         "cant find supported build type",
-			BuildType:    BuildMaven(),
+			BuildType:    BuildMaven(""),
 			WorkDir:      "testdata/jvm/gradle-kts",
 			Error:        true,
 			ErrorMessage: "no supported build files found: testdata/jvm/gradle-kts",

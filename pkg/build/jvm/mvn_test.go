@@ -30,7 +30,7 @@ func TestBuildMaven(t *testing.T) {
 	tests := []test.IntegrationTest{
 		{
 			Name:      "find build file and parse output",
-			BuildType: BuildMaven(),
+			BuildType: BuildMaven(""),
 			WorkDir:   "testdata/jvm/maven",
 			BuildPath: "/usr/local/bin/mvn",
 			Cmd:       "mvn dependency:copy-dependencies -DincludeScope=runtime -Dmdep.useRepositoryLayout=true",
@@ -43,10 +43,23 @@ func TestBuildMaven(t *testing.T) {
 		},
 		{
 			Name:         "cant find build file",
-			BuildType:    BuildMaven(),
+			BuildType:    BuildMaven(""),
 			WorkDir:      "testdata/whatever",
 			Error:        true,
 			ErrorMessage: "could not find match, reading dir open testdata/whatever: no such file or directory",
+		},
+		{
+			Name:      "Add additional command line arguments as a part of the mvn command",
+			BuildType: BuildMaven("-q, -am, -X,-B, -D yolo=molo"),
+			Cmd:       "mvn dependency:copy-dependencies -DincludeScope=runtime -Dmdep.useRepositoryLayout=true -q -am -X -B -D yolo=molo",
+			WorkDir:   "testdata/jvm/maven",
+			BuildPath: "/usr/local/bin/mvn",
+			Want: test.Want{
+				Key:     "com.google.code.gson:gson",
+				Version: "2.8.6",
+				Algo:    "sha256",
+				Digest:  "c8fb4839054d280b3033f800d1f5a97de2f028eb8ba2eb458ad287e536f3f25f",
+			},
 		},
 	}
 

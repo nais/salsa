@@ -17,12 +17,16 @@ const mavenBuildFileName = "pom.xml"
 
 type Maven struct {
 	BuildFilePatterns []string
+	CmdOptions        string
 }
 
-func BuildMaven() build.Tool {
-	return &Maven{
+func BuildMaven(cmdOpts string) build.Tool {
+	m := &Maven{
 		BuildFilePatterns: []string{mavenBuildFileName},
+		CmdOptions:        cmdOpts,
 	}
+
+	return m
 }
 
 func (m Maven) BuildFiles() []string {
@@ -33,11 +37,8 @@ func (m Maven) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) 
 	cmd := utils.NewCmd(
 		"mvn",
 		"dependency:copy-dependencies",
-		[]string{
-			"-DincludeScope=runtime",
-			"-Dmdep.useRepositoryLayout=true",
-		},
-		nil,
+		defaultMavenOpts(),
+		m.parsedCmdOpts(),
 		workDir,
 	)
 
@@ -55,7 +56,28 @@ func (m Maven) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) 
 	args = append(args, cmd.Name)
 	args = append(args, cmd.SubCmd)
 	args = append(args, cmd.Flags...)
+	args = append(args, cmd.Args...)
 	return build.ArtifactDependency(deps, cmd.Name, strings.Join(args, " ")), nil
+}
+
+func defaultMavenOpts() []string {
+	return []string{
+		"-DincludeScope=runtime",
+		"-Dmdep.useRepositoryLayout=true",
+	}
+}
+
+func (m Maven) parsedCmdOpts() []string {
+	if m.CmdOptions == "" {
+		return nil
+	}
+
+	parsed := strings.Split(m.CmdOptions, ",")
+	for i, s := range parsed {
+		parsed[i] = strings.TrimSpace(s)
+	}
+
+	return parsed
 }
 
 func MavenCompileAndRuntimeTimeDeps(rootPath string) (map[string]build.Dependency, error) {

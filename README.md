@@ -189,7 +189,7 @@ jobs:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
       - name: Provenance, upload and sign attestation
-        uses: nais/salsa@v0.3
+        uses: nais/salsa@v0.x
         with:
           key: ${{ env.KEY }}
           docker_pwd: ${{ secrets.GITHUB_TOKEN }}
@@ -260,8 +260,8 @@ jobs:
           id_token_audience: sigstore
           id_token_include_email: true
 
-      - name: Generate provenance, upload and sign image
-        uses: nais/salsa@v0.3
+      - name: Generate provenance, sign and upload image
+        uses: nais/salsa@v0.x
         with:
           identity_token: ${{ steps.google.outputs.id_token }}
           docker_pwd: ${{ secrets.GITHUB_TOKEN }}
@@ -306,8 +306,8 @@ store the cosign signatures and attestations, see more specification in
 the [cosign docs](https://github.com/sigstore/cosign#specifying-registry)
 
 ```yaml
-- name: Generate provenance, upload and sign image
-  uses: nais/salsa@v0.3
+- name: Generate provenance, sign and upload image
+  uses: nais/salsa@v0.x
   with:
     key: ${{ secrets.SALSA_KMS_KEY }}
     docker_pwd: ${{ secrets.GITHUB_TOKEN }}
@@ -331,12 +331,32 @@ build tool can authenticate with a `PAT`. Use the `with.github_token` field to a
 
 `with.token_key_pattern` can be used to specify a key pattern, other than default `GITHUB_TOKEN`.
 
+#### Maven Options
+
+`with.mvn_opts` - (optional) additional maven options in a comma-delimited string.
+
+Useful when your project depends on a custom maven settings file or use dependencies from a private repository.
+
+Actor need to set `with.github_token` with access to the private repository.
+
+```yaml
+ - name: Generate provenance, sign and upload image
+   uses: nais/salsa@v0.x
+   with:
+     mvn_opts: "-s ./.mvn/settings.xml, -Dmaven.repo.local=/path/to/local/repo"
+     github_token: ${{ secrets.PAT }}
+```
+
 #### GitHub context
 
-The GitHub context contains information about the workflow run and the event that triggered the run. By default, this
+`with.github_context` - (required) default to `true` to include the github context in the provenance.
+
+The github context contains information about the workflow run and the event that triggered the run. By default, this
 action uses the [GitHub context](https://docs.github.com/en/actions/learn-github-actions/contexts#github-context).
 
 #### Runner Context
+
+`with.runner_context` - (required) default to `true` to include the runner context in the provenance.
 
 The runner context contains information about the runner that is executing the current job. By default, this action uses
 the [Runner context](https://docs.github.com/en/actions/learn-github-actions/contexts#runner-context).
@@ -356,6 +376,7 @@ The Following inputs can be used as `step.with` keys
 | `github_token`      | String | ""                    | Token to authenticate and read private packages, the token must have read:packages scope                                                                  | False    |
 | `token_key_pattern` | String | ""                    | If a token is provided but the the key pattern is different from the default key pattern "GITHUB_TOKEN"                                                   | False    |
 | `build_started_on`  | String | ""                    | Specify a workflow build start time. Default is set to github_context `event.head_commit` or `event.workflow_run.head_commit` depending on workflow usage | False    |
+| `mvn_opts`          | String | ""                    | A comma-delimited string with additional maven cli options for the dependence build                                                                       | False    |
 | `repo_dir`          | String | $GITHUB_WORKSPACE     | **Internal value (do not set):** Root of directory to look for build files                                                                                | False    |
 | `github_context`    | String | ${{ toJSON(github) }} | **Internal value (do not set):** the [github context](#github-context) object in json                                                                     | False    |
 | `runner_context`    | String | ${{ toJSON(runner) }} | **Internal value (do not set):** the [runner context](#runner-context) object in json                                                                     | False    |

@@ -68,9 +68,15 @@ inputs:
     required: false
     default: ""
 
+  mvn_opts:
+    description: |-
+      A comma-delimited string with additional maven options.
+    required: false
+    default: ""
+
   github_token:
     description: |-
-      Token to authenticate private packages repository.
+      PAT with at least packages:read scope to install packages associated with other private repositories (which GITHUB_TOKEN can't access).
     required: false
     default: ""
 
@@ -97,7 +103,7 @@ inputs:
 
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/nais/salsa:v0.4'
+  image: 'docker://ghcr.io/nais/salsa:v0.5'
   args:
     - ${{ inputs.repo_dir }}
     - ${{ inputs.repo_name }}
@@ -108,6 +114,8 @@ runs:
     - ${{ inputs.repo_sub_dir }}
     - ${{ inputs.key }}
     - ${{ inputs.identity_token }}
+    - ${{ inputs.mvn_opts }}
+    - ${{ inputs.github_token }}
     - ${{ inputs.docker_user }}
     - ${{ inputs.github_token }}
     - ${{ inputs.token_key_pattern }}
