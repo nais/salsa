@@ -73,7 +73,7 @@ jobs:
         with:
           cosign-release: ${{ env.COSIGN_VERSION }}
       - name: Install Syft
-        uses: anchore/sbom-action/download-syft@b7e8507c6a3c89b7099a0198366d862c8f3ad8f1 # ratchet:anchore/sbom-action/download-syft@v0.13.0
+        uses: anchore/sbom-action/download-syft@06e109483e6aa305a2b2395eabae554e51530e1d # ratchet:anchore/sbom-action/download-syft@v0.13.1
         with:
           syft-version: ${{ env.SYFT_VERSION }}
       - name: Put key on file
@@ -136,7 +136,7 @@ jobs:
         with:
           cosign-release: ${{ env.COSIGN_VERSION }}
       - name: Install Syft
-        uses: anchore/sbom-action/download-syft@b7e8507c6a3c89b7099a0198366d862c8f3ad8f1 # ratchet:anchore/sbom-action/download-syft@v0.13.0
+        uses: anchore/sbom-action/download-syft@06e109483e6aa305a2b2395eabae554e51530e1d # ratchet:anchore/sbom-action/download-syft@v0.13.1
         with:
           syft-version: ${{ env.SYFT_VERSION }}
       - name: Login to Docker
