@@ -52,6 +52,7 @@ func (m Maven) ResolveDeps(workDir string) (*build.ArtifactDependencies, error) 
 	if err != nil {
 		return nil, fmt.Errorf("scan: %v\n", err)
 	}
+
 	args := make([]string, 0)
 	args = append(args, cmd.Name)
 	args = append(args, cmd.SubCmd)
@@ -74,7 +75,7 @@ func (m Maven) parsedCmdOpts() []string {
 
 	parsed := strings.Split(m.CmdOptions, ",")
 	for i, s := range parsed {
-		parsed[i] = strings.TrimSpace(s)
+		parsed[i] = strings.ReplaceAll(s, " ", "")
 	}
 
 	return parsed

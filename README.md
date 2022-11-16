@@ -335,6 +335,9 @@ build tool can authenticate with a `PAT`. Use the `with.github_token` field to a
 
 `with.mvn_opts` - (optional) additional maven options in a comma-delimited string.
 
+**NB!**  
+Currently only supports the maven command cli option `-s`, specifying a settings.xml file.
+
 Useful when your project depends on a custom maven settings file or use dependencies from a private repository.
 
 If project depends on dependencies from a private repository, actor need to set GitHub [private token](#access-private-repositories) with proper access right.
@@ -343,7 +346,7 @@ If project depends on dependencies from a private repository, actor need to set 
  - name: Generate provenance, sign and upload image
    uses: nais/salsa@v0.x
    with:
-     mvn_opts: "-s ./.mvn/settings.xml, -Dmaven.repo.local=/path/to/local/repo"
+     mvn_opts: "-s .mvn/settings.xml"
      github_token: ${{ secrets.PAT }}
 ```
 

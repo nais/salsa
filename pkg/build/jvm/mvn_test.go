@@ -50,8 +50,8 @@ func TestBuildMaven(t *testing.T) {
 		},
 		{
 			Name:      "Add additional command line arguments as a part of the mvn command",
-			BuildType: BuildMaven("-q, -am, -X,-B, -D yolo=molo"),
-			Cmd:       "mvn dependency:copy-dependencies -DincludeScope=runtime -Dmdep.useRepositoryLayout=true -q -am -X -B -D yolo=molo",
+			BuildType: BuildMaven("-s .m2/maven-settings.xml"),
+			Cmd:       "mvn dependency:copy-dependencies -DincludeScope=runtime -Dmdep.useRepositoryLayout=true -s.m2/maven-settings.xml",
 			WorkDir:   "testdata/jvm/maven",
 			BuildPath: "/usr/local/bin/mvn",
 			Want: test.Want{
