@@ -1,4 +1,4 @@
-package github
+package vcs
 
 import (
 	"encoding/base64"

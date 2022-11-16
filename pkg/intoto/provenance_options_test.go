@@ -5,7 +5,6 @@ import (
 	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/config"
 	"github.com/nais/salsa/pkg/vcs"
-	"github.com/nais/salsa/pkg/vcs/github"
 	"github.com/spf13/cobra"
 	"os"
 	"testing"
@@ -63,6 +62,7 @@ func TestCreateProvenanceOptions(t *testing.T) {
 				assert.NoError(t, err)
 				env := Environment()
 				scanCfg := &config.ScanConfiguration{
+					BuildStartedOn:     "",
 					WorkDir:            "",
 					RepoName:           "artifact",
 					Dependencies:       artDeps,
@@ -73,7 +73,7 @@ func TestCreateProvenanceOptions(t *testing.T) {
 				assert.Equal(t, "artifact", provenanceArtifact.Name)
 				assert.Equal(t, test.buildType, provenanceArtifact.BuildType)
 				assert.Equal(t, deps, provenanceArtifact.Dependencies.RuntimeDeps)
-				assert.Equal(t, test.buildTimerIsSet, time.Now().UTC().After(provenanceArtifact.BuildStartedOn))
+				assert.Equal(t, "2022-02-14T09:38:16+01:00", provenanceArtifact.BuildStartedOn.Format(time.RFC3339))
 				assert.Equal(t, test.buildInvocationId, provenanceArtifact.BuildInvocationId)
 				assert.Equal(t, test.buildConfig, provenanceArtifact.BuildConfig)
 				assert.NotEmpty(t, provenanceArtifact.Invocation)
@@ -86,6 +86,7 @@ func TestCreateProvenanceOptions(t *testing.T) {
 			} else {
 
 				scanCfg := &config.ScanConfiguration{
+					BuildStartedOn:     time.Now().UTC().Round(time.Second).Add(-10 * time.Minute).Format(time.RFC3339),
 					WorkDir:            "",
 					RepoName:           "artifact",
 					Dependencies:       artDeps,
@@ -140,7 +141,7 @@ func ExpectedArtDeps(deps map[string]build.Dependency) *build.ArtifactDependenci
 
 func Environment() *vcs.GithubCIEnvironment {
 	return &vcs.GithubCIEnvironment{
-		BuildContext: &github.Context{
+		BuildContext: &vcs.GithubContext{
 			Repository: "nais/salsa",
 			RunId:      "1234",
 			SHA:        "4321",
@@ -149,14 +150,19 @@ func Environment() *vcs.GithubCIEnvironment {
 			EventName:  "workflow_dispatch",
 		},
 		Event: &vcs.Event{
-			Inputs: []byte("some user inputs"),
+			EventMetadata: &vcs.EventMetadata{
+				HeadCommit: &vcs.HeadCommit{
+					Id:        "yolo",
+					Timestamp: "2022-02-14T09:38:16+01:00",
+				},
+			},
 		},
-		RunnerContext: &github.RunnerContext{
+		RunnerContext: &vcs.RunnerContext{
 			OS:        "Linux",
 			Temp:      "/home/runner/work/_temp",
 			ToolCache: "/opt/hostedtoolcache",
 		},
-		Actions: github.BuildId("v1"),
+		Actions: vcs.BuildId("v1"),
 	}
 }
 

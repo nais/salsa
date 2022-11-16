@@ -3,15 +3,15 @@ package jvm
 import (
 	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/build/test"
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGradleDeps(t *testing.T) {
-	gradleOutput, _ := ioutil.ReadFile("testdata/gradle_output.txt")
-	checksumXml, _ := ioutil.ReadFile("testdata/verification-metadata.xml")
+	gradleOutput, _ := os.ReadFile("testdata/gradle_output.txt")
+	checksumXml, _ := os.ReadFile("testdata/verification-metadata.xml")
 	got, err := GradleDeps(string(gradleOutput), checksumXml)
 	assert.NoError(t, err)
 	want := map[string]build.Dependency{}
@@ -57,7 +57,7 @@ func TestBuildGradle(t *testing.T) {
 		{
 			Name:      "find build file and parse output",
 			BuildType: BuildGradle(),
-			WorkDir:   "testdata/jvm/gradle",
+			WorkDir:   "testdata/jvm/gradle-kts",
 			BuildPath: "/usr/local/bin/gradle",
 			Cmd:       "gradle -q dependencies --configuration runtimeClasspath -M sha256",
 			Want: test.Want{
@@ -77,9 +77,22 @@ func TestBuildGradle(t *testing.T) {
 		{
 			Name:         "cant find supported build type",
 			BuildType:    BuildMaven(""),
-			WorkDir:      "testdata/jvm/gradle",
+			WorkDir:      "testdata/jvm/gradle-kts",
 			Error:        true,
-			ErrorMessage: "no supported build files found: testdata/jvm/gradle",
+			ErrorMessage: "no supported build files found: testdata/jvm/gradle-kts",
+		},
+		{
+			Name:      "support build.gradle file",
+			BuildType: BuildGradle(),
+			WorkDir:   "testdata/jvm/gradle",
+			BuildPath: "/usr/local/bin/gradle",
+			Cmd:       "gradle -q dependencies --configuration runtimeClasspath -M sha256",
+			Want: test.Want{
+				Key:     "org.jetbrains.kotlin:kotlin-reflect",
+				Version: "1.6.10",
+				Algo:    "sha256",
+				Digest:  "3277ac102ae17aad10a55abec75ff5696c8d109790396434b496e75087854203",
+			},
 		},
 	}
 

@@ -62,6 +62,7 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 				env := Environment()
 
 				scanCfg := &config.ScanConfiguration{
+					BuildStartedOn:     time.Now().UTC().Round(time.Second).Add(-10 * time.Minute).Format(time.RFC3339),
 					WorkDir:            "",
 					RepoName:           "artifact",
 					Dependencies:       artDeps,
@@ -69,17 +70,16 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 					Cmd:                nil,
 				}
 
-				opts := CreateProvenanceOptions(scanCfg)
-				slsaPredicate := GenerateSlsaPredicate(opts)
 				err := os.Setenv("GITHUB_ACTIONS", "true")
 				assert.NoError(t, err)
+				opts := CreateProvenanceOptions(scanCfg)
+				slsaPredicate := GenerateSlsaPredicate(opts)
 
-				// VCS Context
+				// VCS GithubContext
 				assert.Equal(t, test.buildType, slsaPredicate.BuildType)
 				assert.NotEmpty(t, slsaPredicate.Invocation)
-				i, err := slsaPredicate.Invocation.Parameters.(*vcs.Event).Inputs.MarshalJSON()
-				assert.NoError(t, err)
-				assert.Equal(t, "some user inputs", string(i))
+				assert.Equal(t, "yolo", slsaPredicate.Invocation.Parameters.(*vcs.Event).GetHeadCommitId())
+				assert.Equal(t, "2022-02-14T09:38:16+01:00", slsaPredicate.Invocation.Parameters.(*vcs.Event).GetHeadCommitTimestamp())
 				e := slsaPredicate.Invocation.Environment.(*vcs.Metadata)
 				assert.NoError(t, err)
 				assert.Equal(t, expectedMetadata(), e)
@@ -89,8 +89,8 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 
 				// metadata
 				assert.Equal(t, test.buildInvocationId, slsaPredicate.Metadata.BuildInvocationID)
-				assert.Equal(t, test.buildTimerIsSet, time.Now().UTC().After(*slsaPredicate.Metadata.BuildStartedOn))
-				assert.Equal(t, test.buildTimerFinishedIsSet, time.Now().UTC().After(*slsaPredicate.Metadata.BuildFinishedOn))
+				assert.Equal(t, test.buildTimerIsSet, *slsaPredicate.Metadata.BuildStartedOn != time.Time{})
+				assert.Equal(t, test.buildTimerFinishedIsSet, *slsaPredicate.Metadata.BuildFinishedOn != time.Time{})
 				assert.Equal(t, true, slsaPredicate.Metadata.Reproducible)
 
 				// completeness
@@ -105,6 +105,7 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 			} else {
 
 				scanCfg := &config.ScanConfiguration{
+					BuildStartedOn:     time.Now().UTC().Round(time.Second).Add(-10 * time.Minute).Format(time.RFC3339),
 					WorkDir:            "",
 					RepoName:           "artifact",
 					Dependencies:       artDeps,
@@ -126,7 +127,7 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 				// metadata
 				assert.Equal(t, test.buildInvocationId, slsaPredicate.Metadata.BuildInvocationID)
 				assert.Equal(t, test.buildTimerIsSet, time.Now().UTC().After(*slsaPredicate.Metadata.BuildStartedOn))
-				assert.Equal(t, test.buildTimerFinishedIsSet, time.Now().UTC().After(*slsaPredicate.Metadata.BuildFinishedOn))
+				assert.Equal(t, test.buildTimerFinishedIsSet, slsaPredicate.Metadata.BuildFinishedOn.After(*slsaPredicate.Metadata.BuildStartedOn))
 				assert.Equal(t, false, slsaPredicate.Metadata.Reproducible)
 
 				// completeness

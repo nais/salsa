@@ -7,9 +7,10 @@ import (
 )
 
 type ScanConfiguration struct {
+	BuildStartedOn     string
+	Cmd                *cobra.Command
+	ContextEnvironment vcs.ContextEnvironment
+	Dependencies       *build.ArtifactDependencies
 	WorkDir            string
 	RepoName           string
-	Dependencies       *build.ArtifactDependencies
-	ContextEnvironment vcs.ContextEnvironment
-	Cmd                *cobra.Command
 }

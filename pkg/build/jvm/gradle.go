@@ -4,7 +4,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"regexp"
 	"strings"
 
@@ -13,15 +13,16 @@ import (
 	"github.com/nais/salsa/pkg/utils"
 )
 
-const gradleBuildFileName = "build.gradle.kts"
-
 type Gradle struct {
 	BuildFilePatterns []string
 }
 
 func BuildGradle() build.Tool {
 	return &Gradle{
-		BuildFilePatterns: []string{gradleBuildFileName},
+		BuildFilePatterns: []string{
+			"build.gradle.kts",
+			"build.gradle",
+		},
 	}
 }
 
@@ -42,7 +43,7 @@ func (g Gradle) ResolveDeps(workDir string) (*build.ArtifactDependencies, error)
 		return nil, fmt.Errorf("exec: %v\n", err)
 	}
 
-	xmlData, err := ioutil.ReadFile(workDir + "/gradle/verification-metadata.xml")
+	xmlData, err := os.ReadFile(workDir + "/gradle/verification-metadata.xml")
 	if err != nil {
 		return nil, fmt.Errorf("readfile: %v\n", err)
 	}

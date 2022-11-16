@@ -42,20 +42,29 @@ setup() {
     exit 1
   fi
 
-  if [ -n "$COSIGN_EXPERIMENTAL" ]; then
-    export COSIGN_EXPERIMENTAL
-  fi
+  exportCosignEnvironment
+  exportGithubToken
 
   export JAVA_HOME=/opt/java/openjdk
 }
 
-mvnOpts() {
-  if [ -n "$INPUT_MVN_OPTS" ]; then
-    export GITHUB_USERNAME=$GITHUB_ACTOR
+exportGithubToken() {
+  if [ -n "$INPUT_GITHUB_TOKEN" ]; then
+    if [ -n "$INPUT_TOKEN_KEY_PATTERN" ]; then
+      export "$INPUT_TOKEN_KEY_PATTERN"="$INPUT_GITHUB_TOKEN"
+    else
+      export GITHUB_TOKEN="$INPUT_GITHUB_TOKEN"
+    fi
+  fi
+}
+
+exportCosignEnvironment() {
+  if [ -n "$COSIGN_EXPERIMENTAL" ]; then
+    export COSIGN_EXPERIMENTAL
   fi
 
-  if [ -n "$INPUT_GITHUB_TOKEN" ]; then
-    export GITHUB_TOKEN=$INPUT_GITHUB_TOKEN
+  if [ -n "$COSIGN_REPOSITORY" ]; then
+    export COSIGN_REPOSITORY
   fi
 }
 
@@ -78,6 +87,7 @@ scan() {
     --subDir "$INPUT_REPO_SUB_DIR" \
     --with-deps="$INPUT_DEPENDENCIES" \
     --mvn-opts "$INPUT_MVN_OPTS" \
+    --build-started-on "$INPUT_BUILD_STARTED_ON" \
     --remote-run
 }
 
@@ -119,5 +129,13 @@ cleanUpGoogle() {
   fi
 }
 
-setup && mvnOpts && loginDocker && runSalsa && logoutDocker
+setOutput() {
+  echo "---------- Setting output ----------"
+  {
+    echo "provenance_file_path=$REPO_NAME.provenance"
+    echo "raw_file_path=$REPO_NAME.raw.txt"
+  } >>"$GITHUB_OUTPUT"
+}
+
+setup && loginDocker && runSalsa && logoutDocker && setOutput
 cleanUpGoogle

@@ -19,9 +19,9 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout Code
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # ratchet:actions/checkout@v3
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # ratchet:actions/checkout@v3
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@dac4e13deb3640f22e3ffe758fd3f95e6e89f712 # ratchet:google-github-actions/auth@v0.8.1
+        uses: google-github-actions/auth@c4799db9111fba4461e9f9da8732e5057b394f72 # ratchet:google-github-actions/auth@v0.8.1
         id: google
         with:
           workload_identity_provider: ${{ secrets.SLSA_WORKLOAD_IDENTITY_PROVIDER }}
@@ -30,7 +30,7 @@ jobs:
           id_token_audience: sigstore
           id_token_include_email: true
       - name: Build and push
-        uses: docker/build-push-action@c84f38281176d4c9cdb1626ffafcd6b3911b5d94 # ratchet:docker/build-push-action@v3
+        uses: docker/build-push-action@c56af957549030174b10d6867f20e78cfd7debc5 # ratchet:docker/build-push-action@v3
         with:
           context: integration-test
           push: true

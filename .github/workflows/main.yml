@@ -10,9 +10,9 @@ on:
       - 'Makefile'
 
 env:
-  VERSION: v0.2
+  VERSION: v0.4
   IMAGE_NAME: ghcr.io/${{ github.repository }}
-  COSIGN_VERSION: v1.10.1
+  COSIGN_VERSION: v1.13.1
   SYFT_VERSION: v0.44.1
   GO_RELEASER_VERSION: v1.11.2
   GRADLE_VERSION: 7.5.1
@@ -23,7 +23,7 @@ jobs:
     outputs:
       version: ${{ steps.set-version.outputs.version }}
     steps:
-      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # ratchet:actions/checkout@v3
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # ratchet:actions/checkout@v3
       - name: set version
         id: set-version
         run: |
@@ -32,8 +32,8 @@ jobs:
   test:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # ratchet:actions/checkout@v3
-      - uses: actions/setup-go@268d8c0ca0432bb2cf416faae41297df9d262d7f # ratchet:actions/setup-go@v3
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # ratchet:actions/checkout@v3
+      - uses: actions/setup-go@c4a742cab115ed795e34d4513e2cf7d472deb55f # ratchet:actions/setup-go@v3
         with:
           go-version-file: ./go.mod
           check-latest: true
@@ -50,11 +50,11 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout latest code
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # ratchet:actions/checkout@v3
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # ratchet:actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Set up Go
-        uses: actions/setup-go@268d8c0ca0432bb2cf416faae41297df9d262d7f # ratchet:actions/setup-go@v3
+        uses: actions/setup-go@c4a742cab115ed795e34d4513e2cf7d472deb55f # ratchet:actions/setup-go@v3
         with:
           go-version-file: ./go.mod
           check-latest: true
@@ -69,11 +69,11 @@ jobs:
       #          app-id: ${{ secrets.NAIS_APP_ID }}
       #          repo: nais/homebrew-tap
       - name: Install cosign
-        uses: sigstore/cosign-installer@f3c664df7af409cb4873aa5068053ba9d61a57b6 # ratchet:sigstore/cosign-installer@v2.6.0
+        uses: sigstore/cosign-installer@9becc617647dfa20ae7b1151972e9b3a2c338a2b # ratchet:sigstore/cosign-installer@v2.6.0
         with:
           cosign-release: ${{ env.COSIGN_VERSION }}
       - name: Install Syft
-        uses: anchore/sbom-action/download-syft@b5042e9d19d8b32849779bfe17673ff84aec702d # ratchet:anchore/sbom-action/download-syft@v0.12.0
+        uses: anchore/sbom-action/download-syft@b7e8507c6a3c89b7099a0198366d862c8f3ad8f1 # ratchet:anchore/sbom-action/download-syft@v0.13.0
         with:
           syft-version: ${{ env.SYFT_VERSION }}
       - name: Put key on file
@@ -81,7 +81,7 @@ jobs:
           echo '${{ secrets.COSIGN_PRIVATE_KEY }}' > cosign.key
       - name: Run GoReleaser
         if: ${{ github.ref == 'refs/heads/main' }}
-        uses: goreleaser/goreleaser-action@ff11ca24a9b39f2d36796d1fbd7a4e39c182630a # ratchet:goreleaser/goreleaser-action@v3
+        uses: goreleaser/goreleaser-action@b508e2e3ef3b19d4e4146d4f8fb3ba9db644a757 # ratchet:goreleaser/goreleaser-action@v3
         with:
           distribution: goreleaser
           version: ${{ env.GO_RELEASER_VERSION }}
@@ -91,9 +91,9 @@ jobs:
           PUSH_TOKEN: ${{ steps.get-homebrew-token.outputs.token }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6 # ratchet:docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@8c0edbc76e98fa90f69d9a2c020dcb50019dc325 # ratchet:docker/setup-buildx-action@v2
       - name: Login to Docker
-        uses: docker/login-action@49ed152c8eca782a232dede0303416e8f356c37b # ratchet:docker/login-action@v2
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a # ratchet:docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -108,7 +108,7 @@ jobs:
         run: |
           echo "PUSH=true" >> $GITHUB_ENV
       - name: Build and push
-        uses: docker/build-push-action@c84f38281176d4c9cdb1626ffafcd6b3911b5d94 # ratchet:docker/build-push-action@v3
+        uses: docker/build-push-action@c56af957549030174b10d6867f20e78cfd7debc5 # ratchet:docker/build-push-action@v3
         with:
           push: ${{ env.PUSH }}
           tags: ${{ steps.container-tags.outputs.cli-tag }},${{ steps.container-tags.outputs.action-tag }}
@@ -132,15 +132,15 @@ jobs:
       ACTION_IMAGE_TAG: "${{ needs.build.outputs.action-tag }}"
     steps:
       - name: Install cosign
-        uses: sigstore/cosign-installer@b3413d484cc23cf8778c3d2aa361568d4eb54679 # ratchet:sigstore/cosign-installer@v2.5.1
+        uses: sigstore/cosign-installer@9becc617647dfa20ae7b1151972e9b3a2c338a2b # ratchet:sigstore/cosign-installer@v2.5.1
         with:
           cosign-release: ${{ env.COSIGN_VERSION }}
       - name: Install Syft
-        uses: anchore/sbom-action/download-syft@b5042e9d19d8b32849779bfe17673ff84aec702d # ratchet:anchore/sbom-action/download-syft@v0.12.0
+        uses: anchore/sbom-action/download-syft@b7e8507c6a3c89b7099a0198366d862c8f3ad8f1 # ratchet:anchore/sbom-action/download-syft@v0.13.0
         with:
           syft-version: ${{ env.SYFT_VERSION }}
       - name: Login to Docker
-        uses: docker/login-action@49ed152c8eca782a232dede0303416e8f356c37b # ratchet:docker/login-action@v2
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a # ratchet:docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -168,7 +168,7 @@ jobs:
           cosign attach attestation --attestation sbom-action.json ${{ env.ACTION_IMAGE_TAG }}
           cosign verify-attestation --type spdxjson --key cosign.pub ${{ env.ACTION_IMAGE_TAG }} > cosignverify-action.json
       - name: Upload provenance
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # ratchet:actions/upload-artifact@v3
+        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # ratchet:actions/upload-artifact@v3
         with:
           path: |
             ./sbom-cli.json

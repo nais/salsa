@@ -28,6 +28,7 @@ var (
 
 type ProvenanceConfig struct {
 	WithDependencies bool
+	BuildStartedOn   string
 }
 
 var scanCmd = &cobra.Command{
@@ -63,6 +64,7 @@ var scanCmd = &cobra.Command{
 		}
 
 		scanConfiguration := &config.ScanConfiguration{
+			BuildStartedOn:     Config.BuildStartedOn,
 			WorkDir:            workDir,
 			RepoName:           PathFlags.Repo,
 			Dependencies:       deps,
@@ -118,4 +120,5 @@ func init() {
 	scanCmd.Flags().StringVar(&envContext, "env-context", "", "environmental variables of current context")
 	scanCmd.Flags().BoolVar(&Config.WithDependencies, "with-deps", true, "specify if the cli should generate dependencies for a provenance")
 	scanCmd.Flags().StringVar(&mvnOpts, "mvn-opts", "", "pass additional Comma-delimited list of options to the maven build tool")
+	scanCmd.Flags().StringVar(&Config.BuildStartedOn, "build-started-on", "", "set start time for the build")
 }

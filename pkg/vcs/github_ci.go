@@ -2,7 +2,6 @@ package vcs
 
 import (
 	"fmt"
-	"github.com/nais/salsa/pkg/vcs/github"
 )
 
 const (
@@ -10,47 +9,50 @@ const (
 )
 
 type GithubCIEnvironment struct {
-	BuildContext     *github.Context
+	BuildContext     *GithubContext
 	Event            *Event
-	RunnerContext    *github.RunnerContext
-	BuildEnvironment *github.CurrentBuildEnvironment
-	Actions          *github.Actions
+	RunnerContext    *RunnerContext
+	BuildEnvironment *CurrentBuildEnvironment
+	Actions          *Actions
 }
 
 func CreateGithubCIEnvironment(githubContext []byte, runnerContext, envsContext *string) (ContextEnvironment, error) {
-	context, err := github.ParseContext(githubContext)
+	context, err := ParseContext(githubContext)
 	if err != nil {
 		return nil, fmt.Errorf("parsing context: %w", err)
 	}
 
-	runner, err := github.ParseRunner(runnerContext)
+	runner, err := ParseRunner(runnerContext)
 	if err != nil {
 		return nil, fmt.Errorf("parsing runner: %w", err)
 	}
 
-	// Not required to build a CI environment
-	current := &github.CurrentBuildEnvironment{}
-	if envsContext == nil || len(*envsContext) == 0 {
-		return BuildEnvironment(context, runner, current), nil
+	event, err := ParseEvent(context.Event)
+	if err != nil {
+		return nil, fmt.Errorf("parsing event: %w", err)
 	}
 
-	current, err = github.ParseBuild(envsContext)
+	// Not required to build a CI environment
+	current := &CurrentBuildEnvironment{}
+	if envsContext == nil || len(*envsContext) == 0 {
+		return BuildEnvironment(context, runner, current, event), nil
+	}
+
+	current, err = ParseBuild(envsContext)
 	if err != nil {
 		return nil, fmt.Errorf("parsing envs: %w", err)
 	}
 
-	return BuildEnvironment(context, runner, current), nil
+	return BuildEnvironment(context, runner, current, event), nil
 }
 
-func BuildEnvironment(context *github.Context, runner *github.RunnerContext, current *github.CurrentBuildEnvironment) ContextEnvironment {
+func BuildEnvironment(context *GithubContext, runner *RunnerContext, current *CurrentBuildEnvironment, event *Event) ContextEnvironment {
 	return &GithubCIEnvironment{
-		BuildContext: context,
-		Event: &Event{
-			Inputs: context.Event,
-		},
+		BuildContext:     context,
+		Event:            event,
 		RunnerContext:    runner,
 		BuildEnvironment: current,
-		Actions:          github.BuildId(GithubActionsBuildIdVersion),
+		Actions:          BuildId(GithubActionsBuildIdVersion),
 	}
 }
 
@@ -88,6 +90,7 @@ func (in *GithubCIEnvironment) UserDefinedParameters() *Event {
 		return nil
 	}
 
+	// should be filtered to fit the information needed
 	return in.Event
 }
 
@@ -116,4 +119,8 @@ func (in *GithubCIEnvironment) NonReproducibleMetadata() *Metadata {
 			},
 		},
 	}
+}
+
+func (in *GithubCIEnvironment) GetEvent() *Event {
+	return in.Event
 }

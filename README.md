@@ -11,7 +11,8 @@
 <div align="center">
 
 [![Salsa build & release](https://github.com/nais/salsa/actions/workflows/main.yml/badge.svg)](https://github.com/nais/salsa/actions/workflows/main.yml)
-[![Salsa integration](https://github.com/nais/salsa/actions/workflows/nais-salsa-integration.yml/badge.svg)](https://github.com/nais/salsa/actions/workflows/nais-salsa-integration.yml)
+[![Salsa integration](https://github.com/nais/salsa/actions/workflows/service-account-salsa-integration.yml/badge.svg)](https://github.com/nais/salsa/actions/workflows/service-account-salsa-integration.yml)
+[![Salsa keyless integration](https://github.com/nais/salsa/actions/workflows/keyless-salsa-integration.yaml/badge.svg)](https://github.com/nais/salsa/actions/workflows/keyless-salsa-integration.yaml)
 [![Check pinned workflows](https://github.com/nais/salsa/actions/workflows/ratchet.yml/badge.svg)](https://github.com/nais/salsa/actions/workflows/ratchet.yml)  
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/nais/salsa?color=pink&label=release%40latest&logo=github)
 ![GitHub last commit](https://img.shields.io/github/last-commit/nais/salsa?color=yellow&logo=github)
@@ -103,8 +104,10 @@ dependencies)
         * [Workflow](#workflow-with-workload-identity-and-keyless)
 * [Customizing](#customizing)
     * [Inputs](#inputs)
+        * [Access Private Repositories](#access-private-repositories)
         * [GitHub context](#github-context)
         * [Runner context](#runner-context)
+    * [Outputs](#outputs)
 * [Release](#release)
     * [Checksums](#checksums)
     * [Verify signature](#verify-signature)
@@ -186,7 +189,7 @@ jobs:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
       - name: Provenance, upload and sign attestation
-        uses: nais/salsa@v0.2
+        uses: nais/salsa@v0.x
         with:
           key: ${{ env.KEY }}
           docker_pwd: ${{ secrets.GITHUB_TOKEN }}
@@ -258,7 +261,7 @@ jobs:
           id_token_include_email: true
 
       - name: Generate provenance, upload and sign image
-        uses: nais/salsa@v0.2
+        uses: nais/salsa@v0.x
         with:
           identity_token: ${{ steps.google.outputs.id_token }}
           docker_pwd: ${{ secrets.GITHUB_TOKEN }}
@@ -287,19 +290,13 @@ must be added to the workload identity provider as an allowed audience.
 
 The described `with` fields is required for `nais salsa`.
 
-`with.identity_token` is The output `identity_token` from the Google Auth Action.
+`with.identity_token` is the output `identity_token` from the Google Auth Action.
 Format: `steps.steps-id.outputs.id_token`
 
 `with.docker_pwd` is the GitHub token to authenticate with the registry. The password is used by `nais salsa` to
 authenticate with the registry to download the image for Cosign to sign and push attestation to the registry.
 
 `with.env.COSIGN_EXPERIMENTAL` is required to be set to `true` for Cosign to enable keyless signatures.
-
-### Outputs from the workflow
-
-[SLSA provenance](pkg/dsse/testdata/salsa.provenance) with transitive dependencies  
-[Signed Cosign dsse attestation](pkg/dsse/testdata/cosign-dsse-attestation.json)   
-[Decoded Cosign attestation](pkg/dsse/testdata/cosign-attestation.json)
 
 ### Signature repository
 
@@ -309,20 +306,30 @@ store the cosign signatures and attestations, see more specification in
 the [cosign docs](https://github.com/sigstore/cosign#specifying-registry)
 
 ```yaml
-    - name: Generate provenance, upload and sign image
-      uses: nais/salsa@v0.2
-      with:
-        key: ${{ secrets.SALSA_KMS_KEY }}
-        docker_pwd: ${{ secrets.GITHUB_TOKEN }}
-      env:
-        COSIGN_REPOSITORY: "registry.io/signatures"
+- name: Generate provenance, upload and sign image
+  uses: nais/salsa@v0.x
+  with:
+    key: ${{ secrets.SALSA_KMS_KEY }}
+    docker_pwd: ${{ secrets.GITHUB_TOKEN }}
+  env:
+    COSIGN_REPOSITORY: "registry.io/signatures"
 ```
 
 Actor must be sure that `with.docker_pwd` has access to the signature repository.
 
 ## Customizing
 
-### inputs
+### Inputs
+
+#### Access private repositories
+
+Salsa builds your application to retrieve running dependencies, when the build configuration contains private packages,
+the build needs a token with the proper
+access. [Maven](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry#authenticating-with-a-personal-access-token)
+and [gradle](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry)
+build tool can authenticate with a `PAT`. Use the `with.github_token` field to authenticate with the registry.
+
+`with.token_key_pattern` can be used to specify a key pattern, other than default `GITHUB_TOKEN`.
 
 #### Maven Options
 
@@ -335,11 +342,11 @@ Actor need to set `with.github_token` with access to the private repository.
 `with.github_token` - (optional) GitHub token to authenticate with the private repository.
 
 ```yaml
-    - name: Generate provenance, upload and sign image
-      uses: nais/salsa@v0.2
-      with:
-        mvn_opts: "--settings ./.mvn/settings.xml, -Dmaven.repo.local=/path/to/local/repo"
-        github_token: ${{ secrets.PAT }}
+ - name: Generate provenance, upload and sign image
+   uses: nais/salsa@v0.x
+   with:
+     mvn_opts: "--settings ./.mvn/settings.xml, -Dmaven.repo.local=/path/to/local/repo"
+     github_token: ${{ secrets.PAT }}
 ```
 
 #### GitHub context
@@ -358,21 +365,28 @@ the [Runner context](https://docs.github.com/en/actions/learn-github-actions/con
 
 The Following inputs can be used as `step.with` keys
 
-| Name             | Type   | Default               | Description                                                                                                                                        | Required |
-|------------------|--------|:----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|----------|
-| `docker_pwd`     | String | ""                    | Password for docker                                                                                                                                | True     |
-| `key`            | String | ""                    | Private key (cosign.key) or kms provider, used for signing the attestation                                                                         | False    |
-| `identity_token` | String | ""                    | Identity token used for Cosign keyless authentication                                                                                              | False    |
-| `image`          | String | $IMAGE                | The container image to create a attestation for                                                                                                    | False    |
-| `docker_user`    | String | github.actor          | User to login to container registry                                                                                                                | False    |
-| `repo_name`      | String | github.repository     | The name of the repo/project                                                                                                                       | False    |
-| `repo_sub_dir`   | String | ""                    | Specify a subdirectory if build file not found in working root directory                                                                           | False    |
-| `dependencies`   | Bool   | true                  | Set to false if action should not create materials for dependencies (e.g. if build tool is unsupported or repo uses internal/private dependencies) | False    |
-| `mvn_opts`       | String | ""                    | A comma-delimited string with additional maven cli options for the dependence build                                                                | False    |
-| `github_token`   | String | ""                    | GitHub token to authenticate with the private repository                                                                                           | False    |
-| `repo_dir`       | String | $GITHUB_WORKSPACE     | **Internal value (do not set):** Root of directory to look for build files                                                                         | False    |
-| `github_context` | String | ${{ toJSON(github) }} | **Internal value (do not set):** the [github context](#github-context) object in json                                                              | False    |
-| `runner_context` | String | ${{ toJSON(runner) }} | **Internal value (do not set):** the [runner context](#runner-context) object in json                                                              | False    |
+| Name                | Type   | Default               | Description                                                                                                                                               | Required |
+|---------------------|--------|:----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|----------|
+| `docker_pwd`        | String | ""                    | Password for docker                                                                                                                                       | True     |
+| `key`               | String | ""                    | Private key (cosign.key) or kms provider, used for signing the attestation                                                                                | False    |
+| `identity_token`    | String | ""                    | Identity token used for Cosign keyless authentication                                                                                                     | False    |
+| `image`             | String | $IMAGE                | The container image to create a attestation for                                                                                                           | False    |
+| `docker_user`       | String | github.actor          | User to login to container registry                                                                                                                       | False    |
+| `repo_name`         | String | github.repository     | The name of the repo/project                                                                                                                              | False    |
+| `repo_sub_dir`      | String | ""                    | Specify a subdirectory if build file not found in working root directory                                                                                  | False    |
+| `dependencies`      | Bool   | true                  | Set to false if action should not create materials for dependencies (e.g. if build tool is unsupported or repo uses internal/private dependencies)        | False    |
+| `github_token`      | String | ""                    | Token to authenticate and read private packages, the token must have read:packages scope                                                                  | False    |
+| `token_key_pattern` | String | ""                    | If a token is provided but the the key pattern is different from the default key pattern "GITHUB_TOKEN"                                                   | False    |
+| `build_started_on`  | String | ""                    | Specify a workflow build start time. Default is set to github_context `event.head_commit` or `event.workflow_run.head_commit` depending on workflow usage | False    |
+| `mvn_opts`          | String | ""                    | A comma-delimited string with additional maven cli options for the dependence build                                                                       | False    |
+| `repo_dir`          | String | $GITHUB_WORKSPACE     | **Internal value (do not set):** Root of directory to look for build files                                                                                | False    |
+| `github_context`    | String | ${{ toJSON(github) }} | **Internal value (do not set):** the [github context](#github-context) object in json                                                                     | False    |
+| `runner_context`    | String | ${{ toJSON(runner) }} | **Internal value (do not set):** the [runner context](#runner-context) object in json                                                                     | False    |
+
+### Outputs
+
+* `provenance_file_path` [SLSA provenance](pkg/dsse/testdata/salsa.provenance)
+* `raw_file_path` [Signed Cosign dsse attestation](pkg/dsse/testdata/cosign-dsse-attestation.json)
 
 ## Release
 
