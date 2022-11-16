@@ -71,8 +71,10 @@ inputs:
 
   github_token:
     description: |-
-      PAT with at least packages:read scope to install packages associated with other private repositories (which GITHUB_TOKEN can't access).
-    required: false
+      Normal use is "GITHUB_TOKEN". To fetch from private repository use
+      PAT with at least packages:read scope to install packages associated with other private repositories 
+      (which GITHUB_TOKEN can't access).
+    required: true
     default: ""
 
   token_key_pattern:
