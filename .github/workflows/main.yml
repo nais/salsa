@@ -10,7 +10,7 @@ on:
       - 'Makefile'
 
 env:
-  VERSION: v0.5
+  VERSION: v0.6
   IMAGE_NAME: ghcr.io/${{ github.repository }}
   COSIGN_VERSION: v1.13.1
   SYFT_VERSION: v0.44.1
