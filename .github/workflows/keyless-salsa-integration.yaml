@@ -35,7 +35,7 @@ jobs:
           context: integration-test
           push: true
           tags: ${{ env.IMAGE }}
-      - name: Generate provenance, upload and sign image
+      - name: Generate provenance, sign and upload image
         uses: ./
         with:
           identity_token: ${{ steps.google.outputs.id_token }}

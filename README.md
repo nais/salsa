@@ -260,7 +260,7 @@ jobs:
           id_token_audience: sigstore
           id_token_include_email: true
 
-      - name: Generate provenance, upload and sign image
+      - name: Generate provenance, sign and upload image
         uses: nais/salsa@v0.x
         with:
           identity_token: ${{ steps.google.outputs.id_token }}
@@ -306,7 +306,7 @@ store the cosign signatures and attestations, see more specification in
 the [cosign docs](https://github.com/sigstore/cosign#specifying-registry)
 
 ```yaml
-- name: Generate provenance, upload and sign image
+- name: Generate provenance, sign and upload image
   uses: nais/salsa@v0.x
   with:
     key: ${{ secrets.SALSA_KMS_KEY }}
@@ -339,13 +339,11 @@ Useful when your project depends on a custom maven settings file or use dependen
 
 Actor need to set `with.github_token` with access to the private repository.
 
-`with.github_token` - (optional) GitHub token to authenticate with the private repository.
-
 ```yaml
- - name: Generate provenance, upload and sign image
+ - name: Generate provenance, sign and upload image
    uses: nais/salsa@v0.x
    with:
-     mvn_opts: "--settings ./.mvn/settings.xml, -Dmaven.repo.local=/path/to/local/repo"
+     mvn_opts: "-s ./.mvn/settings.xml, -Dmaven.repo.local=/path/to/local/repo"
      github_token: ${{ secrets.PAT }}
 ```
 
