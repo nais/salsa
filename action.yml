@@ -78,6 +78,7 @@ inputs:
     description: |-
       PAT with at least packages:read scope to install packages associated with other private repositories (which GITHUB_TOKEN can't access).
     required: false
+    default: ""
 
   token_key_pattern:
     description: |-
