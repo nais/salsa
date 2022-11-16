@@ -70,7 +70,7 @@ exportCosignEnvironment() {
 
 loginDocker() {
   echo "---------- Logging in to Docker registry: $DOCKER_REGISTRY ----------"
-  echo "$INPUT_GITHUB_TOKEN" | docker login "$DOCKER_REGISTRY" -u "$GITHUB_ACTOR" --password-stdin
+  echo "$GITHUB_TOKEN" | docker login "$DOCKER_REGISTRY" -u "$GITHUB_ACTOR" --password-stdin
 }
 
 logoutDocker() {
