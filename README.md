@@ -337,7 +337,7 @@ build tool can authenticate with a `PAT`. Use the `with.github_token` field to a
 
 Useful when your project depends on a custom maven settings file or use dependencies from a private repository.
 
-Actor need to set `with.github_token` with access to the private repository.
+If project depends on dependencies from a private repository, actor need to set GitHub [private token](#access-private-repositories) with proper access right.
 
 ```yaml
  - name: Generate provenance, sign and upload image
