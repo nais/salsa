@@ -4,6 +4,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
+	"time"
 )
 
 func TestEventHeadCommit(t *testing.T) {
@@ -27,6 +28,10 @@ func TestEventHeadCommit(t *testing.T) {
 			workFlowMeatData: commitMetadata(t, "testdata/github-context.json"),
 			WantTime:         "2022-02-14T09:38:16+01:00",
 		},
+		{
+			name:             "No metadata found, should return default start time",
+			workFlowMeatData: commitMetadata(t, "testdata/unknown-event.json"),
+		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			context, err := ParseContext(test.workFlowMeatData)
@@ -34,7 +39,12 @@ func TestEventHeadCommit(t *testing.T) {
 			parsedEvent, err := ParseEvent(context.Event)
 			assert.NoError(t, err)
 			assert.NotNil(t, parsedEvent)
-			assert.Equal(t, test.WantTime, parsedEvent.GetHeadCommitTimestamp())
+			if test.WantTime != "" {
+				assert.Equal(t, test.WantTime, parsedEvent.GetHeadCommitTimestamp())
+			} else {
+				_, err := time.Parse(time.RFC3339, parsedEvent.GetHeadCommitTimestamp())
+				assert.NoError(t, err)
+			}
 		})
 	}
 }
