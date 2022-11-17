@@ -152,7 +152,6 @@ func Environment() *vcs.GithubCIEnvironment {
 		Event: &vcs.Event{
 			EventMetadata: &vcs.EventMetadata{
 				HeadCommit: &vcs.HeadCommit{
-					Id:        "yolo",
 					Timestamp: "2022-02-14T09:38:16+01:00",
 				},
 			},

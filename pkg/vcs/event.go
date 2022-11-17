@@ -10,17 +10,21 @@ type Event struct {
 }
 
 type EventMetadata struct {
-	WorkFlowRun *WorkFlow   `json:"workflow_run"`
-	HeadCommit  *HeadCommit `json:"head_commit"`
+	HeadCommit  *HeadCommit  `json:"head_commit"`
+	PullRequest *PullRequest `json:"pull_request"`
+	WorkFlowRun *WorkFlow    `json:"workflow_run"`
+}
+
+type HeadCommit struct {
+	Timestamp string `json:"timestamp"`
+}
+
+type PullRequest struct {
+	UpdatedAt string `json:"updated_at"`
 }
 
 type WorkFlow struct {
 	HeadCommit *HeadCommit `json:"head_commit"`
-}
-
-type HeadCommit struct {
-	Id        string `json:"id"`
-	Timestamp string `json:"timestamp"`
 }
 
 func ParseEvent(inputs []byte) (*Event, error) {
@@ -32,21 +36,17 @@ func ParseEvent(inputs []byte) (*Event, error) {
 	return &event, nil
 }
 
-func (in *Event) GetHeadCommitId() string {
-	if in.EventMetadata.WorkFlowRun != nil {
-		return in.EventMetadata.WorkFlowRun.HeadCommit.Id
+func (in *Event) GetHeadCommitTimestamp() string {
+	if in.EventMetadata.HeadCommit != nil {
+		return in.EventMetadata.HeadCommit.Timestamp
 	}
 
-	return in.EventMetadata.HeadCommit.Id
-}
-
-func (in *Event) GetHeadCommitTimestamp() string {
 	if in.EventMetadata.WorkFlowRun != nil {
 		return in.EventMetadata.WorkFlowRun.HeadCommit.Timestamp
 	}
 
-	if in.EventMetadata.HeadCommit != nil {
-		return in.EventMetadata.HeadCommit.Timestamp
+	if in.EventMetadata.PullRequest != nil {
+		return in.EventMetadata.PullRequest.UpdatedAt
 	}
 
 	return time.Now().UTC().Round(time.Second).Format(time.RFC3339)
