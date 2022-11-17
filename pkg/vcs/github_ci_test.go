@@ -15,10 +15,10 @@ func TestCreateCIEnvironment(t *testing.T) {
 	env := envC()
 	ci, err := CreateGithubCIEnvironment(context, &runner, &env)
 	assert.NoError(t, err)
-	assert.Equal(t, "https://github.com/nais/salsa", ci.RepoUri())
+	assert.Equal(t, "https://github.com/bolo/tomato", ci.RepoUri())
 	assert.Equal(t, "90dc9f2bc4007d1099a941ba3d408d2c896fe8dd", ci.Sha())
-	assert.Equal(t, "https://github.com/nais/salsa/Attestations/GitHubHostedActions@v1", ci.BuilderId())
-	assert.Equal(t, "https://github.com/nais/salsa/actions/runs/1839977840", ci.BuildInvocationId())
+	assert.Equal(t, "https://github.com/bolo/tomato/Attestations/GitHubHostedActions@v1", ci.BuilderId())
+	assert.Equal(t, "https://github.com/bolo/tomato/actions/runs/1839977840", ci.BuildInvocationId())
 
 	metadata := Metadata{
 		Arch: "X64",
@@ -46,7 +46,7 @@ func TestCreateCIEnvironment(t *testing.T) {
 	result := ci.UserDefinedParameters()
 	assert.NotNil(t, result)
 	assert.NotEmpty(t, "%s", result)
-	assert.Equal(t, "Salsa CI", ci.Context())
+	assert.Equal(t, "tomato CI", ci.Context())
 
 }
 
