@@ -28,7 +28,7 @@ jobs:
         id: set-version
         run: |
           echo Faking a Semantic Version
-          echo ::set-output name=version::${{ env.VERSION }}.$(date "+%Y%m%d%H%M%S")
+          echo "version=${{ env.VERSION }}.$(date "+%Y%m%d%H%M%S")" >> $GITHUB_OUTPUT
   test:
     runs-on: ubuntu-20.04
     steps:
@@ -101,8 +101,8 @@ jobs:
       - name: Create tags
         id: container-tags
         run: |
-          echo ::set-output name=cli-tag::${{ env.IMAGE_NAME }}:${{ needs.set-version.outputs.version }}
-          echo ::set-output name=action-tag::${{ env.IMAGE_NAME }}:${{ env.VERSION }}
+          echo "cli-tag=${{ env.IMAGE_NAME }}:${{ needs.set-version.outputs.version }}" >> $GITHUB_OUTPUT
+          echo "action-tag=${{ env.IMAGE_NAME }}:${{ env.VERSION }}" >> $GITHUB_OUTPUT
       - name: Only push from main
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
