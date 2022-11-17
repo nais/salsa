@@ -2,6 +2,7 @@ package vcs
 
 import (
 	"encoding/json"
+	"time"
 )
 
 type Event struct {
@@ -44,5 +45,9 @@ func (in *Event) GetHeadCommitTimestamp() string {
 		return in.EventMetadata.WorkFlowRun.HeadCommit.Timestamp
 	}
 
-	return in.EventMetadata.HeadCommit.Timestamp
+	if in.EventMetadata.HeadCommit != nil {
+		return in.EventMetadata.HeadCommit.Timestamp
+	}
+
+	return time.Now().UTC().Round(time.Second).Format(time.RFC3339)
 }

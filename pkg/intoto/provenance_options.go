@@ -137,7 +137,7 @@ func (in *ProvenanceOptions) GetBuildFinishedOn() time.Time {
 
 func buildStartedOn(context vcs.ContextEnvironment, inputBuildTime string) time.Time {
 	if inputBuildTime != "" {
-		return buildStarted(inputBuildTime)
+		return BuildStarted(inputBuildTime)
 	}
 
 	if context == nil {
@@ -150,11 +150,11 @@ func buildStartedOn(context vcs.ContextEnvironment, inputBuildTime string) time.
 		return time.Now().UTC().Round(time.Second)
 	}
 
-	return buildStarted(event.GetHeadCommitTimestamp())
-
+	buildTime := event.GetHeadCommitTimestamp()
+	return BuildStarted(buildTime)
 }
 
-func buildStarted(buildTime string) time.Time {
+func BuildStarted(buildTime string) time.Time {
 	started, err := time.Parse(time.RFC3339, buildTime)
 	if err != nil {
 		log.Warnf("Failed to parse build time: %v, using default start time", err)
