@@ -9,6 +9,11 @@ setup() {
     exit 1
   fi
 
+  if [ -z "$INPUT_REGISTRY" ]; then
+    echo "INPUT_REGISTRY is empty"
+    exit 1
+  fi
+
   if [ -n "$INPUT_DOCKER_USER" ]; then
     export GITHUB_ACTOR=$INPUT_DOCKER_USER
   fi
@@ -18,12 +23,16 @@ setup() {
     exit 1
   fi
 
+  if [ -n "$INPUT_IMAGE_DIGEST" ]; then
+    export IMAGE=$INPUT_IMAGE_DIGEST
+  fi
+
   if [ -n "$INPUT_IMAGE" ]; then
     export IMAGE=$INPUT_IMAGE
   fi
 
-  if [ -z "$IMAGE" ]; then
-    echo "IMAGE is not set"
+  if [ -z "$INPUT_IMAGE_DIGEST" ] && [ -z "$IMAGE" ] && [ -z "$INPUT_IMAGE" ]; then
+    echo "IMAGE, IMAGE_DIGEST or INPUT_IMAGE is not set. Please set it to your to image name or digest."
     exit 1
   fi
 
@@ -35,12 +44,6 @@ setup() {
   GITHUB=$(echo "${INPUT_GITHUB_CONTEXT}" | base64 -w 0) &&
     RUNNER=$(echo "${INPUT_RUNNER_CONTEXT}" | base64 -w 0) &&
     ENVS=$(jq -n env | base64 -w 0)
-
-  DOCKER_REGISTRY="${IMAGE%%/*}"
-  if [ -z "$DOCKER_REGISTRY" ]; then
-    echo "DOCKER_REGISTRY is not set"
-    exit 1
-  fi
 
   exportCosignEnvironment
   exportGithubToken
@@ -55,6 +58,8 @@ exportGithubToken() {
     else
       export GITHUB_TOKEN="$INPUT_GITHUB_TOKEN"
     fi
+  else
+    export GITHUB_TOKEN
   fi
 }
 
@@ -69,13 +74,17 @@ exportCosignEnvironment() {
 }
 
 loginDocker() {
-  echo "---------- Logging in to Docker registry: $DOCKER_REGISTRY ----------"
-  echo "$INPUT_GITHUB_TOKEN" | docker login "$DOCKER_REGISTRY" -u "$GITHUB_ACTOR" --password-stdin
+  echo "---------- Logging in to Docker registry: $INPUT_REGISTRY ----------"
+  if [ -n "$INPUT_REGISTRY_ACCESS_TOKEN" ]; then
+    echo "$INPUT_REGISTRY_ACCESS_TOKEN" | docker login "$INPUT_REGISTRY" -u "$GITHUB_ACTOR" --password-stdin
+  else
+    echo "$GITHUB_TOKEN" | docker login "$INPUT_REGISTRY" -u "$GITHUB_ACTOR" --password-stdin
+  fi
 }
 
 logoutDocker() {
-  echo "---------- Logging out from Docker registry: $DOCKER_REGISTRY ----------"
-  docker logout "$DOCKER_REGISTRY"
+  echo "---------- Logging out from Docker registry: $INPUT_REGISTRY ----------"
+  docker logout "$INPUT_REGISTRY"
 }
 
 scan() {
