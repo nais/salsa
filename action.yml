@@ -13,7 +13,7 @@ inputs:
   image_digest:
     description: |-
       The image digest of the container to be attested
-    required: false
+    required: true
 
   image:
     description: |-
