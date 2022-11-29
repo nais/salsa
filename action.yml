@@ -5,16 +5,19 @@ branding:
   color: red
 inputs:
 
-  repo_dir:
+  registry:
     description: |-
-      Internal value (do not set): root of directory to search for build files.
-      Defaults to "github.workspace".
-    required: false
-    default: ${{ github.workspace }}
+      Registry to push to
+    required: true
 
-  repo_sub_dir:
+  image_digest:
     description: |-
-      Specify a subdirectory if build file not found in working root directory.
+      The image digest of the container to be attested
+    required: false
+
+  image:
+    description: |-
+      The tag of the docker container to sign.
     required: false
     default: ""
 
@@ -48,7 +51,7 @@ inputs:
       Docker login user. 
       Defaults to "github.actor".
     required: false
-    default: ""
+    default: "${{ github.actor }}"
 
   dependencies:
     description: |-
@@ -56,12 +59,6 @@ inputs:
       Defaults to true.
     required: false
     default: "true"
-
-  image:
-    description: |-
-      The docker container to sign.
-    required: false
-    default: ""
 
   mvn_opts:
     description: |-
@@ -74,13 +71,32 @@ inputs:
       Normal use is "GITHUB_TOKEN". To fetch from private repository use
       PAT with at least packages:read scope to install packages associated with other private repositories 
       (which GITHUB_TOKEN can't access).
-    required: true
-    default: ""
+    required: false
+    default: ${{ github.token }}
 
   token_key_pattern:
     description: |-
       When input github_token is provided but the build tool configurations uses a key pattern 
       different from the default "GITHUB_TOKEN".
+    required: false
+    default: ""
+
+  registry_access_token:
+    description: |-
+      Access token for registry. Used to fetch packages from GAR
+    required: false
+    default: ""
+
+  repo_dir:
+    description: |-
+      Internal value (do not set): root of directory to search for build files.
+      Defaults to "github.workspace".
+    required: false
+    default: ${{ github.workspace }}
+
+  repo_sub_dir:
+    description: |-
+      Specify a subdirectory if build file not found in working root directory.
     required: false
     default: ""
 
@@ -100,7 +116,7 @@ inputs:
 
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/nais/salsa:v0.6'
+  image: 'docker://ghcr.io/nais/salsa:v0.7'
   args:
     - ${{ inputs.repo_dir }}
     - ${{ inputs.repo_name }}
@@ -118,3 +134,6 @@ runs:
     - ${{ inputs.token_key_pattern }}
     - ${{ inputs.dependencies }}
     - ${{ inputs.build_started_on }}
+    - ${{ inputs.registry_access_token }}
+    - ${{ inputs.registry }}
+    - ${{ inputs.image_digest }}

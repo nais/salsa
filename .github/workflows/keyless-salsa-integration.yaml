@@ -1,9 +1,9 @@
 name: slsa keyless
 on:
   workflow_run:
-    workflows: [Salsa build & release]
-    types: [completed]
-    branches: [main]
+    workflows: [ Salsa build & release ]
+    types: [ completed ]
+    branches: [ main ]
 env:
   IMAGE: ttl.sh/nais/salsa-keyless-test:1h
 jobs:
@@ -30,6 +30,7 @@ jobs:
           id_token_audience: sigstore
           id_token_include_email: true
       - name: Build and push
+        id: docker
         uses: docker/build-push-action@c56af957549030174b10d6867f20e78cfd7debc5 # ratchet:docker/build-push-action@v3
         with:
           context: integration-test
@@ -38,7 +39,8 @@ jobs:
       - name: Generate provenance, sign and upload image
         uses: ./
         with:
+          image_digest: ${{ steps.docker.outputs.digest }}
+          registry: ttl.sh
           identity_token: ${{ steps.google.outputs.id_token }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
         env:
           COSIGN_EXPERIMENTAL: "true"
