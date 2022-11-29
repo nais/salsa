@@ -23,18 +23,16 @@ setup() {
     exit 1
   fi
 
-  if [ -n "$INPUT_IMAGE_DIGEST" ]; then
-    export IMAGE=$INPUT_IMAGE_DIGEST
-  fi
-
   if [ -n "$INPUT_IMAGE" ]; then
     export IMAGE=$INPUT_IMAGE
   fi
 
-  if [ -z "$INPUT_IMAGE_DIGEST" ] && [ -z "$IMAGE" ] && [ -z "$INPUT_IMAGE" ]; then
-    echo "IMAGE, IMAGE_DIGEST or INPUT_IMAGE is not set. Please set it to your to image name or digest."
+  if [ -z "$INPUT_IMAGE_DIGEST" ] || [ -z "$IMAGE" ]; then
+    echo "IMAGE and IMAGE_DIGEST is not set. Please set it."
     exit 1
   fi
+
+  export IMAGE="$IMAGE@$INPUT_IMAGE_DIGEST"
 
   if [ -z "$INPUT_GITHUB_CONTEXT" ] || [ -z "$INPUT_RUNNER_CONTEXT" ]; then
     echo "GITHUB_CONTEXT and RUNNER_CONTEXT are required"
