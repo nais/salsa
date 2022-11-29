@@ -12,12 +12,12 @@ inputs:
 
   image_digest:
     description: |-
-      Image digest to be attested
+      The image digest of the container to be attested
     required: false
 
   image:
     description: |-
-      The docker container to sign. (Deprecated in favor of image_digest)
+      The tag of the docker container to sign.
     required: false
     default: ""
 
