@@ -61,6 +61,19 @@ func TestBuildMaven(t *testing.T) {
 				Digest:  "c8fb4839054d280b3033f800d1f5a97de2f028eb8ba2eb458ad287e536f3f25f",
 			},
 		},
+		{
+			Name:      "Add additional commands line arguments as a part of the mvn command",
+			BuildType: BuildMaven("--also-make, --threads=2, --batch-mode, --settings=.m2/maven-settings.xml"),
+			Cmd:       "mvn dependency:copy-dependencies -DincludeScope=runtime -Dmdep.useRepositoryLayout=true --also-make --threads=2 --batch-mode --settings=.m2/maven-settings.xml",
+			WorkDir:   "testdata/jvm/maven",
+			BuildPath: "/usr/local/bin/mvn",
+			Want: test.Want{
+				Key:     "com.google.code.gson:gson",
+				Version: "2.8.6",
+				Algo:    "sha256",
+				Digest:  "c8fb4839054d280b3033f800d1f5a97de2f028eb8ba2eb458ad287e536f3f25f",
+			},
+		},
 	}
 
 	test.Run(t, tests)
