@@ -18,7 +18,7 @@ jobs:
           codeql-analysis.yml
         ]
     steps:
-      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
+      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
       - name: Check if ${{matrix.asset}} is pinned
         uses: 'docker://ghcr.io/sethvargo/ratchet@sha256:e5b2409be0d1c82c71a6e60c49027e539f4c90636529e4f8b5c25a68b68a36d4' # ratchet:docker://ghcr.io/sethvargo/ratchet:0.3.0
         with:
