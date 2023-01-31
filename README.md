@@ -335,8 +335,9 @@ build tool can authenticate with a `PAT`. Use the `with.github_token` field to a
 
 `with.mvn_opts` - (optional) additional maven options in a comma-delimited string.
 
-**NB!**  
-Currently only supports the maven command cli option `-s`, specifying a settings.xml file.
+When specified, the options are separated by `,` and appended to the maven command line.
+Options with arguments like `--settings` must be seperated with a `=` sign and not space, for
+example: `--settings=.mvn/settings.xml`. Double `--flag` options can not be mixed with single `-flag`.
 
 Useful when your project depends on a custom maven settings file or use dependencies from a private repository.
 If project depends on dependencies from a private repository, actor need to set GitHub [private token](#access-private-repositories) with proper access right.
