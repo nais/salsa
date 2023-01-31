@@ -192,7 +192,6 @@ jobs:
         uses: nais/salsa@v0.x
         with:
           key: ${{ env.KEY }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ##### Google Authentication
@@ -204,8 +203,6 @@ account json key.
 
 `with.key` is the key [URI format](https://github.com/sigstore/cosign/blob/main/KMS.md#gcp) for Google KMS.
 Format: `gcpkms://projects/$PROJECT/locations/$LOCATION/keyRings/$KEYRING/cryptoKeys/$KEY/versions/$KEY_VERSION`
-
-`with.github_token` is the GitHub token to authenticate with the registry.
 
 ### Keyless Signatures
 
@@ -264,7 +261,6 @@ jobs:
         uses: nais/salsa@v0.x
         with:
           identity_token: ${{ steps.google.outputs.id_token }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
         env:
           COSIGN_EXPERIMENTAL: "true"
 ```
@@ -293,9 +289,6 @@ The described `with` fields is required for `nais salsa`.
 `with.identity_token` is the output `identity_token` from the Google Auth Action.
 Format: `steps.steps-id.outputs.id_token`
 
-`with.github_token` is the GitHub token to authenticate with the registry. The password is used by `nais salsa` to
-authenticate with the registry to download the image for Cosign to sign and push attestation to the registry.
-
 `with.env.COSIGN_EXPERIMENTAL` is required to be set to `true` for Cosign to enable keyless signatures.
 
 ### Signature repository
@@ -310,7 +303,6 @@ the [cosign docs](https://github.com/sigstore/cosign#specifying-registry)
   uses: nais/salsa@v0.x
   with:
     key: ${{ secrets.SALSA_KMS_KEY }}
-    github_token: ${{ secrets.GITHUB_TOKEN }}
   env:
     COSIGN_REPOSITORY: "registry.io/signatures"
 ```
@@ -371,7 +363,7 @@ The Following inputs can be used as `step.with` keys
 | `key`                   | String | ""                                | Private key (cosign.key) or kms provider, used for signing the attestation (Not required for keyless)                                                   | true     |
 | `registry`              | String | ""                                | Identity token used for Cosign keyless authentication                                                                                                   | true     |
 | `image_digest`          | String | ""                                | The image digest to create a attestation for                                                                                                            | true     |
-| `github_token`          | String | $GITHUB_TOKEN                     | Token to authenticate and read private packages, the token must have read:packages scope                                                                | false    |
+| `github_token`          | String | $GITHUB_TOKEN                     | Detected automatically, use this to authenticate and read private packages, the token must have read:packages scope                                     | false    |
 | `identity_token`        | String | ""                                | Identity token used only for Cosign keyless authentication                                                                                              | False    |
 | `registry_access_token` | String | ""                                | Access token, when using workload identity tokens against registries similar to GAR                                                                     | False    |
 | `token_key_pattern`     | String | GITHUB_TOKEN                      | If a token is provided but the the key pattern is different from the default key pattern "GITHUB_TOKEN"                                                 | False    |
