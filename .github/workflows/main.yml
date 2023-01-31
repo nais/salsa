@@ -8,7 +8,6 @@ on:
       - '.gitignore'
       - 'doc/**'
       - 'Makefile'
-
 env:
   VERSION: v0.7
   IMAGE_NAME: ghcr.io/${{ github.repository }}
@@ -69,7 +68,7 @@ jobs:
       #          app-id: ${{ secrets.NAIS_APP_ID }}
       #          repo: nais/homebrew-tap
       - name: Install cosign
-        uses: sigstore/cosign-installer@9becc617647dfa20ae7b1151972e9b3a2c338a2b # ratchet:sigstore/cosign-installer@v2.6.0
+        uses: sigstore/cosign-installer@f3c664df7af409cb4873aa5068053ba9d61a57b6 # ratchet:sigstore/cosign-installer@v2.6.0
         with:
           cosign-release: ${{ env.COSIGN_VERSION }}
       - name: Install Syft
@@ -91,7 +90,9 @@ jobs:
           PUSH_TOKEN: ${{ steps.get-homebrew-token.outputs.token }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@8c0edbc76e98fa90f69d9a2c020dcb50019dc325 # ratchet:docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@15c905b16b06416d2086efa066dd8e3a35cc7f98 # ratchet:docker/setup-buildx-action@v2
+        with:
+          provenance: false
       - name: Login to Docker
         uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a # ratchet:docker/login-action@v2
         with:
@@ -108,7 +109,7 @@ jobs:
         run: |
           echo "PUSH=true" >> $GITHUB_ENV
       - name: Build and push
-        uses: docker/build-push-action@c56af957549030174b10d6867f20e78cfd7debc5 # ratchet:docker/build-push-action@v3
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671 # ratchet:docker/build-push-action@v4
         with:
           push: ${{ env.PUSH }}
           tags: ${{ steps.container-tags.outputs.cli-tag }},${{ steps.container-tags.outputs.action-tag }}
@@ -132,7 +133,7 @@ jobs:
       ACTION_IMAGE_TAG: "${{ needs.build.outputs.action-tag }}"
     steps:
       - name: Install cosign
-        uses: sigstore/cosign-installer@9becc617647dfa20ae7b1151972e9b3a2c338a2b # ratchet:sigstore/cosign-installer@v2.5.1
+        uses: sigstore/cosign-installer@b3413d484cc23cf8778c3d2aa361568d4eb54679 # ratchet:sigstore/cosign-installer@v2.5.1
         with:
           cosign-release: ${{ env.COSIGN_VERSION }}
       - name: Install Syft
