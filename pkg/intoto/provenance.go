@@ -1,12 +1,13 @@
 package intoto
 
 import (
+	"github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/common"
 	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
 )
 
 func GenerateSlsaPredicate(opts *ProvenanceOptions) *slsa.ProvenancePredicate {
 	predicate := &slsa.ProvenancePredicate{
-		Builder: slsa.ProvenanceBuilder{
+		Builder: common.ProvenanceBuilder{
 			ID: opts.BuilderId,
 		},
 		BuildType:   opts.BuildType,
@@ -42,20 +43,20 @@ func withCompleteness(opts *ProvenanceOptions) slsa.ProvenanceComplete {
 	}
 }
 
-func withMaterials(opts *ProvenanceOptions) []slsa.ProvenanceMaterial {
-	materials := make([]slsa.ProvenanceMaterial, 0)
+func withMaterials(opts *ProvenanceOptions) []common.ProvenanceMaterial {
+	materials := make([]common.ProvenanceMaterial, 0)
 	AppendRuntimeDependencies(opts, &materials)
 	AppendBuildContext(opts, &materials)
 	return materials
 }
 
-func AppendRuntimeDependencies(opts *ProvenanceOptions, materials *[]slsa.ProvenanceMaterial) {
+func AppendRuntimeDependencies(opts *ProvenanceOptions, materials *[]common.ProvenanceMaterial) {
 	if opts.Dependencies == nil {
 		return
 	}
 
 	for _, dep := range opts.Dependencies.RuntimeDeps {
-		m := slsa.ProvenanceMaterial{
+		m := common.ProvenanceMaterial{
 			URI:    dep.ToUri(),
 			Digest: dep.ToDigestSet(),
 		}
@@ -63,7 +64,7 @@ func AppendRuntimeDependencies(opts *ProvenanceOptions, materials *[]slsa.Proven
 	}
 }
 
-func AppendBuildContext(opts *ProvenanceOptions, materials *[]slsa.ProvenanceMaterial) {
+func AppendBuildContext(opts *ProvenanceOptions, materials *[]common.ProvenanceMaterial) {
 	if opts.BuilderRepoDigest != nil {
 		*materials = append(*materials, *opts.BuilderRepoDigest)
 	}

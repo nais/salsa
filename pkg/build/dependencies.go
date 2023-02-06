@@ -2,7 +2,7 @@ package build
 
 import (
 	"fmt"
-	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
+	"github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/common"
 )
 
 type artifactType string
@@ -50,8 +50,8 @@ func (d Dependency) ToUri() string {
 	return fmt.Sprintf("%s:%s:%s", d.Type, d.Coordinates, d.Version)
 }
 
-func (d Dependency) ToDigestSet() slsa.DigestSet {
-	return slsa.DigestSet{d.CheckSum.Algorithm: d.CheckSum.Digest}
+func (d Dependency) ToDigestSet() common.DigestSet {
+	return common.DigestSet{d.CheckSum.Algorithm: d.CheckSum.Digest}
 }
 
 func Dependence(coordinates, version string, checksum CheckSum) Dependency {

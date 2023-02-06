@@ -1,6 +1,7 @@
 package intoto
 
 import (
+	"github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/common"
 	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/config"
 	"github.com/nais/salsa/pkg/vcs"
@@ -22,7 +23,7 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 		buildInvocationId       string
 		builderId               string
 		buildConfig             *BuildConfig
-		materials               []slsa.ProvenanceMaterial
+		materials               []common.ProvenanceMaterial
 		configSource            slsa.ConfigSource
 		buildTimerIsSet         bool
 		buildTimerFinishedIsSet bool
@@ -37,7 +38,7 @@ func TestGenerateSlsaPredicate(t *testing.T) {
 			materials:         ExpectedDependenciesMaterial(),
 			configSource: slsa.ConfigSource{
 				URI:        "",
-				Digest:     slsa.DigestSet(nil),
+				Digest:     common.DigestSet(nil),
 				EntryPoint: "",
 			},
 			buildTimerIsSet:         true,
@@ -158,28 +159,28 @@ func expectedMetadata() *vcs.Metadata {
 	}
 }
 
-func ExpectedDependenciesMaterial() []slsa.ProvenanceMaterial {
-	return []slsa.ProvenanceMaterial{
+func ExpectedDependenciesMaterial() []common.ProvenanceMaterial {
+	return []common.ProvenanceMaterial{
 		{
 			URI: "pkg:groupId:artifactId:v01",
-			Digest: slsa.DigestSet{
+			Digest: common.DigestSet{
 				"todo": "todo",
 			},
 		},
 	}
 }
 
-func ToExpectedMaterials() []slsa.ProvenanceMaterial {
-	return []slsa.ProvenanceMaterial{
+func ToExpectedMaterials() []common.ProvenanceMaterial {
+	return []common.ProvenanceMaterial{
 		{
 			URI: "pkg:groupId:artifactId:v01",
-			Digest: slsa.DigestSet{
+			Digest: common.DigestSet{
 				"todo": "todo",
 			},
 		},
 		{
 			URI: "git+https://github.com/nais/salsa",
-			Digest: slsa.DigestSet{
+			Digest: common.DigestSet{
 				build.AlgorithmSHA1: "4321",
 			},
 		},
