@@ -2,6 +2,7 @@ package intoto
 
 import (
 	"fmt"
+	"github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/common"
 	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/config"
 	"github.com/nais/salsa/pkg/vcs"
@@ -24,7 +25,7 @@ func TestCreateProvenanceOptions(t *testing.T) {
 		buildInvocationId string
 		builderId         string
 		buildConfig       *BuildConfig
-		builderRepoDigest *slsa.ProvenanceMaterial
+		builderRepoDigest *common.ProvenanceMaterial
 		configSource      slsa.ConfigSource
 		buildTimerIsSet   bool
 		runnerContext     bool
@@ -35,10 +36,10 @@ func TestCreateProvenanceOptions(t *testing.T) {
 			buildInvocationId: "",
 			builderId:         "https://github.com/nais/salsa",
 			buildConfig:       buildConfig(),
-			builderRepoDigest: (*slsa.ProvenanceMaterial)(nil),
+			builderRepoDigest: (*common.ProvenanceMaterial)(nil),
 			configSource: slsa.ConfigSource{
 				URI:        "",
-				Digest:     slsa.DigestSet(nil),
+				Digest:     common.DigestSet(nil),
 				EntryPoint: "",
 			},
 			buildTimerIsSet: true,
@@ -109,10 +110,10 @@ func TestCreateProvenanceOptions(t *testing.T) {
 	}
 }
 
-func ExpectedBuilderRepoDigestMaterial() *slsa.ProvenanceMaterial {
-	return &slsa.ProvenanceMaterial{
+func ExpectedBuilderRepoDigestMaterial() *common.ProvenanceMaterial {
+	return &common.ProvenanceMaterial{
 		URI: "git+https://github.com/nais/salsa",
-		Digest: slsa.DigestSet{
+		Digest: common.DigestSet{
 			build.AlgorithmSHA1: "4321",
 		},
 	}
@@ -168,7 +169,7 @@ func Environment() *vcs.GithubCIEnvironment {
 func ExpectedConfigSource() slsa.ConfigSource {
 	return slsa.ConfigSource{
 		URI: "git+https://github.com/nais/salsa",
-		Digest: slsa.DigestSet{
+		Digest: common.DigestSet{
 			build.AlgorithmSHA1: "4321",
 		},
 		EntryPoint: "Create a provenance",

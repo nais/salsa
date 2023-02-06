@@ -1,6 +1,7 @@
 package intoto
 
 import (
+	"github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/common"
 	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/config"
 	"github.com/nais/salsa/pkg/vcs"
@@ -19,7 +20,7 @@ const (
 type ProvenanceOptions struct {
 	BuildConfig       *BuildConfig
 	BuilderId         string
-	BuilderRepoDigest *slsa.ProvenanceMaterial
+	BuilderRepoDigest *common.ProvenanceMaterial
 	BuildInvocationId string
 	BuildFinishedOn   *time.Time
 	BuildStartedOn    time.Time
@@ -55,9 +56,9 @@ func CreateProvenanceOptions(scanCfg *config.ScanConfiguration) *ProvenanceOptio
 }
 
 func (in *ProvenanceOptions) withBuilderRepoDigest(env vcs.ContextEnvironment) *ProvenanceOptions {
-	in.BuilderRepoDigest = &slsa.ProvenanceMaterial{
+	in.BuilderRepoDigest = &common.ProvenanceMaterial{
 		URI: "git+" + env.RepoUri(),
-		Digest: slsa.DigestSet{
+		Digest: common.DigestSet{
 			build.AlgorithmSHA1: env.Sha(),
 		},
 	}
@@ -68,7 +69,7 @@ func (in *ProvenanceOptions) withBuilderInvocation(env vcs.ContextEnvironment) *
 	in.Invocation = &slsa.ProvenanceInvocation{
 		ConfigSource: slsa.ConfigSource{
 			URI: "git+" + env.RepoUri(),
-			Digest: slsa.DigestSet{
+			Digest: common.DigestSet{
 				build.AlgorithmSHA1: env.Sha(),
 			},
 			EntryPoint: env.Context(),

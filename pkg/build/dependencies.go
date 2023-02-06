@@ -2,7 +2,7 @@ package build
 
 import (
 	"fmt"
-	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2"
+	slsa "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/common"
 )
 
 type artifactType string
