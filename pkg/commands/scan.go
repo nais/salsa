@@ -60,7 +60,7 @@ var scanCmd = &cobra.Command{
 			if generatedDeps != nil {
 				deps = generatedDeps
 			} else {
-				log.Infof("no supported build files found: %s, proceeding", workDir)
+				log.Infof("no supported build files found for directory: %s, proceeding", workDir)
 			}
 		}
 
