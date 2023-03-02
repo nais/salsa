@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+
 	"github.com/nais/salsa/pkg/build"
 	"github.com/nais/salsa/pkg/build/golang"
 	"github.com/nais/salsa/pkg/build/jvm"
@@ -15,7 +17,6 @@ import (
 	"github.com/nais/salsa/pkg/vcs"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 var (
@@ -55,7 +56,10 @@ var scanCmd = &cobra.Command{
 			if err != nil {
 				return fmt.Errorf("detecting dependecies: %v", err)
 			}
-			deps = generatedDeps
+
+			if generatedDeps != nil {
+				deps = generatedDeps
+			}
 		}
 
 		contextEnvironment, err := vcs.ResolveBuildContext(&buildContext, &runnerContext, &envContext)
