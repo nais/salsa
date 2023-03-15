@@ -53,13 +53,6 @@ inputs:
     required: false
     default: "${{ github.actor }}"
 
-  dependencies:
-    description: |-
-      If salsa should generate materials for the provenance containing dependencies.
-      Defaults to true.
-    required: false
-    default: "true"
-
   mvn_opts:
     description: |-
       A comma-delimited string with additional maven options.
@@ -132,7 +125,6 @@ runs:
     - ${{ inputs.docker_user }}
     - ${{ inputs.github_token }}
     - ${{ inputs.token_key_pattern }}
-    - ${{ inputs.dependencies }}
     - ${{ inputs.build_started_on }}
     - ${{ inputs.registry_access_token }}
     - ${{ inputs.registry }}
