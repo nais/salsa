@@ -9,7 +9,7 @@ on:
       - 'doc/**'
       - 'Makefile'
 env:
-  VERSION: v0.8
+  VERSION: v0.9
   IMAGE_NAME: ghcr.io/${{ github.repository }}
   COSIGN_VERSION: v1.13.1
   SYFT_VERSION: v0.44.1
