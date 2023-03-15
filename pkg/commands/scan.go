@@ -28,8 +28,7 @@ var (
 )
 
 type ProvenanceConfig struct {
-	WithDependencies bool
-	BuildStartedOn   string
+	BuildStartedOn string
 }
 
 var scanCmd = &cobra.Command{
@@ -51,17 +50,15 @@ var scanCmd = &cobra.Command{
 		log.Infof("prepare to scan path %s ...", workDir)
 
 		deps := &build.ArtifactDependencies{}
-		if Config.WithDependencies {
-			generatedDeps, err := InitBuildTools(mvnOpts).DetectDeps(workDir)
-			if err != nil {
-				return fmt.Errorf("detecting dependecies: %v", err)
-			}
+		generatedDeps, err := InitBuildTools(mvnOpts).DetectDeps(workDir)
+		if err != nil {
+			return fmt.Errorf("detecting dependecies: %v", err)
+		}
 
-			if generatedDeps != nil {
-				deps = generatedDeps
-			} else {
-				log.Infof("no supported build files found for directory: %s, proceeding", workDir)
-			}
+		if generatedDeps != nil {
+			deps = generatedDeps
+		} else {
+			log.Infof("no supported build files found for directory: %s, proceeding", workDir)
 		}
 
 		contextEnvironment, err := vcs.ResolveBuildContext(&buildContext, &runnerContext, &envContext)
@@ -124,7 +121,6 @@ func init() {
 	scanCmd.Flags().StringVar(&buildContext, "build-context", "", "context of build tool")
 	scanCmd.Flags().StringVar(&runnerContext, "runner-context", "", "context of runner")
 	scanCmd.Flags().StringVar(&envContext, "env-context", "", "environmental variables of current context")
-	scanCmd.Flags().BoolVar(&Config.WithDependencies, "with-deps", true, "specify if the cli should generate dependencies for a provenance")
 	scanCmd.Flags().StringVar(&mvnOpts, "mvn-opts", "", "pass additional Comma-delimited list of options to the maven build tool")
 	scanCmd.Flags().StringVar(&Config.BuildStartedOn, "build-started-on", "", "set start time for the build")
 }
