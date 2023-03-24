@@ -114,7 +114,7 @@ inputs:
 
 runs:
   using: "docker"
-  image: "docker://ghcr.io/nais/salsa:v0.9"
+  image: "Dockerfile" # TODO Revert after testing action
   args:
     - ${{ inputs.repo_dir }}
     - ${{ inputs.repo_name }}
