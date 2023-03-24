@@ -376,6 +376,7 @@ The Following inputs can be used as `step.with` keys
 | `repo_dir`              | String | $GITHUB_WORKSPACE                 | **Internal value (do not set):** Root of directory to look for build files                                                                              | False    |
 | `github_context`        | String | ${{ toJSON(github) }}             | **Internal value (do not set):** the [github context](#github-context) object in json                                                                   | False    |
 | `runner_context`        | String | ${{ toJSON(runner) }}             | **Internal value (do not set):** the [runner context](#runner-context) object in json                                                                   | False    |
+| `verify_attestation`    | String | "true"                            |  A boolean for enabling or disabling the verify stage of the attestation.                                                           | False    |
 
 ### Outputs
 
