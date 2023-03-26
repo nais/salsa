@@ -1,7 +1,7 @@
 #!/bin/sh -l
 
 setup() {
-  echo "---------- Preparing pico-de-galo SLSA ----------"
+  echo "---------- Preparing pico de gallo SLSA ----------"
 
   REPO_NAME="${INPUT_REPO_NAME##*/}"
   if [ -z "$REPO_NAME" ]; then
@@ -15,7 +15,7 @@ setup() {
   fi
 
   if [ -n "$INPUT_DOCKER_USER" ]; then
-    export GITHUB_ACTOR=$INPUT_DOCKER_USER
+    export GITHUB_ACTOR="$INPUT_DOCKER_USER"
   fi
 
   if [ -z "$GITHUB_ACTOR" ]; then
@@ -24,7 +24,7 @@ setup() {
   fi
 
   if [ -n "$INPUT_IMAGE" ]; then
-    export IMAGE=$INPUT_IMAGE
+    export IMAGE="$INPUT_IMAGE"
   fi
 
   if [ -z "$INPUT_IMAGE_DIGEST" ] || [ -z "$IMAGE" ]; then
@@ -36,6 +36,13 @@ setup() {
 
   if [ -z "$INPUT_GITHUB_CONTEXT" ] || [ -z "$INPUT_RUNNER_CONTEXT" ]; then
     echo "GITHUB_CONTEXT and RUNNER_CONTEXT are required"
+    exit 1
+  fi
+
+  if [ "$INPUT_VERIFY_ATTESTATION" = "false" ] && [ -z "$INPUT_KEY" ]; then
+    echo "When running keyless salsa you must verify the attestation. Please set the verify_attestation flag to 'true'.
+    
+    (This is also the default value, and may instead be omitted)."
     exit 1
   fi
 
@@ -86,20 +93,20 @@ logoutDocker() {
 }
 
 scan() {
-  salsa scan \
-    --repo "$REPO_NAME" \
-    --build-context "$GITHUB" \
-    --runner-context "$RUNNER" \
-    --env-context "$ENVS" \
-    --subDir "$INPUT_REPO_SUB_DIR" \
-    --with-deps="$INPUT_DEPENDENCIES" \
-    --mvn-opts "$INPUT_MVN_OPTS" \
-    --build-started-on "$INPUT_BUILD_STARTED_ON" \
-    --remote-run
+  echo "---------- Running Salsa scan for deps ----------" &&
+    salsa scan \
+      --repo "$REPO_NAME" \
+      --build-context "$GITHUB" \
+      --runner-context "$RUNNER" \
+      --env-context "$ENVS" \
+      --subDir "$INPUT_REPO_SUB_DIR" \
+      --mvn-opts "$INPUT_MVN_OPTS" \
+      --build-started-on "$INPUT_BUILD_STARTED_ON" \
+      --remote-run
 }
 
 attest() {
-  echo "create and upload attestation" &&
+  echo "---------- Creating and Uploading Salsa attestation ----------" &&
     salsa attest \
       --repo "$REPO_NAME" \
       --subDir "$INPUT_REPO_SUB_DIR" \
@@ -110,7 +117,7 @@ attest() {
 }
 
 attestVerify() {
-  echo "verify attestation" &&
+  echo "---------- Verifying Salsa attestation ----------" &&
     salsa attest \
       --verify \
       --repo "$REPO_NAME" \
@@ -121,8 +128,13 @@ attestVerify() {
 }
 
 runSalsa() {
-  echo "---------- Running Salsa for repository: $REPO_NAME ----------" &&
+  echo "---------- Running Salsa for repository: $REPO_NAME ----------"
+  if [ "$INPUT_VERIFY_ATTESTATION" = "true" ]; then
+    scan && attest
+  elif [ "$INPUT_VERIFY_ATTESTATION" = "false" ]; then
     scan && attest && attestVerify
+  fi
+
 }
 
 cleanUpGoogle() {
