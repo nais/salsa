@@ -1,10 +1,9 @@
-name: 'nais SLSA Provenance Action'
-description: 'Action to generate signed SLSA provenance'
+name: "nais SLSA Provenance Action"
+description: "Action to generate signed SLSA provenance"
 branding:
   icon: lock
   color: red
 inputs:
-
   registry:
     description: |-
       Registry to push to
@@ -53,18 +52,17 @@ inputs:
     required: false
     default: "${{ github.actor }}"
 
-  dependencies:
-    description: |-
-      If salsa should generate materials for the provenance containing dependencies.
-      Defaults to true.
-    required: false
-    default: "true"
-
   mvn_opts:
     description: |-
       A comma-delimited string with additional maven options.
     required: false
     default: ""
+
+  verify_attestation:
+    description: |-
+      A boolean for enabling or disabling the verify stage of the attestation.
+    required: false
+    default: "true"
 
   github_token:
     description: |-
@@ -115,8 +113,8 @@ inputs:
     default: ${{ toJSON(runner) }}
 
 runs:
-  using: 'docker'
-  image: 'docker://ghcr.io/nais/salsa:v0.8'
+  using: "docker"
+  image: "docker://ghcr.io/nais/salsa:v0.10"
   args:
     - ${{ inputs.repo_dir }}
     - ${{ inputs.repo_name }}
@@ -130,10 +128,9 @@ runs:
     - ${{ inputs.mvn_opts }}
     - ${{ inputs.github_token }}
     - ${{ inputs.docker_user }}
-    - ${{ inputs.github_token }}
     - ${{ inputs.token_key_pattern }}
-    - ${{ inputs.dependencies }}
     - ${{ inputs.build_started_on }}
     - ${{ inputs.registry_access_token }}
     - ${{ inputs.registry }}
     - ${{ inputs.image_digest }}
+    - ${{ inputs.verify_attestation }}

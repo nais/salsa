@@ -4,3 +4,5 @@
 /cosign.key
 /cover.out
 pkg/build/jvm/testdata/jvm/target/
+.gradle/
+.vscode/

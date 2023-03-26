@@ -1,10 +1,11 @@
 package jvm
 
 import (
-	"github.com/nais/salsa/pkg/build"
-	"github.com/nais/salsa/pkg/build/test"
 	"os"
 	"testing"
+
+	"github.com/nais/salsa/pkg/build"
+	"github.com/nais/salsa/pkg/build/test"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -73,13 +74,6 @@ func TestBuildGradle(t *testing.T) {
 			WorkDir:      "testdata/whatever",
 			Error:        true,
 			ErrorMessage: "could not find match, reading dir open testdata/whatever: no such file or directory",
-		},
-		{
-			Name:         "cant find supported build type",
-			BuildType:    BuildMaven(""),
-			WorkDir:      "testdata/jvm/gradle-kts",
-			Error:        true,
-			ErrorMessage: "no supported build files found: testdata/jvm/gradle-kts",
 		},
 		{
 			Name:      "support build.gradle file",

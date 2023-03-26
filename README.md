@@ -371,12 +371,12 @@ The Following inputs can be used as `step.with` keys
 | `docker_user`           | String | $GITHUB_ACTOR                     | User to login to container registry                                                                                                                     | False    |
 | `repo_name`             | String | $GITHUB_REPOSITORY                | The name of the repo/project                                                                                                                            | False    |
 | `repo_sub_dir`          | String | ""                                | Specify a subdirectory if build file not found in working root directory                                                                                | False    |
-| `dependencies`          | Bool   | true                              | Set to false if action should not create materials for dependencies (e.g. if build tool is unsupported or repo uses internal/private dependencies)      | False    |
 | `build_started_on`      | String | "event.(type if any).head.commit" | Specify a workflow build start time. Default is set to github_context e.g `event.head_commit` or `event.workflow_run.head_commit` depending on workflow | False    |
 | `mvn_opts`              | String | ""                                | A comma-delimited string with additional maven cli options for the dependence build                                                                     | False    |
 | `repo_dir`              | String | $GITHUB_WORKSPACE                 | **Internal value (do not set):** Root of directory to look for build files                                                                              | False    |
 | `github_context`        | String | ${{ toJSON(github) }}             | **Internal value (do not set):** the [github context](#github-context) object in json                                                                   | False    |
 | `runner_context`        | String | ${{ toJSON(runner) }}             | **Internal value (do not set):** the [runner context](#runner-context) object in json                                                                   | False    |
+| `verify_attestation`    | String | "true"                            |  A boolean for enabling or disabling the verify stage of the attestation.                                                           | False    |
 
 ### Outputs
 
