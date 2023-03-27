@@ -129,9 +129,9 @@ attestVerify() {
 
 runSalsa() {
   echo "---------- Running Salsa for repository: $REPO_NAME ----------"
-  if [ "$INPUT_VERIFY_ATTESTATION" = "true" ]; then
+  if [ "$INPUT_VERIFY_ATTESTATION" = "false" ]; then
     scan && attest
-  elif [ "$INPUT_VERIFY_ATTESTATION" = "false" ]; then
+  elif [ "$INPUT_VERIFY_ATTESTATION" = "true" ]; then
     scan && attest && attestVerify
   fi
 
