@@ -3,7 +3,7 @@ module github.com/nais/salsa
 go 1.19
 
 require (
-	github.com/briandowns/spinner v1.21.0
+	github.com/briandowns/spinner v1.23.0
 	github.com/go-git/go-git/v5 v5.6.1
 	github.com/in-toto/in-toto-golang v0.7.0
 	github.com/sirupsen/logrus v1.9.0
