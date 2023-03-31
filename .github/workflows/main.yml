@@ -68,7 +68,7 @@ jobs:
       #          app-id: ${{ secrets.NAIS_APP_ID }}
       #          repo: nais/homebrew-tap
       - name: Install cosign
-        uses: sigstore/cosign-installer@f3c664df7af409cb4873aa5068053ba9d61a57b6 # ratchet:sigstore/cosign-installer@v2.6.0
+        uses: sigstore/cosign-installer@c3667d99424e7e6047999fb6246c0da843953c65 # ratchet:sigstore/cosign-installer@v3.0.1
         with:
           cosign-release: ${{ env.COSIGN_VERSION }}
       - name: Install Syft
@@ -133,7 +133,7 @@ jobs:
       ACTION_IMAGE_TAG: "${{ needs.build.outputs.action-tag }}"
     steps:
       - name: Install cosign
-        uses: sigstore/cosign-installer@b3413d484cc23cf8778c3d2aa361568d4eb54679 # ratchet:sigstore/cosign-installer@v2.5.1
+        uses: sigstore/cosign-installer@c3667d99424e7e6047999fb6246c0da843953c65 # ratchet:sigstore/cosign-installer@v2.5.1
         with:
           cosign-release: ${{ env.COSIGN_VERSION }}
       - name: Install Syft
