@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # ratchet:actions/checkout@v3
-      - uses: actions/setup-go@6edd4406fa81c3da01a34fa6f6343087c207a568 # ratchet:actions/setup-go@v3
+      - uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 # ratchet:actions/setup-go@v3
         with:
           go-version-file: ./go.mod
           check-latest: true
@@ -53,7 +53,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Set up Go
-        uses: actions/setup-go@6edd4406fa81c3da01a34fa6f6343087c207a568 # ratchet:actions/setup-go@v3
+        uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 # ratchet:actions/setup-go@v3
         with:
           go-version-file: ./go.mod
           check-latest: true
@@ -72,7 +72,7 @@ jobs:
         with:
           cosign-release: ${{ env.COSIGN_VERSION }}
       - name: Install Syft
-        uses: anchore/sbom-action/download-syft@07978da4bdb4faa726e52dfc6b1bed63d4b56479 # ratchet:anchore/sbom-action/download-syft@v0.13.3
+        uses: anchore/sbom-action/download-syft@448520c4f19577ffce70a8317e619089054687e3 # ratchet:anchore/sbom-action/download-syft@v0.13.4
         with:
           syft-version: ${{ env.SYFT_VERSION }}
       - name: Put key on file
@@ -137,7 +137,7 @@ jobs:
         with:
           cosign-release: ${{ env.COSIGN_VERSION }}
       - name: Install Syft
-        uses: anchore/sbom-action/download-syft@07978da4bdb4faa726e52dfc6b1bed63d4b56479 # ratchet:anchore/sbom-action/download-syft@v0.13.3
+        uses: anchore/sbom-action/download-syft@448520c4f19577ffce70a8317e619089054687e3 # ratchet:anchore/sbom-action/download-syft@v0.13.4
         with:
           syft-version: ${{ env.SYFT_VERSION }}
       - name: Login to Docker
