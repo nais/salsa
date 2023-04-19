@@ -22,7 +22,7 @@ jobs:
     outputs:
       version: ${{ steps.set-version.outputs.version }}
     steps:
-      - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # ratchet:actions/checkout@v3
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # ratchet:actions/checkout@v3
       - name: set version
         id: set-version
         run: |
@@ -31,7 +31,7 @@ jobs:
   test:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # ratchet:actions/checkout@v3
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # ratchet:actions/checkout@v3
       - uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 # ratchet:actions/setup-go@v3
         with:
           go-version-file: ./go.mod
@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout latest code
-        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # ratchet:actions/checkout@v3
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # ratchet:actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Set up Go
@@ -72,7 +72,7 @@ jobs:
         with:
           cosign-release: ${{ env.COSIGN_VERSION }}
       - name: Install Syft
-        uses: anchore/sbom-action/download-syft@448520c4f19577ffce70a8317e619089054687e3 # ratchet:anchore/sbom-action/download-syft@v0.13.4
+        uses: anchore/sbom-action/download-syft@422cb34a0f8b599678c41b21163ea6088edb2624 # ratchet:anchore/sbom-action/download-syft@v0.14.1
         with:
           syft-version: ${{ env.SYFT_VERSION }}
       - name: Put key on file
@@ -137,7 +137,7 @@ jobs:
         with:
           cosign-release: ${{ env.COSIGN_VERSION }}
       - name: Install Syft
-        uses: anchore/sbom-action/download-syft@448520c4f19577ffce70a8317e619089054687e3 # ratchet:anchore/sbom-action/download-syft@v0.13.4
+        uses: anchore/sbom-action/download-syft@422cb34a0f8b599678c41b21163ea6088edb2624 # ratchet:anchore/sbom-action/download-syft@v0.14.1
         with:
           syft-version: ${{ env.SYFT_VERSION }}
       - name: Login to Docker
