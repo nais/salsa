@@ -1,4 +1,4 @@
-FROM golang:1.20.2 AS builder
+FROM golang:1.20.3 AS builder
 
 ENV GOOS=linux
 ENV CGO_ENABLED=0
@@ -11,7 +11,7 @@ RUN go mod download
 COPY . /src
 RUN make salsa
 
-FROM maven:3.9.0-eclipse-temurin-17-alpine
+FROM maven:3.9.1-eclipse-temurin-17-alpine
 
 RUN apk add --no-cache ca-certificates docker jq httpie
 
