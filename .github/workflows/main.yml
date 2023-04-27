@@ -120,11 +120,6 @@ jobs:
             COSIGN_VERSION=${{ env.COSIGN_VERSION }}
             GRADLE_VERSION=${{ env.GRADLE_VERSION }}
 
-      - name: Set digest
-        id: digest
-        run: |
-          echo "digest=${{ steps.docker_build.outputs.digest }}" >> $GITHUB_OUTPUT
-
       - name: Update major/minor version tag
         if: ${{ github.ref == 'refs/heads/main' }}
         run: "git tag -f ${{ env.VERSION }}\ngit push -f origin ${{ env.VERSION }} \n"
@@ -156,8 +151,8 @@ jobs:
       - name: Sign Docker image
         run: |
           echo '${{ secrets.COSIGN_PRIVATE_KEY }}' > cosign.key
-          cosign sign --yes --key cosign.key ${{ env.IMAGE_NAME }}@{{ env.DIGEST }}
-          cosign sign --yes --key cosign.key ${{ env.IMAGE_NAME }}@{{ env.DIGEST }}
+          cosign sign --yes --key cosign.key ${{ env.IMAGE_NAME }}@${{ env.DIGEST }}
+          cosign sign --yes --key cosign.key ${{ env.IMAGE_NAME }}@${{ env.DIGEST }}
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
       - name: Verify and attach attestation
@@ -165,10 +160,10 @@ jobs:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
           echo '${{ secrets.COSIGN_PUBLIC_KEY }}' > cosign.pub
-          cosign verify --key cosign.pub ${{ env.IMAGE_NAME }}@{{ env.DIGEST }}
-          syft attest -o spdx-json ${{ env.IMAGE_NAME }}@{{ env.DIGEST }} > sbom-cli.json
-          cosign attach attestation --attestation sbom-cli.json ${{ env.IMAGE_NAME }}@{{ env.DIGEST }}
-          cosign verify-attestation --type spdxjson --key cosign.pub ${{ env.IMAGE_NAME }}@{{ env.DIGEST }} > cosignverify.json
+          cosign verify --key cosign.pub ${{ env.IMAGE_NAME }}@${{ env.DIGEST }}
+          syft attest -o spdx-json ${{ env.IMAGE_NAME }}@${{ env.DIGEST }} > sbom-cli.json
+          cosign attach attestation --attestation sbom-cli.json ${{ env.IMAGE_NAME }}@${{ env.DIGEST }}
+          cosign verify-attestation --type spdxjson --key cosign.pub ${{ env.IMAGE_NAME }}@${{ env.DIGEST }} > cosignverify.json
       - name: Upload provenance
         uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # ratchet:actions/upload-artifact@v3
         with:
