@@ -12,7 +12,6 @@ env:
   VERSION: v0.11
   IMAGE_NAME: ghcr.io/${{ github.repository }}
   COSIGN_VERSION: v2.0.2
-  SYFT_VERSION: v0.44.1
   GO_RELEASER_VERSION: v1.11.2
   GRADLE_VERSION: 7.5.1
   PUSH: false
@@ -72,10 +71,6 @@ jobs:
         uses: sigstore/cosign-installer@f3c664df7af409cb4873aa5068053ba9d61a57b6 # ratchet:sigstore/cosign-installer@v2.6.0
         with:
           cosign-release: ${{ env.COSIGN_VERSION }}
-      - name: Install Syft
-        uses: anchore/sbom-action/download-syft@422cb34a0f8b599678c41b21163ea6088edb2624 # ratchet:anchore/sbom-action/download-syft@v0.14.1
-        with:
-          syft-version: ${{ env.SYFT_VERSION }}
       - name: Put key on file
         run: |
           echo '${{ secrets.COSIGN_PRIVATE_KEY }}' > cosign.key
@@ -138,38 +133,30 @@ jobs:
         uses: sigstore/cosign-installer@b3413d484cc23cf8778c3d2aa361568d4eb54679 # ratchet:sigstore/cosign-installer@v2.5.1
         with:
           cosign-release: ${{ env.COSIGN_VERSION }}
-      - name: Install Syft
-        uses: anchore/sbom-action/download-syft@422cb34a0f8b599678c41b21163ea6088edb2624 # ratchet:anchore/sbom-action/download-syft@v0.14.1
-        with:
-          syft-version: ${{ env.SYFT_VERSION }}
       - name: Login to Docker
         uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a # ratchet:docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Sign Docker image
+
+      - name: Generate SBOM
+        id: sbom
+        uses: aquasecurity/trivy-action@8bd2f9fbda2109502356ff8a6a89da55b1ead252 # ratchet:aquasecurity/trivy-action@master
+        with:
+          scan-type: 'image'
+          format: 'cyclonedx'
+          output: 'sbom.json'
+          image-ref: ${{ env.IMAGE_NAME }}@${{ env.DIGEST }}
+
+      - name: Sign Docker image and and add signed attest
         run: |
           echo '${{ secrets.COSIGN_PRIVATE_KEY }}' > cosign.key
           cosign sign --yes --key cosign.key ${{ env.IMAGE_NAME }}@${{ env.DIGEST }}
           cosign sign --yes --key cosign.key ${{ env.IMAGE_NAME }}@${{ env.DIGEST }}
+          cosign attest --yes --tlog-upload=false -- key cosing.key --predicate sbom.json --type cyclonedx ${{ env.IMAGE_NAME }}@${{ env.DIGEST }}
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-      - name: Verify and attach attestation
-        env:
-          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-        run: |
-          echo '${{ secrets.COSIGN_PUBLIC_KEY }}' > cosign.pub
-          cosign verify --key cosign.pub ${{ env.IMAGE_NAME }}@${{ env.DIGEST }}
-          syft attest -o spdx-json ${{ env.IMAGE_NAME }}@${{ env.DIGEST }} > sbom-cli.json
-          cosign attach attestation --attestation sbom-cli.json ${{ env.IMAGE_NAME }}@${{ env.DIGEST }}
-          cosign verify-attestation --type spdxjson --key cosign.pub ${{ env.IMAGE_NAME }}@${{ env.DIGEST }} > cosignverify.json
-      - name: Upload provenance
-        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # ratchet:actions/upload-artifact@v3
-        with:
-          path: |
-            ./sbom-cli.json
-            ./cosignverify.json
       - name: Clean up
         if: ${{ always() }}
         run: |
