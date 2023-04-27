@@ -161,7 +161,7 @@ jobs:
           echo '${{ secrets.COSIGN_PRIVATE_KEY }}' > cosign.key
           cosign sign --yes --key cosign.key ${{ env.IMAGE_NAME }}@${{ env.DIGEST }}
           cosign sign --yes --key cosign.key ${{ env.IMAGE_NAME }}@${{ env.DIGEST }}
-          cosign attest --yes --tlog-upload=false -- key cosing.key --predicate sbom.json --type cyclonedx ${{ env.IMAGE_NAME }}@${{ env.DIGEST }}
+          cosign attest --yes --tlog-upload=false --key cosing.key --predicate sbom.json --type cyclonedx ${{ env.IMAGE_NAME }}@${{ env.DIGEST }}
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
       - name: Clean up
