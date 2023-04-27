@@ -132,6 +132,7 @@ jobs:
     runs-on: ubuntu-20.04
     permissions:
       contents: read
+      id-token: write
     if: ${{ github.ref == 'refs/heads/main' }}
     env:
       DIGEST: "${{ needs.build.outputs.digest }}"
