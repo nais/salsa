@@ -39,13 +39,13 @@ signs:
   - id: sign archives
     cmd: cosign
     stdin: '{{ .Env.COSIGN_PASSWORD }}'
-    args: ["sign-blob", "--key=cosign.key", "--output=${signature}", "${artifact}"]
+    args: ["sign-blob", "--key=cosign.key", "--output=${signature}", "--yes", "${artifact}"]
     signature: "${artifact}.sig"
     artifacts: archive
   - id: sign checksum.txt
     cmd: cosign
     stdin: '{{ .Env.COSIGN_PASSWORD }}'
-    args: ["sign-blob", "--key=cosign.key", "--output=${signature}", "${artifact}"]
+    args: ["sign-blob", "--key=cosign.key", "--output=${signature}", "--yes", "${artifact}"]
     signature: "${artifact}.sig"
     artifacts: checksum
 changelog:

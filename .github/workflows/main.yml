@@ -149,8 +149,8 @@ jobs:
       - name: Sign Docker image
         run: |
           echo '${{ secrets.COSIGN_PRIVATE_KEY }}' > cosign.key
-          cosign sign --key cosign.key ${{ env.CLI_IMAGE_TAG }}
-          cosign sign --key cosign.key ${{ env.ACTION_IMAGE_TAG }}
+          cosign sign --yes --key cosign.key ${{ env.CLI_IMAGE_TAG }}
+          cosign sign --yes --key cosign.key ${{ env.ACTION_IMAGE_TAG }}
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
       - name: Verify and attach attestation
