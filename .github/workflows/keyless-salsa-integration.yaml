@@ -21,7 +21,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # ratchet:actions/checkout@v3
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@ef5d53e30bbcd8d0836f4288f5e50ff3e086997d # ratchet:google-github-actions/auth@v1.0.0
+        uses: google-github-actions/auth@e8df18b60c5dd38ba618c121b779307266153fbf # ratchet:google-github-actions/auth@v1.1.0
         id: google
         with:
           workload_identity_provider: ${{ secrets.SLSA_WORKLOAD_IDENTITY_PROVIDER }}
