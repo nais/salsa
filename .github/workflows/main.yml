@@ -11,7 +11,7 @@ on:
 env:
   VERSION: v0.11
   IMAGE_NAME: ghcr.io/${{ github.repository }}
-  COSIGN_VERSION: v1.13.1
+  COSIGN_VERSION: v2.0.2
   SYFT_VERSION: v0.44.1
   GO_RELEASER_VERSION: v1.11.2
   GRADLE_VERSION: 7.5.1

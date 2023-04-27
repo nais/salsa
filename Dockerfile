@@ -50,7 +50,7 @@ COPY --from=builder /src/salsa-sample.yaml .salsa.yaml
 RUN chmod +x /usr/local/bin/salsa
 
 # Verify and install Cosign
-ARG COSIGN_VERSION=v1.13.1
+ARG COSIGN_VERSION=v2.0.2
 ENV COSIGN_BINARY=cosign-linux-amd64
 ENV COSIGN_CHECKSUM=cosign_checksums.txt
 ENV COSIGN_PUBLIC_KEY=release-cosign.pub
