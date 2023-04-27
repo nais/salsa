@@ -3,10 +3,10 @@ package commands
 import (
 	"errors"
 	"fmt"
-	"gopkg.in/square/go-jose.v2/jwt"
 	"os"
-	"strconv"
 	"strings"
+
+	"gopkg.in/square/go-jose.v2/jwt"
 
 	"github.com/nais/salsa/pkg/utils"
 	log "github.com/sirupsen/logrus"
@@ -110,6 +110,9 @@ func (o AttestOptions) Run(args []string, runner utils.CmdRunner) (string, error
 	}
 }
 
+// TODO: Verifying keyless requires the use of the flags --certificate-identity and --certificate-oidc-issuer to Cosign. These flags
+// will require input, such as the identy (email/DNS/IP) and the issuer used for receiving the identity token. This will probably be
+// google for all salsa users.
 func (o AttestOptions) verifyCmd(a []string, runner utils.CmdRunner) utils.Cmd {
 	return utils.Cmd{
 		Name:    "cosign",
@@ -178,12 +181,20 @@ func (o AttestOptions) attestFlags() ([]string, error) {
 }
 
 func (o AttestOptions) defaultAttestFlags() []string {
-	return []string{
+	flags := []string{
 		"--predicate", o.PredicateFile,
 		"--type", o.PredicateType,
 		"--rekor-url", o.RekorURL,
-		fmt.Sprintf("--no-upload=%s", strconv.FormatBool(o.NoUpload)),
 	}
+
+	if !o.NoUpload {
+		// Flag must be set to automatically upload to the default transparency log
+		flags = append(flags, "--yes")
+	} else {
+		flags = append(flags, "--no-upload")
+	}
+
+	return flags
 }
 
 func init() {
