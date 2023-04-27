@@ -36,7 +36,7 @@ func TestAttestCosignCommand(t *testing.T) {
 
 	out, err := o.Run([]string{"image"}, runner)
 	assert.NoError(t, err)
-	expectedCmd := "[cosign attest --key mykey --predicate file.json --type slsaprovenance --rekor-url http://rekor.example.com --no-upload=false image]\n"
+	expectedCmd := "[cosign attest --key mykey --predicate file.json --type slsaprovenance --rekor-url http://rekor.example.com --yes image]\n"
 	assert.Equal(t, expectedCmd, out)
 }
 
