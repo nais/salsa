@@ -120,6 +120,11 @@ jobs:
             COSIGN_VERSION=${{ env.COSIGN_VERSION }}
             GRADLE_VERSION=${{ env.GRADLE_VERSION }}
 
+      - name: Set digest
+        id: digest
+        run: |
+          echo "digest=${{ steps.docker_build.outputs.digest }}" >> $GITHUB_OUTPUT
+
       - name: Update major/minor version tag
         if: ${{ github.ref == 'refs/heads/main' }}
         run: "git tag -f ${{ env.VERSION }}\ngit push -f origin ${{ env.VERSION }} \n"
