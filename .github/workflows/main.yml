@@ -12,6 +12,7 @@ env:
   VERSION: v0.11
   IMAGE_NAME: ghcr.io/${{ github.repository }}
   COSIGN_VERSION: v2.0.2
+  SYFT_VERSION: v0.44.1
   GO_RELEASER_VERSION: v1.11.2
   GRADLE_VERSION: 7.5.1
   PUSH: false
@@ -71,6 +72,10 @@ jobs:
         uses: sigstore/cosign-installer@f3c664df7af409cb4873aa5068053ba9d61a57b6 # ratchet:sigstore/cosign-installer@v2.6.0
         with:
           cosign-release: ${{ env.COSIGN_VERSION }}
+      - name: Install Syft
+        uses: anchore/sbom-action/download-syft@422cb34a0f8b599678c41b21163ea6088edb2624 # ratchet:anchore/sbom-action/download-syft@v0.14.1
+        with:
+          syft-version: ${{ env.SYFT_VERSION }}
       - name: Put key on file
         run: |
           echo '${{ secrets.COSIGN_PRIVATE_KEY }}' > cosign.key
