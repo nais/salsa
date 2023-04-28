@@ -14,8 +14,8 @@ jobs:
       - run: echo 'The triggering workflow failed' && exit 1
   keyless:
     permissions:
-      contents: 'read'
-      id-token: 'write'
+      contents: "read"
+      id-token: "write"
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout Code
@@ -42,5 +42,3 @@ jobs:
           image_digest: ${{ steps.docker.outputs.digest }}
           registry: ttl.sh
           identity_token: ${{ steps.google.outputs.id_token }}
-        env:
-          COSIGN_EXPERIMENTAL: "true"

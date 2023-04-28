@@ -39,13 +39,6 @@ setup() {
     exit 1
   fi
 
-  if [ "$INPUT_VERIFY_ATTESTATION" = "false" ] && [ -z "$INPUT_KEY" ]; then
-    echo "When running keyless salsa you must verify the attestation. Please set the verify_attestation flag to 'true'.
-    
-    (This is also the default value, and may instead be omitted)."
-    exit 1
-  fi
-
   GITHUB=$(echo "${INPUT_GITHUB_CONTEXT}" | base64 -w 0) &&
     RUNNER=$(echo "${INPUT_RUNNER_CONTEXT}" | base64 -w 0) &&
     ENVS=$(jq -n env | base64 -w 0)
@@ -69,10 +62,6 @@ exportGithubToken() {
 }
 
 exportCosignEnvironment() {
-  if [ -n "$COSIGN_EXPERIMENTAL" ]; then
-    export COSIGN_EXPERIMENTAL
-  fi
-
   if [ -n "$COSIGN_REPOSITORY" ]; then
     export COSIGN_REPOSITORY
   fi
