@@ -125,16 +125,14 @@ func (o AttestOptions) verifyCmd(a []string, runner utils.CmdRunner) utils.Cmd {
 }
 
 func (o AttestOptions) verifyFlags() []string {
+	flags := []string{
+		"--type", o.PredicateType,
+	}
 	if o.Key != "" {
-		return []string{
-			"--key", o.Key,
-			"--type", o.PredicateType,
-		}
+		flags = append(flags, "--key", o.Key)
+
 	}
-	return []string{
-		"--type",
-		o.PredicateType,
-	}
+	return flags
 }
 
 func (o AttestOptions) attestCmd(a []string, runner utils.CmdRunner) utils.Cmd {
@@ -163,16 +161,11 @@ func (o AttestOptions) attestFlags() ([]string, error) {
 		return append(flags, o.defaultAttestFlags()...), nil
 	}
 
-	if o.IdentityToken == "" || os.Getenv("COSIGN_EXPERIMENTAL") == "" {
-		return nil, fmt.Errorf("identity token must be specified with 'COSIGN_EXPERIMENTAL' enabled")
-	}
-
 	_, err := jwt.ParseSigned(o.IdentityToken)
 	if err != nil {
 		return nil, fmt.Errorf("invalid identity token: %w", err)
 	}
 
-	log.Infof("no key specified, using cosign expriemental keyless mode")
 	flags = []string{
 		"--identity-token", o.IdentityToken,
 	}
