@@ -151,7 +151,7 @@ jobs:
 
       - name: Generate SBOM
         id: sbom
-        uses: aquasecurity/trivy-action@8bd2f9fbda2109502356ff8a6a89da55b1ead252 # ratchet:aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@91713af97dc80187565512baba96e4364e983601 # ratchet:aquasecurity/trivy-action@master
         with:
           scan-type: 'image'
           format: 'cyclonedx'
