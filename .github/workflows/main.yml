@@ -73,7 +73,7 @@ jobs:
         with:
           cosign-release: ${{ env.COSIGN_VERSION }}
       - name: Install Syft
-        uses: anchore/sbom-action/download-syft@422cb34a0f8b599678c41b21163ea6088edb2624 # ratchet:anchore/sbom-action/download-syft@v0.14.1
+        uses: anchore/sbom-action/download-syft@719133684c7d294116626d1344fe64f0d2ff3e9e # ratchet:anchore/sbom-action/download-syft@v0.15.2
         with:
           syft-version: ${{ env.SYFT_VERSION }}
       - name: Put key on file
