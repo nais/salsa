@@ -7,7 +7,7 @@ jobs:
     name: lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # ratchet:actions/checkout@v3
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # ratchet:actions/checkout@v3
       # wait for support go 1.18: https://github.com/golangci/golangci-lint/issues/2649.
       - uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 # ratchet:actions/setup-go@v3
         with:
