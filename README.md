@@ -1,3 +1,7 @@
+## Deprecated - this repo is archived 
+This action is deprecated in favour of using Trivy and CycloneDX. See https://doc.nais.io/security/salsa/ for more information.
+
+
 <br />
 <div align="center">
 <a href="https://github.com/nais/salsa">
