@@ -3,10 +3,9 @@ package commands
 import (
 	"errors"
 	"fmt"
+	"github.com/go-jose/go-jose/v3/jwt"
 	"os"
 	"strings"
-
-	"gopkg.in/square/go-jose.v2/jwt"
 
 	"github.com/nais/salsa/pkg/utils"
 	log "github.com/sirupsen/logrus"
