@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/briandowns/spinner v1.23.0
 	github.com/go-git/go-git/v5 v5.11.0
-	github.com/go-jose/go-jose/v3 v3.0.0
+	github.com/go-jose/go-jose/v3 v3.0.3
 	github.com/in-toto/in-toto-golang v0.7.1
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.7.0
